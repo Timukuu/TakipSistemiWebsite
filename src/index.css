@@ -284,8 +284,10 @@ a {
 .subject-summary-card {
   padding: 1rem;
   border-radius: 1.15rem;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #0f172a;
 }
 
 .subject-summary-top,
@@ -306,7 +308,7 @@ a {
 .subject-summary-bottom span {
   margin: 0.25rem 0 0;
   font-size: 0.88rem;
-  color: #64748b;
+  color: #334155;
 }
 
 .subject-progress {
@@ -314,7 +316,7 @@ a {
   height: 10px;
   margin: 1rem 0 0.85rem;
   border-radius: 999px;
-  background: #e2e8f0;
+  background: #dbe7f6;
   overflow: hidden;
 }
 
@@ -322,6 +324,12 @@ a {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #2563eb, #22c55e);
+}
+
+.subject-summary-card .badge.text-bg-light {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border: 1px solid rgba(59, 130, 246, 0.18);
 }
 
 .project-table thead th {
