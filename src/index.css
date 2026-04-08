@@ -23,6 +23,7 @@ body {
   background:
     radial-gradient(circle at top left, rgba(13, 110, 253, 0.08), transparent 24%),
     linear-gradient(180deg, #f7faff 0%, #eef3f9 100%);
+  color: #dbe7ff;
 }
 
 button,
@@ -53,6 +54,60 @@ a {
   background: rgba(13, 110, 253, 0.08);
 }
 
+.top-header .navbar {
+  background: linear-gradient(135deg, #08162f 0%, #102a52 100%) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.top-header .navbar,
+.top-header .navbar .nav-item,
+.top-header .navbar .btn-toggle a,
+.top-header .navbar .nav-right-links .nav-link,
+.top-header .navbar .material-icons-outlined {
+  color: #eff6ff !important;
+}
+
+.sidebar-wrapper,
+.sidebar-wrapper .sidebar-header,
+.sidebar-wrapper .sidebar-nav {
+  background: linear-gradient(180deg, #08162f 0%, #102849 54%, #0c1d35 100%) !important;
+  border-right-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+.sidebar-wrapper .sidebar-header .logo-name h5,
+.sidebar-wrapper .menu-label,
+.sidebar-wrapper .sidebar-header .sidebar-close,
+.sidebar-wrapper .sidebar-nav .metismenu a,
+.sidebar-wrapper .sidebar-nav .metismenu a .menu-title,
+.sidebar-wrapper .sidebar-nav .metismenu a .parent-icon,
+.sidebar-wrapper .sidebar-nav .metismenu button,
+.sidebar-wrapper .sidebar-nav .metismenu .material-icons-outlined {
+  color: #e8f1ff !important;
+}
+
+.sidebar-wrapper .menu-label {
+  color: #8fb3e8 !important;
+}
+
+.sidebar-wrapper .sidebar-nav .metismenu a:hover,
+.sidebar-wrapper .sidebar-nav .metismenu a:focus,
+.sidebar-wrapper .sidebar-nav .metismenu .mm-active > a,
+.sidebar-wrapper .sidebar-nav .metismenu .mm-active > .nav-button,
+.sidebar-wrapper .sidebar-nav .metismenu .nav-button:hover,
+.sidebar-wrapper .sidebar-nav .metismenu .nav-button:focus {
+  background: rgba(96, 165, 250, 0.16) !important;
+  color: #ffffff !important;
+}
+
+.sidebar-wrapper .sidebar-nav .metismenu .mm-active > a .parent-icon,
+.sidebar-wrapper .sidebar-nav .metismenu .mm-active > a .menu-title,
+.sidebar-wrapper .sidebar-nav .metismenu .mm-active > .nav-button .parent-icon,
+.sidebar-wrapper .sidebar-nav .metismenu .mm-active > .nav-button .menu-title,
+.sidebar-wrapper .sidebar-nav .metismenu .nav-button:hover .parent-icon,
+.sidebar-wrapper .sidebar-nav .metismenu .nav-button:hover .menu-title {
+  color: #ffffff !important;
+}
+
 .page-title-wrap {
   display: flex;
   flex-direction: column;
@@ -67,14 +122,14 @@ a {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #2563eb;
+  color: #93c5fd;
 }
 
 .page-title {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #f8fbff;
 }
 
 .header-chip {
@@ -84,9 +139,9 @@ a {
   min-height: 42px;
   padding: 0 1rem;
   border-radius: 999px;
-  background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  color: #0f172a;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(191, 219, 254, 0.2);
+  color: #f8fbff;
 }
 
 .nav-button {
@@ -137,15 +192,15 @@ a {
 }
 
 .crumb-pill.muted {
-  background: rgba(148, 163, 184, 0.14);
-  color: #334155;
+  background: rgba(148, 163, 184, 0.16);
+  color: #dbeafe;
 }
 
 .info-banner {
   border: 0;
   border-radius: 1rem;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.11), rgba(14, 165, 233, 0.08));
-  color: #1e3a8a;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.22), rgba(14, 165, 233, 0.16));
+  color: #eaf3ff;
 }
 
 .section-heading {
@@ -294,11 +349,6 @@ a {
   color: #64748b;
 }
 
-.page-footer {
-  background: transparent;
-  color: #64748b;
-}
-
 .overlay {
   position: fixed;
   inset: 0;
@@ -363,6 +413,27 @@ a {
 
 .sidebar-wrapper.sidebar-open {
   transform: translateX(0);
+}
+
+.main-wrapper .main-content .breadcrumb-title,
+.form-label {
+  color: #f8fbff !important;
+}
+
+.card,
+.subject-summary-card,
+.table,
+.table td,
+.table th,
+.table-title,
+.table-subtitle,
+.section-heading h3,
+.section-heading p,
+.empty-state,
+.subject-summary-top h4,
+.subject-summary-top p,
+.subject-summary-bottom span {
+  color: inherit;
 }
 
 @media (max-width: 1199.98px) {

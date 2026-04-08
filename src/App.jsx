@@ -243,19 +243,6 @@ function App() {
                 </button>
               </li>
             ))}
-            <li className="menu-label">Kapsam</li>
-            <li>
-              <div className="sidebar-note">
-                <h6>Faz 1</h6>
-                <p>Dashboard, filtreli oyun listesi ve detay paneli.</p>
-              </div>
-            </li>
-            <li>
-              <div className="sidebar-note">
-                <h6>Veri Kaynagi</h6>
-                <p>Kalici guncelleme `data/*.json` dosyalari duzenlenip push edilerek yapilir.</p>
-              </div>
-            </li>
           </ul>
         </div>
       </aside>
@@ -340,10 +327,6 @@ function App() {
           )}
         </div>
       </main>
-
-      <footer className="page-footer">
-        <p className="mb-0">MEB Oyun Uretim Takip Sistemi · Faz 1 statik operasyon paneli</p>
-      </footer>
 
       <div
         className={`overlay ${isMobileSidebarOpen ? 'show' : ''}`}
