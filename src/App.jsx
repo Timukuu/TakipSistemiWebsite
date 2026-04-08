@@ -27,6 +27,7 @@ import {
 } from './utils/gameData'
 
 function App() {
+  const baseUrl = import.meta.env.BASE_URL
   const initialRoleState = useMemo(() => getInitialRoleState(usersData), [])
   const [currentView, setCurrentView] = useState('dashboard')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
@@ -205,7 +206,7 @@ function App() {
         <div className="sidebar-header">
           <div className="logo-icon">
             <img
-              src="/theme/assets/images/logo-icon.png"
+              src={`${baseUrl}theme/assets/images/logo-icon.png`}
               className="logo-img"
               alt="MEB Oyun Uretim Takip Sistemi"
             />
