@@ -1,7 +1,23 @@
+@font-face {
+  font-family: 'Quicksand';
+  src: url('./assets/fonts/Quicksand-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('./assets/fonts/Quicksand-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color: #334155;
   background: #f4f7fb;
-  font-family: 'Noto Sans', sans-serif;
+  font-family: 'Quicksand', 'Noto Sans', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,6 +40,8 @@ body {
     radial-gradient(circle at top left, rgba(13, 110, 253, 0.08), transparent 24%),
     linear-gradient(180deg, #f7faff 0%, #eef3f9 100%);
   color: #dbe7ff;
+  font-family: 'Quicksand', 'Noto Sans', sans-serif;
+  font-weight: 500;
 }
 
 button,
@@ -149,6 +167,33 @@ a {
   border: 0;
   background: transparent;
   text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.8rem;
+  line-height: 1;
+}
+
+.nav-button .parent-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.nav-button .parent-icon .material-icons-outlined {
+  font-size: 1.8rem;
+}
+
+.nav-button .menu-title {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0 !important;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .sidebar-note {

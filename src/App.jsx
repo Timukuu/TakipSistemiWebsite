@@ -251,11 +251,11 @@ function App() {
         <div className="main-content">
           <div className="page-breadcrumb d-flex flex-column flex-lg-row align-items-lg-center gap-3 mb-4">
             <div className="breadcrumb-title pe-lg-3">
-              {currentView === 'dashboard' ? 'Dashboard' : 'Oyun Listesi'}
+              {currentView === 'dashboard' ? 'Ana Panel' : 'Oyun Listesi'}
             </div>
             <div className="page-breadcrumb-content">
               <span className="crumb-pill">
-                {roleMode === 'admin' ? 'Yonetici gorunumu' : 'Ders sorumlusu gorunumu'}
+                {roleMode === 'admin' ? 'Yonetici Gorunumu' : 'Ders Sorumlusu Gorunumu'}
               </span>
               {roleMode === 'user' && activeUser ? (
                 <span className="crumb-pill muted">
@@ -353,10 +353,10 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
   return (
     <>
       <section className="row g-4 mb-4">
-        <MetricCard icon="sports_esports" label="Toplam oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel kapsamindaki tum kayitlar" />
-        <MetricCard icon="task_alt" label="Tamamlanan kayit" value={dashboardSummary.completedGames} tone="success" helper="Tum asamalari kapanan oyunlar" />
-        <MetricCard icon="autorenew" label="Devam eden kayit" value={dashboardSummary.inProgressGames} tone="warning" helper="En az bir asamasi aktif olanlar" />
-        <MetricCard icon="approval" label="Onay bekleyen asama" value={dashboardSummary.awaitingApprovalStages} tone="danger" helper="Onaya gonderildi durumundaki adimlar" />
+        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel Kapsamindaki Tum Kayitlar" />
+        <MetricCard icon="task_alt" label="Tamamlanan Kayit" value={dashboardSummary.completedGames} tone="success" helper="Tum Asamalari Kapanan Oyunlar" />
+        <MetricCard icon="autorenew" label="Devam Eden Kayit" value={dashboardSummary.inProgressGames} tone="warning" helper="En Az Bir Asamasi Aktif Olanlar" />
+        <MetricCard icon="approval" label="Onay Bekleyen Asama" value={dashboardSummary.awaitingApprovalStages} tone="danger" helper="Onaya Gonderildi Durumundaki Adimlar" />
       </section>
 
       <section className="row g-4 mb-4">
@@ -366,7 +366,7 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
               <div className="section-heading">
                 <div>
                   <h3>Ders Bazli Ozet</h3>
-                  <p>Her ders icin toplam, tamamlanan ve aktif kayit gorunumu.</p>
+                  <p>Her Ders Icin Toplam, Tamamlanan ve Aktif Kayit Gorunumu.</p>
                 </div>
               </div>
               <div className="row g-3 mt-1">
@@ -376,16 +376,16 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
                       <div className="subject-summary-top">
                         <div>
                           <h4>{subjectSummary.name}</h4>
-                          <p>{subjectSummary.totalGames} oyun kaydi</p>
+                          <p>{subjectSummary.totalGames} Oyun Kaydi</p>
                         </div>
-                        <span className="badge text-bg-light">{subjectSummary.completedGames} tamamlandi</span>
+                        <span className="badge text-bg-light">{subjectSummary.completedGames} Tamamlandi</span>
                       </div>
                       <div className="subject-progress">
                         <div className="subject-progress-bar" style={{ width: `${subjectSummary.completionRate}%` }} />
                       </div>
                       <div className="subject-summary-bottom">
-                        <span>{subjectSummary.inProgressGames} aktif kayit</span>
-                        <span>{subjectSummary.awaitingApprovalStages} onay bekleyen asama</span>
+                        <span>{subjectSummary.inProgressGames} Aktif Kayit</span>
+                        <span>{subjectSummary.awaitingApprovalStages} Onay Bekleyen Asama</span>
                       </div>
                     </div>
                   </div>
@@ -484,7 +484,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
           <div className="section-heading mb-3">
             <div>
               <h3>Oyun Listesi</h3>
-              <p>{filteredGames.length} kayit gosteriliyor.</p>
+              <p>{filteredGames.length} Kayit Gosteriliyor.</p>
             </div>
           </div>
           <div className="table-responsive">
@@ -534,7 +534,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                 {filteredGames.length === 0 ? (
                   <tr>
                     <td colSpan={11 + STAGE_ORDER.length}>
-                      <div className="empty-state">Secili filtrelerle eslesen kayit bulunamadi.</div>
+                      <div className="empty-state">Secili Filtrelerle Eslesen Kayit Bulunamadi.</div>
                     </td>
                   </tr>
                 ) : null}

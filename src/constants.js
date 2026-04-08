@@ -4,7 +4,7 @@ export const ROLE_OPTIONS = [
 ]
 
 export const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { id: 'dashboard', label: 'Ana Panel', icon: 'dashboard' },
   { id: 'games', label: 'Oyun Listesi', icon: 'table_rows' },
 ]
 
