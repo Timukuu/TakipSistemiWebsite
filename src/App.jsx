@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import gamesData from '../data/games.json'
 import subjectsData from '../data/subjects.json'
 import usersData from '../data/users.json'
@@ -139,11 +139,11 @@ function App() {
     }
 
     if (Number(draftGame?.interface_count) < 0) {
-      nextErrors.interface_count = 'Arayuz sayisi 0 veya daha buyuk olmalidir.'
+      nextErrors.interface_count = 'Aray\u00fcz sayisi 0 veya daha buyuk olmalidir.'
     }
 
     if (draftGame?.start_date && draftGame?.end_date && draftGame.start_date > draftGame.end_date) {
-      nextErrors.end_date = 'Bitis tarihi baslangic tarihinden once olamaz.'
+      nextErrors.end_date = 'Biti\u015f tarihi baslangic tarihinden once olamaz.'
     }
 
     setFormErrors(nextErrors)
@@ -255,11 +255,11 @@ function App() {
             </div>
             <div className="page-breadcrumb-content">
               <span className="crumb-pill">
-                {roleMode === 'admin' ? 'Yonetici Gorunumu' : 'Ders Sorumlusu Gorunumu'}
+                {roleMode === 'admin' ? 'Y\u00f6netici G\u00f6r\u00fcn\u00fcm\u00fc' : 'Ders Sorumlusu G\u00f6r\u00fcn\u00fcm\u00fc'}
               </span>
               {roleMode === 'user' && activeUser ? (
                 <span className="crumb-pill muted">
-                  {activeUser.name} · {SUBJECT_LABELS[activeUser.subject]}
+                  {activeUser.name} - {SUBJECT_LABELS[activeUser.subject]}
                 </span>
               ) : null}
             </div>
@@ -269,7 +269,7 @@ function App() {
             <div className="card-body">
               <div className="row g-3 align-items-end">
                 <div className="col-12 col-xl-3">
-                  <label className="form-label">Aktif Gorunum</label>
+                  <label className="form-label">Aktif G\u00f6r\u00fcn\u00fcm</label>
                   <select
                     className="form-select"
                     value={roleMode}
@@ -283,7 +283,7 @@ function App() {
                   </select>
                 </div>
                 <div className="col-12 col-xl-3">
-                  <label className="form-label">Mock Kullanici</label>
+                  <label className="form-label">Mock Kullan\u0131c\u0131</label>
                   <select
                     className="form-select"
                     value={selectedUserId}
@@ -292,14 +292,14 @@ function App() {
                   >
                     {nonAdminUsers.map((user) => (
                       <option key={user.id} value={user.id}>
-                        {user.name} · {SUBJECT_LABELS[user.subject]}
+                        {user.name} - {SUBJECT_LABELS[user.subject]}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="col-12 col-xl-6">
                   <div className="alert alert-primary mb-0 info-banner">
-                    Bu panel statik yayinlanir. Form alanlari operasyon akisinin iskeletidir; kalici veri guncellemesi repo icindeki JSON dosyalari uzerinden yapilir.
+                    Bu Panel Statik Yay\u0131nlan\u0131r. Form Alanlar\u0131 Operasyon Ak\u0131\u015f\u0131n\u0131n \u0130skeletidir; Kal\u0131c\u0131 Veri G\u00fcncellemesi Repo \u0130\u00e7indeki JSON Dosyalar\u0131 \u00dczerinden Yap\u0131l\u0131r.
                   </div>
                 </div>
               </div>
@@ -353,10 +353,10 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
   return (
     <>
       <section className="row g-4 mb-4">
-        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel Kapsamindaki Tum Kayitlar" />
-        <MetricCard icon="task_alt" label="Tamamlanan Kayit" value={dashboardSummary.completedGames} tone="success" helper="Tum Asamalari Kapanan Oyunlar" />
-        <MetricCard icon="autorenew" label="Devam Eden Kayit" value={dashboardSummary.inProgressGames} tone="warning" helper="En Az Bir Asamasi Aktif Olanlar" />
-        <MetricCard icon="approval" label="Onay Bekleyen Asama" value={dashboardSummary.awaitingApprovalStages} tone="danger" helper="Onaya Gonderildi Durumundaki Adimlar" />
+        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel Kapsam\u0131ndaki T\u00fcm Kay\u0131tlar" />
+        <MetricCard icon="task_alt" label="Tamamlanan Kay\u0131t" value={dashboardSummary.completedGames} tone="success" helper="T\u00fcm A\u015famalar\u0131 Kapanan Oyunlar" />
+        <MetricCard icon="autorenew" label="Devam Eden Kay\u0131t" value={dashboardSummary.inProgressGames} tone="warning" helper="En Az Bir A\u015famas\u0131 Aktif Olanlar" />
+        <MetricCard icon="approval" label="Onay Bekleyen A\u015fama" value={dashboardSummary.awaitingApprovalStages} tone="danger" helper="Onaya G\u00f6nderildi Durumundaki Ad\u0131mlar" />
       </section>
 
       <section className="row g-4 mb-4">
@@ -365,8 +365,8 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Ders Bazli Ozet</h3>
-                  <p>Her Ders Icin Toplam, Tamamlanan ve Aktif Kayit Gorunumu.</p>
+                  <h3>Ders Bazl\u0131 \u00d6zet</h3>
+                  <p>Her Ders \u0130\u00e7in Toplam, Tamamlanan ve Aktif Kay\u0131t G\u00f6r\u00fcn\u00fcm\u00fc.</p>
                 </div>
               </div>
               <div className="row g-3 mt-1">
@@ -376,16 +376,16 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
                       <div className="subject-summary-top">
                         <div>
                           <h4>{subjectSummary.name}</h4>
-                          <p>{subjectSummary.totalGames} Oyun Kaydi</p>
+                          <p>{subjectSummary.totalGames} Oyun Kayd\u0131</p>
                         </div>
-                        <span className="badge text-bg-light">{subjectSummary.completedGames} Tamamlandi</span>
+                        <span className="badge text-bg-light">{subjectSummary.completedGames} Tamamland\u0131</span>
                       </div>
                       <div className="subject-progress">
                         <div className="subject-progress-bar" style={{ width: `${subjectSummary.completionRate}%` }} />
                       </div>
                       <div className="subject-summary-bottom">
-                        <span>{subjectSummary.inProgressGames} Aktif Kayit</span>
-                        <span>{subjectSummary.awaitingApprovalStages} Onay Bekleyen Asama</span>
+                        <span>{subjectSummary.inProgressGames} Aktif Kay\u0131t</span>
+                        <span>{subjectSummary.awaitingApprovalStages} Onay Bekleyen A\u015fama</span>
                       </div>
                     </div>
                   </div>
@@ -399,16 +399,16 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Asama Durum Ozeti</h3>
-                  <p>Bes uretim adiminin anlik dagilimi.</p>
+                  <h3>A\u015fama Durum \u00d6zeti</h3>
+                  <p>Be\u015f \u00dcretim Ad\u0131m\u0131n\u0131n Anl\u0131k Da\u011f\u0131l\u0131m\u0131.</p>
                 </div>
               </div>
               <div className="table-responsive mt-3">
                 <table className="table align-middle mb-0">
                   <thead>
                     <tr>
-                      <th>Asama</th>
-                      <th>Baslamadi</th>
+                      <th>A\u015fama</th>
+                      <th>Ba\u015flamad\u0131</th>
                       <th>Devam</th>
                       <th>Onay</th>
                       <th>Tamam</th>
@@ -445,12 +445,12 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
           <div className="row g-3">
             <div className="col-12 col-xl-4">
               <label className="form-label">Konu Ara</label>
-              <input className="form-control" type="search" value={formFilters.search} onChange={(event) => onFilterChange('search', event.target.value)} placeholder="Ornek: Kuvvet ve Hareket" />
+              <input className="form-control" type="search" value={formFilters.search} onChange={(event) => onFilterChange('search', event.target.value)} placeholder="\u00d6rnek: Kuvvet ve Hareket" />
             </div>
             <div className="col-12 col-md-6 col-xl-2">
               <label className="form-label">Ders</label>
               <select className="form-select" value={subjectValue} onChange={(event) => onFilterChange('subject', event.target.value)} disabled={roleMode === 'user'}>
-                <option value="">Tum dersler</option>
+                <option value="">T\u00fcm Dersler</option>
                 {subjectOptions.map((subject) => (
                   <option key={subject.id} value={subject.code}>{subject.name}</option>
                 ))}
@@ -473,7 +473,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
               </select>
             </div>
             <div className="col-12 col-md-6 col-xl-2 d-flex align-items-end">
-              <button type="button" className="btn btn-outline-secondary w-100" onClick={onResetFilters}>Filtreleri Sifirla</button>
+              <button type="button" className="btn btn-outline-secondary w-100" onClick={onResetFilters}>Filtreleri S\u0131f\u0131rla</button>
             </div>
           </div>
         </div>
@@ -484,7 +484,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
           <div className="section-heading mb-3">
             <div>
               <h3>Oyun Listesi</h3>
-              <p>{filteredGames.length} Kayit Gosteriliyor.</p>
+              <p>{filteredGames.length} Kay\u0131t G\u00f6steriliyor.</p>
             </div>
           </div>
           <div className="table-responsive">
@@ -494,10 +494,10 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                   <th>Ders</th>
                   <th>Konu</th>
                   <th>Sorumlu</th>
-                  <th>Arayuz</th>
+                  <th>Aray\u00fcz</th>
                   {STAGE_ORDER.map((stageKey) => (<th key={stageKey}>{STAGE_LABELS[stageKey]}</th>))}
-                  <th>Baslangic</th>
-                  <th>Bitis</th>
+                  <th>Ba\u015flang\u0131\u00e7</th>
+                  <th>Biti\u015f</th>
                   <th>Tamam</th>
                   <th></th>
                 </tr>
@@ -523,7 +523,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                     <td>{formatDate(game.end_date)}</td>
                     <td>
                       <span className={`badge rounded-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
-                        {game.is_completed ? 'Tamamlandi' : 'Acik'}
+                        {game.is_completed ? 'Tamamland\u0131' : 'A\u00e7\u0131k'}
                       </span>
                     </td>
                     <td>
@@ -534,7 +534,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                 {filteredGames.length === 0 ? (
                   <tr>
                     <td colSpan={11 + STAGE_ORDER.length}>
-                      <div className="empty-state">Secili Filtrelerle Eslesen Kayit Bulunamadi.</div>
+                      <div className="empty-state">Se\u00e7ili Filtrelerle E\u015fle\u015fen Kay\u0131t Bulunamad\u0131.</div>
                     </td>
                   </tr>
                 ) : null}
@@ -571,16 +571,16 @@ function GameDetailDrawer({ draftGame, formErrors, onChange, onClose, onSave, sa
       <aside className="detail-drawer">
         <div className="detail-drawer-header">
           <div>
-            <span className="eyebrow">Oyun Detay / Duzenleme</span>
+            <span className="eyebrow">Oyun Detay / D\u00fczenleme</span>
             <h3>{draftGame.topic}</h3>
           </div>
-          <button type="button" className="theme-icon-button" onClick={onClose} aria-label="Detay panelini kapat">
+          <button type="button" className="theme-icon-button" onClick={onClose} aria-label="Detay Panelini Kapat">
             <span className="material-icons-outlined">close</span>
           </button>
         </div>
         <div className="detail-drawer-body">
           <div className="alert alert-warning">
-            Kalici kayit yok. Bu form, Faz 2 kalici veri akisina hazir bir operasyon iskeleti saglar.
+            Kal\u0131c\u0131 Kay\u0131t Yok. Bu Form, Faz 2 Kal\u0131c\u0131 Veri Ak\u0131\u015f\u0131na Haz\u0131r Bir Operasyon \u0130skeleti Sa\u011flar.
           </div>
           <div className="row g-3">
             <FormField label="Ders">
@@ -596,13 +596,13 @@ function GameDetailDrawer({ draftGame, formErrors, onChange, onClose, onSave, sa
             <FormField label="Konu" error={formErrors.topic}>
               <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} />
             </FormField>
-            <FormField label="Arayuz Sayisi" error={formErrors.interface_count}>
+            <FormField label="Aray\u00fcz Say\u0131s\u0131" error={formErrors.interface_count}>
               <input className={`form-control ${formErrors.interface_count ? 'is-invalid' : ''}`} type="number" min="0" value={draftGame.interface_count} onChange={(event) => onChange('interface_count', Number(event.target.value))} />
             </FormField>
-            <FormField label="Baslangic Tarihi">
+            <FormField label="Ba\u015flang\u0131\u00e7 Tarihi">
               <input className="form-control" type="date" value={draftGame.start_date} onChange={(event) => onChange('start_date', event.target.value)} />
             </FormField>
-            <FormField label="Bitis Tarihi" error={formErrors.end_date}>
+            <FormField label="Biti\u015f Tarihi" error={formErrors.end_date}>
               <input className={`form-control ${formErrors.end_date ? 'is-invalid' : ''}`} type="date" value={draftGame.end_date} onChange={(event) => onChange('end_date', event.target.value)} />
             </FormField>
             {STAGE_ORDER.map((stageKey) => (
@@ -614,10 +614,10 @@ function GameDetailDrawer({ draftGame, formErrors, onChange, onClose, onSave, sa
                 </select>
               </FormField>
             ))}
-            <FormField label="Kazanimlar" fullWidth>
+            <FormField label="Kazan\u0131mlar" fullWidth>
               <textarea className="form-control" rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} />
             </FormField>
-            <FormField label="EBA Baglantisi" fullWidth>
+            <FormField label="EBA Ba\u011flant\u0131s\u0131" fullWidth>
               <input className="form-control" type="url" value={draftGame.eba_link} onChange={(event) => onChange('eba_link', event.target.value)} />
             </FormField>
             <FormField label="Notlar" fullWidth>
@@ -628,7 +628,7 @@ function GameDetailDrawer({ draftGame, formErrors, onChange, onClose, onSave, sa
         </div>
         <div className="detail-drawer-footer">
           <button type="button" className="btn btn-light" onClick={onClose}>Kapat</button>
-          <button type="button" className="btn btn-primary" onClick={onSave}>Kaydet Akisini Goster</button>
+          <button type="button" className="btn btn-primary" onClick={onSave}>Kaydet Ak\u0131\u015f\u0131n\u0131 G\u00f6ster</button>
         </div>
       </aside>
     </>
@@ -646,3 +646,6 @@ function FormField({ children, error, fullWidth = false, label }) {
 }
 
 export default App
+
+
+

@@ -1,5 +1,5 @@
-export const ROLE_OPTIONS = [
-  { value: 'admin', label: 'Yonetici' },
+﻿export const ROLE_OPTIONS = [
+  { value: 'admin', label: 'Y\u00f6netici' },
   { value: 'user', label: 'Ders Sorumlusu' },
 ]
 
@@ -18,17 +18,17 @@ export const STAGE_ORDER = [
 
 export const STAGE_LABELS = {
   scenario_status: 'Senaryo',
-  design_status: 'Tasarim',
+  design_status: 'Tasar\u0131m',
   unity_status: 'Unity',
   webgl_scorm_status: 'WebGL / SCORM',
   eba_status: 'EBA',
 }
 
 export const STATUS_LABELS = {
-  baslamadi: 'Baslamadi',
+  baslamadi: 'Ba\u015flamad\u0131',
   devam_ediyor: 'Devam Ediyor',
-  onaya_gonderildi: 'Onaya Gonderildi',
-  onaylandi: 'Onaylandi',
+  onaya_gonderildi: 'Onaya G\u00f6nderildi',
+  onaylandi: 'Onayland\u0131',
 }
 
 export const STATUS_BADGE_CLASSNAMES = {
@@ -39,11 +39,11 @@ export const STATUS_BADGE_CLASSNAMES = {
 }
 
 export const STATUS_FILTER_OPTIONS = [
-  { value: '', label: 'Tum durumlar' },
-  { value: 'baslamadi', label: 'Baslamadi' },
+  { value: '', label: 'T\u00fcm Durumlar' },
+  { value: 'baslamadi', label: 'Ba\u015flamad\u0131' },
   { value: 'devam_ediyor', label: 'Devam Ediyor' },
-  { value: 'onaya_gonderildi', label: 'Onaya Gonderildi' },
-  { value: 'onaylandi', label: 'Onaylandi' },
+  { value: 'onaya_gonderildi', label: 'Onaya G\u00f6nderildi' },
+  { value: 'onaylandi', label: 'Onayland\u0131' },
 ]
 
 export const COMPLETION_FILTER_OPTIONS = [
@@ -60,7 +60,7 @@ export const SUBJECT_LABELS = {
   fen_bilimleri: 'Fen Bilimleri',
   sosyal_bilgiler: 'Sosyal Bilgiler',
   hayat_bilgisi: 'Hayat Bilgisi',
-  turkce: 'Turkce',
+  turkce: 'T\u00fcrk\u00e7e',
 }
 
 export const DEFAULT_FILTERS = {
@@ -69,3 +69,4 @@ export const DEFAULT_FILTERS = {
   status: '',
   completion: 'all',
 }
+
