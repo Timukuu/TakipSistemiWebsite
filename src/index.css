@@ -1,15 +1,15 @@
 @font-face {
-  font-family: 'Quicksand';
-  src: url('./assets/fonts/Quicksand-Medium.ttf') format('truetype');
-  font-weight: 500;
+  font-family: 'Comfortaa';
+  src: url('./assets/fonts/Comfortaa-Regular.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Quicksand';
-  src: url('./assets/fonts/Quicksand-SemiBold.ttf') format('truetype');
-  font-weight: 600;
+  font-family: 'Comfortaa';
+  src: url('./assets/fonts/Comfortaa-Bold.ttf') format('truetype');
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -17,7 +17,7 @@
 :root {
   color: #334155;
   background: #f4f7fb;
-  font-family: 'Quicksand', 'Noto Sans', sans-serif;
+  font-family: 'Comfortaa', 'Noto Sans', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -40,8 +40,8 @@ body {
     radial-gradient(circle at top left, rgba(13, 110, 253, 0.08), transparent 24%),
     linear-gradient(180deg, #f7faff 0%, #eef3f9 100%);
   color: #dbe7ff;
-  font-family: 'Quicksand', 'Noto Sans', sans-serif;
-  font-weight: 500;
+  font-family: 'Comfortaa', 'Noto Sans', sans-serif;
+  font-weight: 400;
 }
 
 button,
