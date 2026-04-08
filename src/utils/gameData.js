@@ -1,11 +1,65 @@
 import { STAGE_LABELS, STAGE_ORDER, SUBJECT_LABELS } from '../constants'
 
+const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000
+
+function normalizeText(value) {
+  return String(value ?? '')
+    .toLocaleLowerCase('tr-TR')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+function safeDateDifference(dateValue, referenceDate) {
+  if (!dateValue) {
+    return Number.POSITIVE_INFINITY
+  }
+
+  const targetDate = new Date(`${dateValue}T00:00:00`)
+
+  if (Number.isNaN(targetDate.getTime())) {
+    return Number.POSITIVE_INFINITY
+  }
+
+  const normalizedReference = new Date(referenceDate)
+  normalizedReference.setHours(0, 0, 0, 0)
+
+  return Math.round((targetDate.getTime() - normalizedReference.getTime()) / ONE_DAY_IN_MS)
+}
+
 export function getInitialRoleState(users) {
   const firstUser = users.find((user) => user.role === 'user') ?? null
 
   return {
     roleMode: 'admin',
     selectedUserId: firstUser?.id ?? '',
+  }
+}
+
+export function createEmptyGame(subjectCode, userId) {
+  const now = new Date()
+  const dateStamp = now.toISOString().slice(0, 10)
+  const uniqueSuffix = `${Date.now()}`
+
+  return {
+    id: `game_${uniqueSuffix}`,
+    subject: subjectCode ?? 'fizik',
+    class_level: '',
+    topic: '',
+    interface_count: 0,
+    scenario_status: 'baslamadi',
+    design_status: 'baslamadi',
+    unity_status: 'baslamadi',
+    webgl_scorm_status: 'baslamadi',
+    eba_status: 'baslamadi',
+    start_date: dateStamp,
+    end_date: '',
+    is_completed: false,
+    responsible_user_id: userId ?? '',
+    kazanimlar: '',
+    eba_link: '',
+    notes: '',
+    created_at: now.toISOString(),
+    updated_at: now.toISOString(),
   }
 }
 
@@ -33,7 +87,9 @@ export function getEffectiveFilters(filters, roleMode, activeUser) {
 }
 
 export function matchesFilters(game, filters) {
-  const topicMatches = game.topic.toLowerCase().includes(filters.search.toLowerCase().trim())
+  const searchValue = normalizeText(filters.search.trim())
+  const searchTarget = normalizeText(`${game.topic} ${game.kazanimlar} ${game.class_level}`)
+  const topicMatches = !searchValue || searchTarget.includes(searchValue)
   const subjectMatches = !filters.subject || game.subject === filters.subject
   const completionMatches =
     filters.completion === 'all' ||
@@ -45,24 +101,116 @@ export function matchesFilters(game, filters) {
   return topicMatches && subjectMatches && completionMatches && statusMatches
 }
 
-export function buildDashboardSummary(games) {
+export function validateGameDraft(game, users) {
+  const errors = {}
+  const responsibleUser = users.find((user) => user.id === game?.responsible_user_id)
+
+  if (!game?.subject) {
+    errors.subject = 'Ders seçimi zorunludur.'
+  }
+
+  if (!game?.class_level?.trim()) {
+    errors.class_level = 'Sınıf bilgisi zorunludur.'
+  }
+
+  if (!game?.topic?.trim()) {
+    errors.topic = 'Konu alanı zorunludur.'
+  }
+
+  if (!game?.responsible_user_id) {
+    errors.responsible_user_id = 'Sorumlu kullanıcı seçimi zorunludur.'
+  }
+
+  if (responsibleUser && game.subject && responsibleUser.subject !== game.subject) {
+    errors.responsible_user_id = 'Seçilen sorumlu kullanıcının dersi kayıtla uyuşmuyor.'
+  }
+
+  if (!Number.isInteger(Number(game?.interface_count)) || Number(game?.interface_count) < 0) {
+    errors.interface_count = 'Bölüm sayısı 0 veya daha büyük bir sayı olmalıdır.'
+  }
+
+  if (!game?.kazanimlar?.trim()) {
+    errors.kazanimlar = 'Kazanımlar alanı zorunludur.'
+  }
+
+  if (!game?.start_date) {
+    errors.start_date = 'Başlangıç tarihi zorunludur.'
+  }
+
+  if (game?.start_date && game?.end_date && game.start_date > game.end_date) {
+    errors.end_date = 'Bitiş tarihi başlangıç tarihinden önce olamaz.'
+  }
+
+  if (game?.eba_link?.trim()) {
+    try {
+      const parsedUrl = new URL(game.eba_link)
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        errors.eba_link = 'Link alanı geçerli bir http veya https adresi olmalıdır.'
+      }
+    } catch {
+      errors.eba_link = 'Link alanı geçerli bir URL olmalıdır.'
+    }
+  }
+
+  if (game?.is_completed) {
+    const hasOpenStage = STAGE_ORDER.some((stageKey) => game[stageKey] !== 'onaylandi')
+    if (hasOpenStage) {
+      errors.is_completed = 'Tamamlandı işaretli kayıtların tüm aşamaları Onaylandı olmalıdır.'
+    }
+  }
+
+  return errors
+}
+
+export function getGameHealthIssues(game, users) {
+  const issues = []
+  const responsibleUser = users.find((user) => user.id === game.responsible_user_id)
+
+  if (!game.class_level?.trim()) {
+    issues.push('Sınıf bilgisi eksik')
+  }
+
+  if (!game.kazanimlar?.trim()) {
+    issues.push('Kazanım bilgisi eksik')
+  }
+
+  if (!game.end_date) {
+    issues.push('Bitiş tarihi eksik')
+  }
+
+  if (!responsibleUser) {
+    issues.push('Sorumlu kullanıcı tanımsız')
+  } else if (responsibleUser.subject !== game.subject) {
+    issues.push('Ders-sorumlu eşleşmesi hatalı')
+  }
+
+  if (game.is_completed && STAGE_ORDER.some((stageKey) => game[stageKey] !== 'onaylandi')) {
+    issues.push('Tamamlandı kaydı aşamalarla uyumsuz')
+  }
+
+  return issues
+}
+
+export function buildDashboardSummary(games, users) {
   const completedGames = games.filter((game) => game.is_completed).length
-  const inProgressGames = games.filter((game) => !game.is_completed).length
+  const openGames = games.filter((game) => !game.is_completed)
   const awaitingApprovalStages = games.reduce(
     (count, game) =>
       count + STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length,
     0,
   )
+  const missingInfoGames = games.filter((game) => getGameHealthIssues(game, users).length > 0).length
 
   return {
     totalGames: games.length,
     completedGames,
-    inProgressGames,
+    inProgressGames: openGames.length,
     awaitingApprovalStages,
+    missingInfoGames,
   }
 }
 
-export function getSubjectSummaries(games, subjects) {
+export function getSubjectSummaries(games, subjects, users) {
   return subjects
     .filter((subject) => subject.is_active)
     .map((subject) => {
@@ -74,6 +222,7 @@ export function getSubjectSummaries(games, subjects) {
           count + STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length,
         0,
       )
+      const missingInfoGames = subjectGames.filter((game) => getGameHealthIssues(game, users).length > 0).length
 
       return {
         code: subject.code,
@@ -82,6 +231,7 @@ export function getSubjectSummaries(games, subjects) {
         completedGames,
         inProgressGames,
         awaitingApprovalStages,
+        missingInfoGames,
         completionRate: subjectGames.length
           ? Math.round((completedGames / subjectGames.length) * 100)
           : 0,
@@ -106,6 +256,54 @@ export function buildStageSummary(games) {
       },
     ),
   }))
+}
+
+export function buildOperationalHighlights(games, users, referenceDate = new Date()) {
+  const openGames = games.filter((game) => !game.is_completed)
+
+  const dueSoonGames = [...openGames]
+    .filter((game) => safeDateDifference(game.end_date, referenceDate) <= 10)
+    .sort((leftGame, rightGame) => safeDateDifference(leftGame.end_date, referenceDate) - safeDateDifference(rightGame.end_date, referenceDate))
+    .slice(0, 5)
+    .map((game) => ({
+      id: game.id,
+      topic: game.topic,
+      subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
+      meta: game.end_date ? `${formatDate(game.end_date)} terminli` : 'Bitiş tarihi eksik',
+      tone: safeDateDifference(game.end_date, referenceDate) < 0 ? 'danger' : 'warning',
+    }))
+
+  const approvalQueue = [...openGames]
+    .filter((game) => STAGE_ORDER.some((stageKey) => game[stageKey] === 'onaya_gonderildi'))
+    .slice(0, 5)
+    .map((game) => ({
+      id: game.id,
+      topic: game.topic,
+      subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
+      meta: `${STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length} aşama onay bekliyor`,
+      tone: 'danger',
+    }))
+
+  const missingFieldQueue = games
+    .map((game) => ({
+      game,
+      issues: getGameHealthIssues(game, users),
+    }))
+    .filter((entry) => entry.issues.length > 0)
+    .slice(0, 5)
+    .map(({ game, issues }) => ({
+      id: game.id,
+      topic: game.topic,
+      subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
+      meta: issues.join(' · '),
+      tone: 'secondary',
+    }))
+
+  return {
+    dueSoonGames,
+    approvalQueue,
+    missingFieldQueue,
+  }
 }
 
 export function getResponsibleUserName(users, responsibleUserId) {

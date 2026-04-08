@@ -1,8 +1,9 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import gamesData from '../data/games.json'
 import subjectsData from '../data/subjects.json'
 import usersData from '../data/users.json'
 import {
+  CLASS_LEVEL_OPTIONS,
   COMPLETION_FILTER_OPTIONS,
   DEFAULT_FILTERS,
   NAV_ITEMS,
@@ -16,19 +17,24 @@ import {
 } from './constants'
 import {
   buildDashboardSummary,
+  buildOperationalHighlights,
   buildStageSummary,
+  createEmptyGame,
   formatDate,
   getEffectiveFilters,
+  getGameHealthIssues,
   getInitialRoleState,
   getResponsibleUserName,
   getScopedGames,
   getSubjectSummaries,
   matchesFilters,
+  validateGameDraft,
 } from './utils/gameData'
 
 function App() {
   const baseUrl = import.meta.env.BASE_URL
   const initialRoleState = useMemo(() => getInitialRoleState(usersData), [])
+  const [games, setGames] = useState(gamesData)
   const [currentView, setCurrentView] = useState('dashboard')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -36,6 +42,7 @@ function App() {
   const [selectedUserId, setSelectedUserId] = useState(initialRoleState.selectedUserId)
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [draftGame, setDraftGame] = useState(null)
+  const [drawerMode, setDrawerMode] = useState('edit')
   const [formErrors, setFormErrors] = useState({})
   const [saveMessage, setSaveMessage] = useState('')
 
@@ -47,8 +54,8 @@ function App() {
   )
 
   const scopedGames = useMemo(
-    () => getScopedGames(gamesData, roleMode, activeUser),
-    [activeUser, roleMode],
+    () => getScopedGames(games, roleMode, activeUser),
+    [activeUser, games, roleMode],
   )
 
   const effectiveFilters = useMemo(
@@ -62,7 +69,7 @@ function App() {
   )
 
   const dashboardSummary = useMemo(
-    () => buildDashboardSummary(scopedGames),
+    () => buildDashboardSummary(scopedGames, usersData),
     [scopedGames],
   )
 
@@ -72,7 +79,12 @@ function App() {
   )
 
   const subjectSummaries = useMemo(
-    () => getSubjectSummaries(scopedGames, subjectsData),
+    () => getSubjectSummaries(scopedGames, subjectsData, usersData),
+    [scopedGames],
+  )
+
+  const operationalHighlights = useMemo(
+    () => buildOperationalHighlights(scopedGames, usersData),
     [scopedGames],
   )
 
@@ -85,6 +97,15 @@ function App() {
     roleMode === 'admin'
       ? subjectsData
       : subjectsData.filter((subject) => subject.code === activeUser?.subject)
+
+  const availableResponsibleUsers = useMemo(() => {
+    const subjectCode = draftGame?.subject
+    if (!subjectCode) {
+      return nonAdminUsers
+    }
+
+    return nonAdminUsers.filter((user) => user.subject === subjectCode)
+  }, [draftGame?.subject, nonAdminUsers])
 
   const handleRoleChange = (nextRoleMode) => {
     setRoleMode(nextRoleMode)
@@ -107,10 +128,40 @@ function App() {
   }
 
   const handleDraftChange = (field, value) => {
-    setDraftGame((currentDraft) => ({
-      ...currentDraft,
-      [field]: value,
-    }))
+    setDraftGame((currentDraft) => {
+      if (!currentDraft) {
+        return currentDraft
+      }
+
+      const nextDraft = {
+        ...currentDraft,
+        [field]: value,
+      }
+
+      if (field === 'subject') {
+        const fallbackUser = nonAdminUsers.find((user) => user.subject === value)
+        nextDraft.responsible_user_id = fallbackUser?.id ?? ''
+      }
+
+      if (field === 'is_completed' && value) {
+        STAGE_ORDER.forEach((stageKey) => {
+          nextDraft[stageKey] = 'onaylandi'
+        })
+      }
+
+      nextDraft.updated_at = new Date().toISOString()
+      return nextDraft
+    })
+
+    setFormErrors((currentErrors) => {
+      const nextErrors = { ...currentErrors }
+      delete nextErrors[field]
+      if (field === 'subject') {
+        delete nextErrors.responsible_user_id
+      }
+      return nextErrors
+    })
+    setSaveMessage('')
   }
 
   const handleOpenGame = (gameId) => {
@@ -120,43 +171,64 @@ function App() {
       return
     }
 
-    setDraftGame(nextGame)
+    setDrawerMode('edit')
+    setDraftGame(structuredClone(nextGame))
+    setFormErrors({})
+    setSaveMessage('')
+  }
+
+  const handleCreateGame = () => {
+    const subjectCode = roleMode === 'user' ? activeUser?.subject : subjectOptions[0]?.code
+    const responsibleUserId =
+      roleMode === 'user'
+        ? activeUser?.id
+        : nonAdminUsers.find((user) => user.subject === subjectCode)?.id
+
+    setDrawerMode('create')
+    setDraftGame(createEmptyGame(subjectCode, responsibleUserId))
     setFormErrors({})
     setSaveMessage('')
   }
 
   const handleCloseGame = () => {
     setDraftGame(null)
+    setDrawerMode('edit')
     setFormErrors({})
     setSaveMessage('')
   }
 
-  const validateDraft = () => {
-    const nextErrors = {}
-
-    if (!draftGame?.topic?.trim()) {
-      nextErrors.topic = 'Konu alani zorunludur.'
-    }
-
-    if (Number(draftGame?.interface_count) < 0) {
-      nextErrors.interface_count = 'Bölüm sayısı 0 veya daha büyük olmalıdır.'
-    }
-
-    if (draftGame?.start_date && draftGame?.end_date && draftGame.start_date > draftGame.end_date) {
-      nextErrors.end_date = 'Bitiş tarihi başlangıç tarihinden önce olamaz.'
-    }
-
-    setFormErrors(nextErrors)
-    return Object.keys(nextErrors).length === 0
-  }
-
   const handleSaveDraft = () => {
-    if (!validateDraft()) {
+    if (!draftGame) {
+      return
+    }
+
+    const nextErrors = validateGameDraft(draftGame, usersData)
+    setFormErrors(nextErrors)
+
+    if (Object.keys(nextErrors).length > 0) {
       setSaveMessage('')
       return
     }
 
-    setSaveMessage('Bu sürümde değişiklikler kalıcı olarak repo içindeki JSON dosyaları güncellenerek yayınlanır.')
+    setGames((currentGames) => {
+      const nextGame = {
+        ...draftGame,
+        updated_at: new Date().toISOString(),
+      }
+
+      if (drawerMode === 'create') {
+        return [nextGame, ...currentGames]
+      }
+
+      return currentGames.map((game) => (game.id === nextGame.id ? nextGame : game))
+    })
+
+    setSaveMessage(
+      drawerMode === 'create'
+        ? 'Yeni kayıt panel üzerinde eklendi. Kalıcı yayın için JSON verisini repo üzerinden güncellemeniz gerekir.'
+        : 'Kayıt panel üzerinde güncellendi. Kalıcı yayın için JSON verisini repo üzerinden güncellemeniz gerekir.',
+    )
+    setDrawerMode('edit')
   }
 
   return (
@@ -168,15 +240,15 @@ function App() {
               type="button"
               className="theme-icon-button"
               onClick={() => setIsSidebarCollapsed((current) => !current)}
-              aria-label="Yan menuyu daralt"
+              aria-label="Yan menüyü daralt"
             >
               <span className="material-icons-outlined">menu</span>
             </button>
           </div>
           <div className="search-bar flex-grow-1">
             <div className="page-title-wrap">
-              <span className="eyebrow">MEB Uretim Paneli</span>
-              <h1 className="page-title">Oyun Uretim Takip Sistemi</h1>
+              <span className="eyebrow">MEB Üretim Paneli</span>
+              <h1 className="page-title">Oyun Üretim Takip Sistemi</h1>
             </div>
           </div>
           <ul className="navbar-nav gap-2 nav-right-links align-items-center ms-auto">
@@ -185,7 +257,7 @@ function App() {
                 type="button"
                 className="theme-icon-button"
                 onClick={() => setIsMobileSidebarOpen(true)}
-                aria-label="Mobil menuyu ac"
+                aria-label="Mobil menüyü aç"
               >
                 <span className="material-icons-outlined">dashboard</span>
               </button>
@@ -206,7 +278,7 @@ function App() {
             <img
               src={`${baseUrl}theme/assets/images/logo-icon.png`}
               className="logo-img"
-              alt="MEB Oyun Uretim Takip Sistemi"
+              alt="MEB Oyun Üretim Takip Sistemi"
             />
           </div>
           <div className="logo-name flex-grow-1">
@@ -216,7 +288,7 @@ function App() {
             type="button"
             className="sidebar-close"
             onClick={() => setIsMobileSidebarOpen(false)}
-            aria-label="Yan menuyu kapat"
+            aria-label="Yan menüyü kapat"
           >
             <span className="material-icons-outlined">close</span>
           </button>
@@ -257,7 +329,7 @@ function App() {
               </span>
               {roleMode === 'user' && activeUser ? (
                 <span className="crumb-pill muted">
-                  {activeUser.name} - {SUBJECT_LABELS[activeUser.subject]}
+                  {activeUser.name} · {SUBJECT_LABELS[activeUser.subject]}
                 </span>
               ) : null}
             </div>
@@ -290,10 +362,16 @@ function App() {
                   >
                     {nonAdminUsers.map((user) => (
                       <option key={user.id} value={user.id}>
-                        {user.name} - {SUBJECT_LABELS[user.subject]}
+                        {user.name} · {SUBJECT_LABELS[user.subject]}
                       </option>
                     ))}
                   </select>
+                </div>
+                <div className="col-12 col-xl-6">
+                  <div className="phase-banner">
+                    <strong>Faz 2 Aktif</strong>
+                    <span>Yerel düzenleme, yeni kayıt akışı ve yönetici operasyon özetleri açık durumda.</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -302,14 +380,15 @@ function App() {
           {currentView === 'dashboard' ? (
             <DashboardView
               dashboardSummary={dashboardSummary}
+              operationalHighlights={operationalHighlights}
               stageSummary={stageSummary}
               subjectSummaries={subjectSummaries}
             />
           ) : (
             <GamesView
               filteredGames={filteredGames}
-              filters={effectiveFilters}
               formFilters={filters}
+              onCreateGame={handleCreateGame}
               onFilterChange={handleFilterChange}
               onOpenGame={handleOpenGame}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
@@ -329,27 +408,29 @@ function App() {
 
       {draftGame ? (
         <GameDetailDrawer
+          availableResponsibleUsers={availableResponsibleUsers}
+          drawerMode={drawerMode}
           draftGame={draftGame}
           formErrors={formErrors}
           onChange={handleDraftChange}
           onClose={handleCloseGame}
           onSave={handleSaveDraft}
           saveMessage={saveMessage}
-          users={usersData}
+          subjectOptions={subjectOptions}
         />
       ) : null}
     </>
   )
 }
 
-function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
+function DashboardView({ dashboardSummary, operationalHighlights, stageSummary, subjectSummaries }) {
   return (
     <>
       <section className="row g-4 mb-4">
-        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel Kapsamındaki Tüm Kayıtlar" />
-        <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={dashboardSummary.completedGames} tone="success" helper="Tüm Aşamaları Kapanan Oyunlar" />
-        <MetricCard icon="autorenew" label="Aktif Kayıt" value={dashboardSummary.inProgressGames} tone="warning" helper="Tamamlanmamış Oyunlar" />
-        <MetricCard icon="approval" label="Onay Bekleyen Aşama" value={dashboardSummary.awaitingApprovalStages} tone="danger" helper="Onaya Gönderildi Durumundaki Adımlar" />
+        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel kapsamındaki tüm kayıtlar" />
+        <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={dashboardSummary.completedGames} tone="success" helper="Tüm aşamaları kapanan oyunlar" />
+        <MetricCard icon="autorenew" label="Aktif Kayıt" value={dashboardSummary.inProgressGames} tone="warning" helper="Tamamlanmamış oyunlar" />
+        <MetricCard icon="warning" label="Eksik Bilgi" value={dashboardSummary.missingInfoGames} tone="danger" helper="Veri doğrulama uyarısı taşıyan kayıtlar" />
       </section>
 
       <section className="row g-4 mb-4">
@@ -359,7 +440,7 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
               <div className="section-heading">
                 <div>
                   <h3>Ders Bazlı Özet</h3>
-                  <p>Her Ders İçin Toplam, Tamamlanan ve Aktif Kayıt Görünümü.</p>
+                  <p>Her ders için toplam, tamamlanan, aktif ve eksik alanlı kayıt görünümü.</p>
                 </div>
               </div>
               <div className="row g-3 mt-1">
@@ -380,6 +461,9 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
                         <span>{subjectSummary.inProgressGames} Aktif Kayıt</span>
                         <span>{subjectSummary.awaitingApprovalStages} Onay Bekleyen Aşama</span>
                       </div>
+                      <div className="subject-summary-meta">
+                        <span>{subjectSummary.missingInfoGames} Eksik Bilgili Kayıt</span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -393,7 +477,7 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
               <div className="section-heading">
                 <div>
                   <h3>Aşama Durum Özeti</h3>
-                  <p>Beş Üretim Adımının Anlık Dağılımı.</p>
+                  <p>Beş üretim adımının anlık dağılımı.</p>
                 </div>
               </div>
               <div className="table-responsive mt-3">
@@ -424,12 +508,43 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
           </div>
         </div>
       </section>
+
+      <section className="row g-4 mb-4">
+        <HighlightListCard
+          title="Yaklaşan Terminler"
+          description="Bitiş tarihi yakın veya geçmiş olan açık kayıtlar."
+          items={operationalHighlights.dueSoonGames}
+          emptyMessage="Yaklaşan veya geciken açık kayıt bulunmuyor."
+        />
+        <HighlightListCard
+          title="Onay Kuyruğu"
+          description="En az bir aşaması onaya gönderilmiş kayıtlar."
+          items={operationalHighlights.approvalQueue}
+          emptyMessage="Onay bekleyen kayıt bulunmuyor."
+        />
+        <HighlightListCard
+          title="Veri Uyarıları"
+          description="Eksik alan veya tutarsızlık taşıyan kayıtlar."
+          items={operationalHighlights.missingFieldQueue}
+          emptyMessage="Veri doğrulama uyarısı bulunmuyor."
+        />
+      </section>
     </>
   )
 }
 
-function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpenGame, onResetFilters, roleMode, subjectOptions, users }) {
-  const subjectValue = roleMode === 'user' ? filters.subject : formFilters.subject
+function GamesView({
+  filteredGames,
+  formFilters,
+  onCreateGame,
+  onFilterChange,
+  onOpenGame,
+  onResetFilters,
+  roleMode,
+  subjectOptions,
+  users,
+}) {
+  const subjectValue = roleMode === 'user' ? subjectOptions[0]?.code ?? '' : formFilters.subject
 
   return (
     <>
@@ -438,35 +553,67 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
           <div className="row g-3">
             <div className="col-12 col-xl-4">
               <label className="form-label">Konu Ara</label>
-              <input className="form-control" type="search" value={formFilters.search} onChange={(event) => onFilterChange('search', event.target.value)} placeholder="Örnek: Kuvvet ve Hareket" />
+              <input
+                className="form-control"
+                type="search"
+                value={formFilters.search}
+                onChange={(event) => onFilterChange('search', event.target.value)}
+                placeholder="Örnek: Kuvvet ve Hareket"
+              />
             </div>
             <div className="col-12 col-md-6 col-xl-2">
               <label className="form-label">Ders</label>
-              <select className="form-select" value={subjectValue} onChange={(event) => onFilterChange('subject', event.target.value)} disabled={roleMode === 'user'}>
+              <select
+                className="form-select"
+                value={subjectValue}
+                onChange={(event) => onFilterChange('subject', event.target.value)}
+                disabled={roleMode === 'user'}
+              >
                 <option value="">Tüm Dersler</option>
                 {subjectOptions.map((subject) => (
-                  <option key={subject.id} value={subject.code}>{subject.name}</option>
+                  <option key={subject.id} value={subject.code}>
+                    {SUBJECT_LABELS[subject.code] ?? subject.name}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="col-12 col-md-6 col-xl-2">
               <label className="form-label">Durum</label>
-              <select className="form-select" value={formFilters.status} onChange={(event) => onFilterChange('status', event.target.value)}>
+              <select
+                className="form-select"
+                value={formFilters.status}
+                onChange={(event) => onFilterChange('status', event.target.value)}
+              >
                 {STATUS_FILTER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="col-12 col-md-6 col-xl-2">
               <label className="form-label">Tamamlanma</label>
-              <select className="form-select" value={formFilters.completion} onChange={(event) => onFilterChange('completion', event.target.value)}>
+              <select
+                className="form-select"
+                value={formFilters.completion}
+                onChange={(event) => onFilterChange('completion', event.target.value)}
+              >
                 {COMPLETION_FILTER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
                 ))}
               </select>
             </div>
-            <div className="col-12 col-md-6 col-xl-2 d-flex align-items-end">
-              <button type="button" className="btn btn-outline-secondary w-100" onClick={onResetFilters}>Filtreleri Sıfırla</button>
+            <div className="col-6 col-md-3 col-xl-1 d-flex align-items-end">
+              <button type="button" className="btn btn-outline-secondary w-100" onClick={onResetFilters}>
+                Sıfırla
+              </button>
+            </div>
+            <div className="col-6 col-md-3 col-xl-1 d-flex align-items-end">
+              <button type="button" className="btn btn-primary w-100" onClick={onCreateGame}>
+                Yeni
+              </button>
             </div>
           </div>
         </div>
@@ -489,62 +636,66 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                   <th>Konu</th>
                   <th>Sorumlu</th>
                   <th>Bölüm</th>
-                  {STAGE_ORDER.map((stageKey) => (<th key={stageKey}>{STAGE_LABELS[stageKey]}</th>))}
+                  {STAGE_ORDER.map((stageKey) => (
+                    <th key={stageKey}>{STAGE_LABELS[stageKey]}</th>
+                  ))}
                   <th>Başlangıç</th>
                   <th>Bitiş</th>
                   <th>Link</th>
-                  <th>Tamam</th>
+                  <th>Durum</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {filteredGames.map((game) => (
-                  <tr key={game.id}>
-                    <td className="fw-semibold">{SUBJECT_LABELS[game.subject]}</td>
-                    <td>{game.class_level}</td>
-                    <td>
-                      <div className="table-title">{game.topic}</div>
-                      <div className="table-subtitle">{game.kazanimlar}</div>
-                    </td>
-                    <td>{getResponsibleUserName(users, game.responsible_user_id)}</td>
-                    <td>{game.interface_count}</td>
-                    {STAGE_ORDER.map((stageKey) => (
-                      <td key={stageKey}>
-                        <span className={`badge rounded-pill ${STATUS_BADGE_CLASSNAMES[game[stageKey]]}`}>
-                          {STATUS_LABELS[game[stageKey]]}
+                {filteredGames.map((game) => {
+                  const issues = getGameHealthIssues(game, users)
+
+                  return (
+                    <tr key={game.id}>
+                      <td className="fw-semibold">{SUBJECT_LABELS[game.subject]}</td>
+                      <td>{game.class_level}</td>
+                      <td>
+                        <div className="table-title">{game.topic}</div>
+                        <div className="table-subtitle">{game.kazanimlar}</div>
+                        {issues.length > 0 ? <div className="table-inline-note">{issues.length} Veri Uyarısı</div> : null}
+                      </td>
+                      <td>{getResponsibleUserName(users, game.responsible_user_id)}</td>
+                      <td>{game.interface_count}</td>
+                      {STAGE_ORDER.map((stageKey) => (
+                        <td key={stageKey}>
+                          <span className={`badge rounded-pill ${STATUS_BADGE_CLASSNAMES[game[stageKey]]}`}>
+                            {STATUS_LABELS[game[stageKey]]}
+                          </span>
+                        </td>
+                      ))}
+                      <td>{formatDate(game.start_date)}</td>
+                      <td>{formatDate(game.end_date)}</td>
+                      <td>
+                        {game.eba_link ? (
+                          <a className="badge rounded-pill text-bg-primary link-badge" href={game.eba_link} target="_blank" rel="noreferrer">
+                            Aç
+                          </a>
+                        ) : (
+                          <span className="badge rounded-pill text-bg-light link-badge disabled">Yok</span>
+                        )}
+                      </td>
+                      <td>
+                        <span className={`badge rounded-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
+                          {game.is_completed ? 'Tamamlandı' : 'Açık'}
                         </span>
                       </td>
-                    ))}
-                    <td>{formatDate(game.start_date)}</td>
-                    <td>{formatDate(game.end_date)}</td>
-                    <td>
-                      {game.eba_link ? (
-                        <a
-                          className="badge rounded-pill text-bg-primary link-badge"
-                          href={game.eba_link}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Aç
-                        </a>
-                      ) : (
-                        <span className="badge rounded-pill text-bg-light link-badge disabled">Yok</span>
-                      )}
-                    </td>
-                    <td>
-                      <span className={`badge rounded-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
-                        {game.is_completed ? 'Tamamlandı' : 'Açık'}
-                      </span>
-                    </td>
-                    <td>
-                      <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => onOpenGame(game.id)}>Detay</button>
-                    </td>
-                  </tr>
-                ))}
+                      <td>
+                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => onOpenGame(game.id)}>
+                          Detay
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
                 {filteredGames.length === 0 ? (
                   <tr>
                     <td colSpan={13 + STAGE_ORDER.length}>
-                      <div className="empty-state">Seçili Filtrelerle Eşleşen Kayıt Bulunamadı.</div>
+                      <div className="empty-state">Seçili filtrelerle eşleşen kayıt bulunamadı.</div>
                     </td>
                   </tr>
                 ) : null}
@@ -554,6 +705,36 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
         </div>
       </section>
     </>
+  )
+}
+
+function HighlightListCard({ description, emptyMessage, items, title }) {
+  return (
+    <div className="col-12 col-xl-4">
+      <div className="card rounded-4 border-0 shadow-sm h-100">
+        <div className="card-body">
+          <div className="section-heading compact-heading">
+            <div>
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </div>
+          </div>
+          <div className="highlight-list">
+            {items.length === 0 ? (
+              <div className="empty-state small">{emptyMessage}</div>
+            ) : (
+              items.map((item) => (
+                <article key={item.id} className={`highlight-item tone-${item.tone}`}>
+                  <div className="highlight-meta">{item.subjectLabel}</div>
+                  <h4>{item.topic}</h4>
+                  <p>{item.meta}</p>
+                </article>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -574,71 +755,134 @@ function MetricCard({ helper, icon, label, tone, value }) {
   )
 }
 
-function GameDetailDrawer({ draftGame, formErrors, onChange, onClose, onSave, saveMessage, users }) {
+function GameDetailDrawer({
+  availableResponsibleUsers,
+  drawerMode,
+  draftGame,
+  formErrors,
+  onChange,
+  onClose,
+  onSave,
+  saveMessage,
+  subjectOptions,
+}) {
   return (
     <>
       <div className="drawer-backdrop" onClick={onClose} aria-hidden="true" />
       <aside className="detail-drawer">
         <div className="detail-drawer-header">
           <div>
-            <span className="eyebrow">Oyun Detay / Düzenleme</span>
-            <h3>{draftGame.topic}</h3>
+            <span className="eyebrow">{drawerMode === 'create' ? 'Yeni Oyun Kaydı' : 'Oyun Detay / Düzenleme'}</span>
+            <h3>{draftGame.topic || 'Yeni Kayıt Hazırlanıyor'}</h3>
           </div>
           <button type="button" className="theme-icon-button" onClick={onClose} aria-label="Detay Panelini Kapat">
             <span className="material-icons-outlined">close</span>
           </button>
         </div>
         <div className="detail-drawer-body">
-          <div className="row g-3">
-            <FormField label="Ders">
-              <input className="form-control" value={SUBJECT_LABELS[draftGame.subject]} disabled />
-            </FormField>
-            <FormField label="Sınıf">
-              <input className="form-control" value={draftGame.class_level ?? ''} onChange={(event) => onChange('class_level', event.target.value)} />
-            </FormField>
-            <FormField label="Sorumlu">
-              <select className="form-select" value={draftGame.responsible_user_id} onChange={(event) => onChange('responsible_user_id', event.target.value)}>
-                {users.filter((user) => user.role === 'user').map((user) => (
-                  <option key={user.id} value={user.id}>{user.name}</option>
-                ))}
-              </select>
-            </FormField>
-            <FormField label="Konu" error={formErrors.topic}>
-              <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} />
-            </FormField>
-            <FormField label="Bölüm Sayısı" error={formErrors.interface_count}>
-              <input className={`form-control ${formErrors.interface_count ? 'is-invalid' : ''}`} type="number" min="0" value={draftGame.interface_count} onChange={(event) => onChange('interface_count', Number(event.target.value))} />
-            </FormField>
-            <FormField label="Başlangıç Tarihi">
-              <input className="form-control" type="date" value={draftGame.start_date} onChange={(event) => onChange('start_date', event.target.value)} />
-            </FormField>
-            <FormField label="Bitiş Tarihi" error={formErrors.end_date}>
-              <input className={`form-control ${formErrors.end_date ? 'is-invalid' : ''}`} type="date" value={draftGame.end_date} onChange={(event) => onChange('end_date', event.target.value)} />
-            </FormField>
-            {STAGE_ORDER.map((stageKey) => (
-              <FormField key={stageKey} label={STAGE_LABELS[stageKey]}>
-                <select className="form-select" value={draftGame[stageKey]} onChange={(event) => onChange(stageKey, event.target.value)}>
-                  {STATUS_FILTER_OPTIONS.filter((option) => option.value).map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+          <div className="drawer-section">
+            <div className="drawer-section-title">
+              <h4>Temel Bilgiler</h4>
+              <p>Ders, sınıf, konu ve sorumlu atamalarını bu alanda yönetin.</p>
+            </div>
+            <div className="row g-3">
+              <FormField label="Ders" error={formErrors.subject}>
+                <select className={`form-select ${formErrors.subject ? 'is-invalid' : ''}`} value={draftGame.subject} onChange={(event) => onChange('subject', event.target.value)}>
+                  {subjectOptions.map((subject) => (
+                    <option key={subject.id} value={subject.code}>
+                      {SUBJECT_LABELS[subject.code] ?? subject.name}
+                    </option>
                   ))}
                 </select>
               </FormField>
-            ))}
-            <FormField label="Kazanımlar" fullWidth>
-              <textarea className="form-control" rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} />
-            </FormField>
-            <FormField label="EBA Bağlantısı" fullWidth>
-              <input className="form-control" type="url" value={draftGame.eba_link} onChange={(event) => onChange('eba_link', event.target.value)} />
-            </FormField>
-            <FormField label="Notlar" fullWidth>
-              <textarea className="form-control" rows="4" value={draftGame.notes} onChange={(event) => onChange('notes', event.target.value)} />
-            </FormField>
+              <FormField label="Sınıf" error={formErrors.class_level}>
+                <select className={`form-select ${formErrors.class_level ? 'is-invalid' : ''}`} value={draftGame.class_level ?? ''} onChange={(event) => onChange('class_level', event.target.value)}>
+                  <option value="">Sınıf Seçin</option>
+                  {CLASS_LEVEL_OPTIONS.map((classLevel) => (
+                    <option key={classLevel} value={classLevel}>
+                      {classLevel}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+              <FormField label="Sorumlu" error={formErrors.responsible_user_id}>
+                <select className={`form-select ${formErrors.responsible_user_id ? 'is-invalid' : ''}`} value={draftGame.responsible_user_id} onChange={(event) => onChange('responsible_user_id', event.target.value)}>
+                  <option value="">Sorumlu Seçin</option>
+                  {availableResponsibleUsers.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+              <FormField label="Konu" error={formErrors.topic}>
+                <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} placeholder="Örnek: Kesirler Parkuru" />
+              </FormField>
+              <FormField label="Bölüm Sayısı" error={formErrors.interface_count}>
+                <input className={`form-control ${formErrors.interface_count ? 'is-invalid' : ''}`} type="number" min="0" value={draftGame.interface_count} onChange={(event) => onChange('interface_count', Number(event.target.value))} />
+              </FormField>
+              <FormField label="Tamamlandı Uygula" error={formErrors.is_completed}>
+                <div className="completion-toggle">
+                  <input id="is-completed" className="form-check-input" type="checkbox" checked={draftGame.is_completed} onChange={(event) => onChange('is_completed', event.target.checked)} />
+                  <label htmlFor="is-completed">Tüm aşamalar onaylandıysa kaydı tamamlandı olarak işaretle</label>
+                </div>
+              </FormField>
+            </div>
           </div>
+
+          <div className="drawer-section">
+            <div className="drawer-section-title">
+              <h4>Tarih ve Aşamalar</h4>
+              <p>Üretim akışındaki zamanlamayı ve aşama durumlarını burada güncelleyin.</p>
+            </div>
+            <div className="row g-3">
+              <FormField label="Başlangıç Tarihi" error={formErrors.start_date}>
+                <input className={`form-control ${formErrors.start_date ? 'is-invalid' : ''}`} type="date" value={draftGame.start_date} onChange={(event) => onChange('start_date', event.target.value)} />
+              </FormField>
+              <FormField label="Bitiş Tarihi" error={formErrors.end_date}>
+                <input className={`form-control ${formErrors.end_date ? 'is-invalid' : ''}`} type="date" value={draftGame.end_date} onChange={(event) => onChange('end_date', event.target.value)} />
+              </FormField>
+              {STAGE_ORDER.map((stageKey) => (
+                <FormField key={stageKey} label={STAGE_LABELS[stageKey]}>
+                  <select className="form-select" value={draftGame[stageKey]} onChange={(event) => onChange(stageKey, event.target.value)}>
+                    {STATUS_FILTER_OPTIONS.filter((option) => option.value).map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+              ))}
+            </div>
+          </div>
+
+          <div className="drawer-section">
+            <div className="drawer-section-title">
+              <h4>İçerik ve Yayın Bilgileri</h4>
+              <p>Kazanım, link ve operasyon notları kaydın görünürlüğünü güçlendirir.</p>
+            </div>
+            <div className="row g-3">
+              <FormField label="Kazanımlar" error={formErrors.kazanimlar} fullWidth>
+                <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun desteklediği kazanımları yazın" />
+              </FormField>
+              <FormField label="Link" error={formErrors.eba_link} fullWidth>
+                <input className={`form-control ${formErrors.eba_link ? 'is-invalid' : ''}`} type="url" value={draftGame.eba_link} onChange={(event) => onChange('eba_link', event.target.value)} placeholder="https://" />
+              </FormField>
+              <FormField label="Notlar" fullWidth>
+                <textarea className="form-control" rows="4" value={draftGame.notes} onChange={(event) => onChange('notes', event.target.value)} placeholder="Üretim ekibinin bilmesi gereken operasyon notlarını ekleyin" />
+              </FormField>
+            </div>
+          </div>
+
           {saveMessage ? <div className="alert alert-info mt-3 mb-0">{saveMessage}</div> : null}
         </div>
         <div className="detail-drawer-footer">
-          <button type="button" className="btn btn-light" onClick={onClose}>Kapat</button>
-          <button type="button" className="btn btn-primary" onClick={onSave}>Kaydet Akışını Göster</button>
+          <button type="button" className="btn btn-light" onClick={onClose}>
+            Kapat
+          </button>
+          <button type="button" className="btn btn-primary" onClick={onSave}>
+            {drawerMode === 'create' ? 'Kaydı Ekle' : 'Kaydı Güncelle'}
+          </button>
         </div>
       </aside>
     </>
@@ -656,6 +900,3 @@ function FormField({ children, error, fullWidth = false, label }) {
 }
 
 export default App
-
-
-
