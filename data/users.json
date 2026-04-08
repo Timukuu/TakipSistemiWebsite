@@ -1,0 +1,74 @@
+[
+  {
+    "id": "user_admin",
+    "name": "Merkez Yonetici",
+    "email": "admin@meb.gov.tr",
+    "role": "admin",
+    "subject": "fizik",
+    "created_at": "2026-04-08T08:00:00Z"
+  },
+  {
+    "id": "user_fizik",
+    "name": "Aylin Demir",
+    "email": "aylin.demir@meb.gov.tr",
+    "role": "user",
+    "subject": "fizik",
+    "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_kimya",
+    "name": "Baris Tunc",
+    "email": "baris.tunc@meb.gov.tr",
+    "role": "user",
+    "subject": "kimya",
+    "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_matematik",
+    "name": "Ceren Kose",
+    "email": "ceren.kose@meb.gov.tr",
+    "role": "user",
+    "subject": "matematik",
+    "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_biyoloji",
+    "name": "Deniz Erkan",
+    "email": "deniz.erkan@meb.gov.tr",
+    "role": "user",
+    "subject": "biyoloji",
+    "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_fen",
+    "name": "Ebru Yilmaz",
+    "email": "ebru.yilmaz@meb.gov.tr",
+    "role": "user",
+    "subject": "fen_bilimleri",
+    "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_sosyal",
+    "name": "Furkan Aksoy",
+    "email": "furkan.aksoy@meb.gov.tr",
+    "role": "user",
+    "subject": "sosyal_bilgiler",
+    "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_hayat",
+    "name": "Gizem Karaca",
+    "email": "gizem.karaca@meb.gov.tr",
+    "role": "user",
+    "subject": "hayat_bilgisi",
+    "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_turkce",
+    "name": "Hakan Ates",
+    "email": "hakan.ates@meb.gov.tr",
+    "role": "user",
+    "subject": "turkce",
+    "created_at": "2026-04-08T08:10:00Z"
+  }
+]

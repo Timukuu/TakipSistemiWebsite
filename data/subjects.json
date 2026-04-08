@@ -1,0 +1,10 @@
+[
+  { "id": "subject_fizik", "name": "Fizik", "code": "fizik", "is_active": true },
+  { "id": "subject_kimya", "name": "Kimya", "code": "kimya", "is_active": true },
+  { "id": "subject_matematik", "name": "Matematik", "code": "matematik", "is_active": true },
+  { "id": "subject_biyoloji", "name": "Biyoloji", "code": "biyoloji", "is_active": true },
+  { "id": "subject_fen", "name": "Fen Bilimleri", "code": "fen_bilimleri", "is_active": true },
+  { "id": "subject_sosyal", "name": "Sosyal Bilgiler", "code": "sosyal_bilgiler", "is_active": true },
+  { "id": "subject_hayat", "name": "Hayat Bilgisi", "code": "hayat_bilgisi", "is_active": true },
+  { "id": "subject_turkce", "name": "Turkce", "code": "turkce", "is_active": true }
+]
