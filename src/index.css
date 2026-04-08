@@ -104,7 +104,15 @@ a {
 }
 
 .sidebar-wrapper .menu-label {
-  color: #8fb3e8 !important;
+  display: block;
+  margin: 0.5rem 0 0.85rem;
+  padding: 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #dbeafe !important;
+  opacity: 1;
 }
 
 .sidebar-wrapper .sidebar-nav .metismenu a:hover,
