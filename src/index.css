@@ -413,10 +413,17 @@ a {
 }
 
 .subject-summary-card .badge.text-bg-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.55rem 0.9rem;
   background: #e9eef5 !important;
   color: #334155 !important;
   border: 0 !important;
   box-shadow: none !important;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .project-table thead th {
