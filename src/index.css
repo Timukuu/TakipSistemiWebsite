@@ -388,17 +388,50 @@ a {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #64748b;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.project-table tbody td {
+  text-align: center;
+  vertical-align: middle;
 }
 
 .table-title {
   font-weight: 700;
   color: #0f172a;
+  text-align: center;
 }
 
 .table-subtitle {
   margin-top: 0.2rem;
   font-size: 0.82rem;
   color: #64748b;
+  text-align: center;
+}
+
+.project-table .table-title,
+.project-table .table-subtitle {
+  max-width: 260px;
+  margin-inline: auto;
+}
+
+.project-table .badge,
+.project-table .btn {
+  margin-inline: auto;
+}
+
+.link-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  min-height: 32px;
+  text-decoration: none;
+}
+
+.link-badge.disabled {
+  pointer-events: none;
 }
 
 .empty-state {

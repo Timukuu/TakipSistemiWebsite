@@ -139,11 +139,11 @@ function App() {
     }
 
     if (Number(draftGame?.interface_count) < 0) {
-      nextErrors.interface_count = 'Arayüz sayisi 0 veya daha buyuk olmalidir.'
+      nextErrors.interface_count = 'Bölüm sayısı 0 veya daha büyük olmalıdır.'
     }
 
     if (draftGame?.start_date && draftGame?.end_date && draftGame.start_date > draftGame.end_date) {
-      nextErrors.end_date = 'Bitiş tarihi baslangic tarihinden once olamaz.'
+      nextErrors.end_date = 'Bitiş tarihi başlangıç tarihinden önce olamaz.'
     }
 
     setFormErrors(nextErrors)
@@ -156,9 +156,7 @@ function App() {
       return
     }
 
-    setSaveMessage(
-      'Bu surumde kayitlar yalnizca repo icindeki JSON dosyalari duzenlenip push edilerek kalici hale gelir. Form, Faz 2 veri akisina hazirlik amaciyla sunuluyor.',
-    )
+    setSaveMessage('Bu sürümde değişiklikler kalıcı olarak repo içindeki JSON dosyaları güncellenerek yayınlanır.')
   }
 
   return (
@@ -297,11 +295,6 @@ function App() {
                     ))}
                   </select>
                 </div>
-                <div className="col-12 col-xl-6">
-                  <div className="alert alert-primary mb-0 info-banner">
-                    Bu Panel Statik Yayınlanır. Form Alanları Operasyon Akışının İskeletidir; Kalıcı Veri Güncellemesi Repo İçindeki JSON Dosyaları Üzerinden Yapılır.
-                  </div>
-                </div>
               </div>
             </div>
           </section>
@@ -355,7 +348,7 @@ function DashboardView({ dashboardSummary, stageSummary, subjectSummaries }) {
       <section className="row g-4 mb-4">
         <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel Kapsamındaki Tüm Kayıtlar" />
         <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={dashboardSummary.completedGames} tone="success" helper="Tüm Aşamaları Kapanan Oyunlar" />
-        <MetricCard icon="autorenew" label="Devam Eden Kayıt" value={dashboardSummary.inProgressGames} tone="warning" helper="En Az Bir Aşaması Aktif Olanlar" />
+        <MetricCard icon="autorenew" label="Aktif Kayıt" value={dashboardSummary.inProgressGames} tone="warning" helper="Tamamlanmamış Oyunlar" />
         <MetricCard icon="approval" label="Onay Bekleyen Aşama" value={dashboardSummary.awaitingApprovalStages} tone="danger" helper="Onaya Gönderildi Durumundaki Adımlar" />
       </section>
 
@@ -492,12 +485,14 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
               <thead>
                 <tr>
                   <th>Ders</th>
+                  <th>Sınıf</th>
                   <th>Konu</th>
                   <th>Sorumlu</th>
-                  <th>Arayüz</th>
+                  <th>Bölüm</th>
                   {STAGE_ORDER.map((stageKey) => (<th key={stageKey}>{STAGE_LABELS[stageKey]}</th>))}
                   <th>Başlangıç</th>
                   <th>Bitiş</th>
+                  <th>Link</th>
                   <th>Tamam</th>
                   <th></th>
                 </tr>
@@ -506,6 +501,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                 {filteredGames.map((game) => (
                   <tr key={game.id}>
                     <td className="fw-semibold">{SUBJECT_LABELS[game.subject]}</td>
+                    <td>{game.class_level}</td>
                     <td>
                       <div className="table-title">{game.topic}</div>
                       <div className="table-subtitle">{game.kazanimlar}</div>
@@ -522,6 +518,20 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                     <td>{formatDate(game.start_date)}</td>
                     <td>{formatDate(game.end_date)}</td>
                     <td>
+                      {game.eba_link ? (
+                        <a
+                          className="badge rounded-pill text-bg-primary link-badge"
+                          href={game.eba_link}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Aç
+                        </a>
+                      ) : (
+                        <span className="badge rounded-pill text-bg-light link-badge disabled">Yok</span>
+                      )}
+                    </td>
+                    <td>
                       <span className={`badge rounded-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
                         {game.is_completed ? 'Tamamlandı' : 'Açık'}
                       </span>
@@ -533,7 +543,7 @@ function GamesView({ filteredGames, filters, formFilters, onFilterChange, onOpen
                 ))}
                 {filteredGames.length === 0 ? (
                   <tr>
-                    <td colSpan={11 + STAGE_ORDER.length}>
+                    <td colSpan={13 + STAGE_ORDER.length}>
                       <div className="empty-state">Seçili Filtrelerle Eşleşen Kayıt Bulunamadı.</div>
                     </td>
                   </tr>
@@ -579,12 +589,12 @@ function GameDetailDrawer({ draftGame, formErrors, onChange, onClose, onSave, sa
           </button>
         </div>
         <div className="detail-drawer-body">
-          <div className="alert alert-warning">
-            Kalıcı Kayıt Yok. Bu Form, Faz 2 Kalıcı Veri Akışına Hazır Bir Operasyon İskeleti Sağlar.
-          </div>
           <div className="row g-3">
             <FormField label="Ders">
               <input className="form-control" value={SUBJECT_LABELS[draftGame.subject]} disabled />
+            </FormField>
+            <FormField label="Sınıf">
+              <input className="form-control" value={draftGame.class_level ?? ''} onChange={(event) => onChange('class_level', event.target.value)} />
             </FormField>
             <FormField label="Sorumlu">
               <select className="form-select" value={draftGame.responsible_user_id} onChange={(event) => onChange('responsible_user_id', event.target.value)}>
@@ -596,7 +606,7 @@ function GameDetailDrawer({ draftGame, formErrors, onChange, onClose, onSave, sa
             <FormField label="Konu" error={formErrors.topic}>
               <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} />
             </FormField>
-            <FormField label="Arayüz Sayısı" error={formErrors.interface_count}>
+            <FormField label="Bölüm Sayısı" error={formErrors.interface_count}>
               <input className={`form-control ${formErrors.interface_count ? 'is-invalid' : ''}`} type="number" min="0" value={draftGame.interface_count} onChange={(event) => onChange('interface_count', Number(event.target.value))} />
             </FormField>
             <FormField label="Başlangıç Tarihi">
