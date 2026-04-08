@@ -47,9 +47,7 @@ export function matchesFilters(game, filters) {
 
 export function buildDashboardSummary(games) {
   const completedGames = games.filter((game) => game.is_completed).length
-  const inProgressGames = games.filter((game) =>
-    STAGE_ORDER.some((stageKey) => game[stageKey] === 'devam_ediyor'),
-  ).length
+  const inProgressGames = games.filter((game) => !game.is_completed).length
   const awaitingApprovalStages = games.reduce(
     (count, game) =>
       count + STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length,
@@ -70,9 +68,7 @@ export function getSubjectSummaries(games, subjects) {
     .map((subject) => {
       const subjectGames = games.filter((game) => game.subject === subject.code)
       const completedGames = subjectGames.filter((game) => game.is_completed).length
-      const inProgressGames = subjectGames.filter((game) =>
-        STAGE_ORDER.some((stageKey) => game[stageKey] === 'devam_ediyor'),
-      ).length
+      const inProgressGames = subjectGames.filter((game) => !game.is_completed).length
       const awaitingApprovalStages = subjectGames.reduce(
         (count, game) =>
           count + STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length,
