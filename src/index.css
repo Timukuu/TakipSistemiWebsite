@@ -287,11 +287,11 @@ a {
   border: 1px solid rgba(148, 163, 184, 0.22);
   background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  color: #0f172a;
+  color: #0f172a !important;
 }
 
 .subject-summary-card * {
-  color: inherit;
+  color: inherit !important;
 }
 
 .subject-summary-top,
@@ -305,14 +305,14 @@ a {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #1e293b !important;
 }
 
 .subject-summary-top p,
 .subject-summary-bottom span {
   margin: 0.25rem 0 0;
   font-size: 0.88rem;
-  color: #334155;
+  color: #475569 !important;
 }
 
 .subject-progress {
@@ -333,6 +333,8 @@ a {
 .subject-summary-card .badge.text-bg-light {
   background: #e9eef5 !important;
   color: #334155 !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 .project-table thead th {
