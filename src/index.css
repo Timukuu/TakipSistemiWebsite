@@ -488,10 +488,26 @@ a {
 }
 
 .stage-progress-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
+}
+
+.stage-progress-item::after {
+  content: '';
+  position: absolute;
+  top: calc(1.85rem + 0.35rem + 16px);
+  left: calc(50% + 44px);
+  width: calc(100% - 22px);
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.45);
+}
+
+.stage-progress-item.is-last::after {
+  display: none;
 }
 
 .stage-progress-label {
@@ -504,6 +520,8 @@ a {
 }
 
 .stage-progress-badge {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -554,6 +572,13 @@ a {
   text-align: center;
   line-height: 1.2;
   text-decoration: none;
+}
+
+.table-secondary-stack {
+  min-height: calc(1.85rem + 0.35rem + 34px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
 .link-badge.disabled {
@@ -790,6 +815,11 @@ a {
 
   .stage-progress-track {
     gap: 0.6rem;
+  }
+
+  .stage-progress-item::after {
+    left: calc(50% + 38px);
+    width: calc(100% - 18px);
   }
 
   .stage-progress-badge {

@@ -662,21 +662,29 @@ function GamesView({
                       <td className="stage-flow-cell">
                         <StageProgress game={game} />
                       </td>
-                      <td>{formatDate(game.start_date)}</td>
-                      <td>{formatDate(game.end_date)}</td>
                       <td>
-                        {game.eba_link ? (
-                          <a className="badge rounded-pill text-bg-primary link-badge table-pill" href={game.eba_link} target="_blank" rel="noreferrer">
-                            Aç
-                          </a>
-                        ) : (
-                          <span className="badge rounded-pill text-bg-light link-badge table-pill disabled">Yok</span>
-                        )}
+                        <div className="table-secondary-stack">{formatDate(game.start_date)}</div>
                       </td>
                       <td>
-                        <span className={`badge rounded-pill table-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
-                          {game.is_completed ? 'Tamamlandı' : 'Açık'}
-                        </span>
+                        <div className="table-secondary-stack">{formatDate(game.end_date)}</div>
+                      </td>
+                      <td>
+                        <div className="table-secondary-stack">
+                          {game.eba_link ? (
+                            <a className="badge rounded-pill text-bg-primary link-badge table-pill" href={game.eba_link} target="_blank" rel="noreferrer">
+                              Aç
+                            </a>
+                          ) : (
+                            <span className="badge rounded-pill text-bg-light link-badge table-pill disabled">Yok</span>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="table-secondary-stack">
+                          <span className={`badge rounded-pill table-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
+                            {game.is_completed ? 'Tamamlandı' : 'Açık'}
+                          </span>
+                        </div>
                       </td>
                       <td>
                         <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => onOpenGame(game.id)}>
