@@ -716,7 +716,7 @@ function StageProgress({ game }) {
       {STAGE_ORDER.map((stageKey, index) => {
         const status = game[stageKey]
         return (
-          <div key={stageKey} className={`stage-progress-item ${index === STAGE_ORDER.length - 1 ? 'is-last' : ''}`} role="listitem">
+          <div key={stageKey} className={`stage-progress-item status-${status} ${index === STAGE_ORDER.length - 1 ? 'is-last' : ''}`} role="listitem">
             <span className="stage-progress-label">{STAGE_LABELS[stageKey]}</span>
             <span className={`stage-progress-badge status-${status}`}>
               {STATUS_LABELS[status]}
