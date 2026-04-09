@@ -48,6 +48,24 @@ function resolvePlayableUrl(playUrl, baseUrl) {
   return new URL(playUrl.replace(/^\//, ''), normalizedBase).toString()
 }
 
+function formatActivityTimestamp(dateValue) {
+  if (!dateValue) {
+    return 'Tarih Yok'
+  }
+
+  const parsedDate = new Date(dateValue)
+  if (Number.isNaN(parsedDate.getTime())) {
+    return 'Tarih Yok'
+  }
+
+  return new Intl.DateTimeFormat('tr-TR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(parsedDate)
+}
+
 function App() {
   const baseUrl = import.meta.env.BASE_URL
   const initialRoleState = useMemo(() => getInitialRoleState(usersData), [])
@@ -113,6 +131,31 @@ function App() {
 
   const reportsSnapshot = useMemo(
     () => buildReportsSnapshot(scopedGames, subjectsData, usersData),
+    [scopedGames],
+  )
+
+  const recentActivities = useMemo(
+    () =>
+      [...scopedGames]
+        .sort((leftGame, rightGame) => {
+          const leftValue = new Date(leftGame.updated_at || leftGame.created_at || 0).getTime()
+          const rightValue = new Date(rightGame.updated_at || rightGame.created_at || 0).getTime()
+          return rightValue - leftValue
+        })
+        .slice(0, 3)
+        .map((game) => {
+          const createdTime = new Date(game.created_at || 0).getTime()
+          const updatedTime = new Date(game.updated_at || game.created_at || 0).getTime()
+          const isNewRecord = Math.abs(updatedTime - createdTime) < 60 * 1000
+
+          return {
+            id: game.id,
+            topic: game.topic,
+            subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
+            actionLabel: isNewRecord ? 'Yeni Kayıt' : 'Güncellendi',
+            timestampLabel: formatActivityTimestamp(game.updated_at || game.created_at),
+          }
+        }),
     [scopedGames],
   )
 
@@ -418,8 +461,25 @@ function App() {
                 </div>
                 <div className="col-12 col-xl-6">
                   <div className="phase-banner">
-                    <strong>Faz 2 Aktif</strong>
-                    <span>Yerel düzenleme, yeni kayıt akışı ve yönetici operasyon özetleri açık durumda.</span>
+                    <strong>Son İşlemler</strong>
+                    <div className="recent-activity-list">
+                      {recentActivities.length > 0 ? (
+                        recentActivities.map((activity) => (
+                          <article key={activity.id} className="recent-activity-item">
+                            <div className="recent-activity-copy">
+                              <span>{activity.topic}</span>
+                              <small>{activity.subjectLabel}</small>
+                            </div>
+                            <div className="recent-activity-meta">
+                              <strong>{activity.actionLabel}</strong>
+                              <small>{activity.timestampLabel}</small>
+                            </div>
+                          </article>
+                        ))
+                      ) : (
+                        <div className="recent-activity-empty">Henüz gösterilecek bir işlem bulunmuyor.</div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

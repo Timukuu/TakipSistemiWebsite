@@ -191,6 +191,52 @@ a {
   color: #94a3b8;
 }
 
+.recent-activity-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.recent-activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.9rem;
+  background: rgba(15, 23, 42, 0.24);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.recent-activity-copy,
+.recent-activity-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.recent-activity-copy span,
+.recent-activity-meta strong {
+  color: #f8fbff;
+  font-size: 0.8rem;
+}
+
+.recent-activity-copy small,
+.recent-activity-meta small,
+.recent-activity-empty {
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.recent-activity-meta {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.recent-activity-empty {
+  padding: 0.55rem 0;
+}
+
 .utility-panel {
   background: linear-gradient(180deg, rgba(8, 22, 47, 0.96), rgba(16, 40, 73, 0.94));
   border: 1px solid rgba(148, 163, 184, 0.14);
@@ -661,6 +707,20 @@ a {
 .detail-icon-pill .material-icons-outlined {
   font-size: 1rem;
   line-height: 1;
+  color: #ffffff;
+}
+
+.detail-icon-pill {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.85), rgba(14, 165, 233, 0.88));
+  border-color: rgba(125, 211, 252, 0.28);
+  color: #ffffff;
+}
+
+.detail-icon-pill:hover,
+.detail-icon-pill:focus {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(14, 165, 233, 0.96));
+  border-color: rgba(186, 230, 253, 0.36);
+  color: #ffffff;
 }
 
 .table-action-pill:hover,
