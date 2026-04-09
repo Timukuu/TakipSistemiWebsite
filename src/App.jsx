@@ -666,15 +666,15 @@ function GamesView({
                       <td>{formatDate(game.end_date)}</td>
                       <td>
                         {game.eba_link ? (
-                          <a className="badge rounded-pill text-bg-primary link-badge" href={game.eba_link} target="_blank" rel="noreferrer">
+                          <a className="badge rounded-pill text-bg-primary link-badge table-pill" href={game.eba_link} target="_blank" rel="noreferrer">
                             Aç
                           </a>
                         ) : (
-                          <span className="badge rounded-pill text-bg-light link-badge disabled">Yok</span>
+                          <span className="badge rounded-pill text-bg-light link-badge table-pill disabled">Yok</span>
                         )}
                       </td>
                       <td>
-                        <span className={`badge rounded-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
+                        <span className={`badge rounded-pill table-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
                           {game.is_completed ? 'Tamamlandı' : 'Açık'}
                         </span>
                       </td>

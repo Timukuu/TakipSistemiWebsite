@@ -477,65 +477,47 @@ a {
 }
 
 .stage-flow-cell {
-  min-width: 640px;
+  min-width: 620px;
 }
 
 .stage-progress-track {
   display: grid;
   grid-template-columns: repeat(5, minmax(112px, 1fr));
   align-items: start;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .stage-progress-item {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.45rem;
-}
-
-.stage-progress-item::after {
-  content: '';
-  position: absolute;
-  top: 2.25rem;
-  left: calc(50% + 58px);
-  width: calc(100% - 4px);
-  height: 4px;
-  border-radius: 999px;
-  background: #d5ddea;
-}
-
-.stage-progress-item.is-last::after {
-  display: none;
+  gap: 0.35rem;
 }
 
 .stage-progress-label {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #334155;
   text-align: center;
   line-height: 1.35;
-  min-height: 2rem;
+  min-height: 1.85rem;
 }
 
 .stage-progress-badge {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 116px;
-  min-width: 116px;
-  min-height: 40px;
-  padding: 0.45rem 0.7rem;
+  width: 108px;
+  min-width: 108px;
+  min-height: 34px;
+  padding: 0.3rem 0.65rem;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-align: center;
   line-height: 1.2;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
 }
 
 .stage-progress-badge.status-baslamadi {
@@ -559,18 +541,18 @@ a {
   color: #fff;
 }
 
-.stage-progress-item:has(.status-devam_ediyor)::after,
-.stage-progress-item:has(.status-onaya_gonderildi)::after,
-.stage-progress-item:has(.status-onaylandi)::after {
-  background: linear-gradient(90deg, rgba(16, 185, 129, 0.95), rgba(37, 99, 235, 0.72));
-}
-
+.table-pill,
 .link-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 68px;
-  min-height: 32px;
+  min-width: 88px;
+  min-height: 34px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
   text-decoration: none;
 }
 
@@ -803,20 +785,17 @@ a {
   }
 
   .stage-flow-cell {
-    min-width: 540px;
+    min-width: 520px;
   }
 
   .stage-progress-track {
-    gap: 0.75rem;
-  }
-
-  .stage-progress-item::after {
-    left: calc(50% + 48px);
+    gap: 0.6rem;
   }
 
   .stage-progress-badge {
-    width: 96px;
-    min-width: 96px;
+    width: 92px;
+    min-width: 92px;
+    min-height: 32px;
     font-size: 0.68rem;
   }
 }
