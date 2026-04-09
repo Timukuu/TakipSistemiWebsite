@@ -474,7 +474,6 @@ function DashboardView({ dashboardSummary, operationalHighlights, stageSummary, 
                           <h4>{subjectSummary.name}</h4>
                           <p>{subjectSummary.totalGames} Oyun Kaydı</p>
                         </div>
-                        <span className="badge text-bg-light">{subjectSummary.completedGames} Tamamlandı</span>
                       </div>
                       <div className="subject-progress">
                         <div className="subject-progress-bar" style={{ width: `${subjectSummary.completionRate}%` }} />
@@ -485,6 +484,7 @@ function DashboardView({ dashboardSummary, operationalHighlights, stageSummary, 
                       </div>
                       <div className="subject-summary-meta">
                         <span>{subjectSummary.missingInfoGames} Eksik Bilgili Kayıt</span>
+                        <span className="badge text-bg-light">{subjectSummary.completedGames} Tamamlandı</span>
                       </div>
                     </div>
                   </div>
