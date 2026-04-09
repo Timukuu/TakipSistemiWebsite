@@ -636,9 +636,7 @@ function GamesView({
                   <th>Konu</th>
                   <th>Sorumlu</th>
                   <th>Bölüm</th>
-                  {STAGE_ORDER.map((stageKey) => (
-                    <th key={stageKey}>{STAGE_LABELS[stageKey]}</th>
-                  ))}
+                  <th>Üretim Akışı</th>
                   <th>Başlangıç</th>
                   <th>Bitiş</th>
                   <th>Link</th>
@@ -661,13 +659,9 @@ function GamesView({
                       </td>
                       <td>{getResponsibleUserName(users, game.responsible_user_id)}</td>
                       <td>{game.interface_count}</td>
-                      {STAGE_ORDER.map((stageKey) => (
-                        <td key={stageKey}>
-                          <span className={`badge rounded-pill ${STATUS_BADGE_CLASSNAMES[game[stageKey]]}`}>
-                            {STATUS_LABELS[game[stageKey]]}
-                          </span>
-                        </td>
-                      ))}
+                      <td className="stage-flow-cell">
+                        <StageProgress game={game} />
+                      </td>
                       <td>{formatDate(game.start_date)}</td>
                       <td>{formatDate(game.end_date)}</td>
                       <td>
@@ -694,7 +688,7 @@ function GamesView({
                 })}
                 {filteredGames.length === 0 ? (
                   <tr>
-                    <td colSpan={13 + STAGE_ORDER.length}>
+                    <td colSpan={11}>
                       <div className="empty-state">Seçili filtrelerle eşleşen kayıt bulunamadı.</div>
                     </td>
                   </tr>
@@ -705,6 +699,24 @@ function GamesView({
         </div>
       </section>
     </>
+  )
+}
+
+function StageProgress({ game }) {
+  return (
+    <div className="stage-progress-track" role="list" aria-label="Üretim Aşamaları">
+      {STAGE_ORDER.map((stageKey, index) => {
+        const status = game[stageKey]
+        return (
+          <div key={stageKey} className={`stage-progress-item ${index === STAGE_ORDER.length - 1 ? 'is-last' : ''}`} role="listitem">
+            <span className="stage-progress-label">{STAGE_LABELS[stageKey]}</span>
+            <span className={`stage-progress-badge status-${status}`}>
+              {STATUS_LABELS[status]}
+            </span>
+          </div>
+        )
+      })}
+    </div>
   )
 }
 

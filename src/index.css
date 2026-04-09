@@ -476,6 +476,95 @@ a {
   margin-inline: auto;
 }
 
+.stage-flow-cell {
+  min-width: 640px;
+}
+
+.stage-progress-track {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(112px, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.stage-progress-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.stage-progress-item::after {
+  content: '';
+  position: absolute;
+  top: 2.25rem;
+  left: calc(50% + 58px);
+  width: calc(100% - 4px);
+  height: 4px;
+  border-radius: 999px;
+  background: #d5ddea;
+}
+
+.stage-progress-item.is-last::after {
+  display: none;
+}
+
+.stage-progress-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #334155;
+  text-align: center;
+  line-height: 1.35;
+  min-height: 2rem;
+}
+
+.stage-progress-badge {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 116px;
+  min-width: 116px;
+  min-height: 40px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.stage-progress-badge.status-baslamadi {
+  background: #f1f5f9;
+  color: #64748b;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.stage-progress-badge.status-devam_ediyor {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  color: #fff;
+}
+
+.stage-progress-badge.status-onaya_gonderildi {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  color: #fff;
+}
+
+.stage-progress-badge.status-onaylandi {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  color: #fff;
+}
+
+.stage-progress-item:has(.status-devam_ediyor)::after,
+.stage-progress-item:has(.status-onaya_gonderildi)::after,
+.stage-progress-item:has(.status-onaylandi)::after {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.95), rgba(37, 99, 235, 0.72));
+}
+
 .link-badge {
   display: inline-flex;
   align-items: center;
@@ -711,5 +800,23 @@ a {
   .subject-summary-top,
   .subject-summary-bottom {
     flex-direction: column;
+  }
+
+  .stage-flow-cell {
+    min-width: 540px;
+  }
+
+  .stage-progress-track {
+    gap: 0.75rem;
+  }
+
+  .stage-progress-item::after {
+    left: calc(50% + 48px);
+  }
+
+  .stage-progress-badge {
+    width: 96px;
+    min-width: 96px;
+    font-size: 0.68rem;
   }
 }
