@@ -1262,7 +1262,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
               </div>
               <div className="report-chart-wrap">
                 <ReactApexChart
-                  type="pie"
+                  type="donut"
                   height={320}
                   series={reportsSnapshot.classDistribution.map((item) => item.value)}
                   options={classDistributionOptions}
