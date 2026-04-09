@@ -1066,6 +1066,91 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     },
   }
 
+  const last7DaysActivityOptions = {
+    chart: {
+      type: 'bar',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '42%',
+        borderRadius: 6,
+      },
+    },
+    dataLabels: { enabled: false },
+    xaxis: {
+      categories: reportsSnapshot.last7DaysActivity.map((item) => item.label),
+      labels: {
+        style: { colors: '#94a3b8', fontSize: '11px' },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: '#94a3b8' },
+      },
+    },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'left',
+      labels: { colors: '#94a3b8' },
+    },
+    colors: ['#2563eb', '#10b981'],
+    grid: {
+      borderColor: 'rgba(148, 163, 184, 0.16)',
+    },
+  }
+
+  const last7DaysActivitySeries = [
+    {
+      name: 'Yeni',
+      data: reportsSnapshot.last7DaysActivity.map((item) => item.createdCount),
+    },
+    {
+      name: 'Güncellendi',
+      data: reportsSnapshot.last7DaysActivity.map((item) => item.updatedCount),
+    },
+  ]
+
+  const scopeSizeOptions = {
+    chart: {
+      type: 'bar',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        borderRadius: 8,
+        barHeight: '64%',
+      },
+    },
+    dataLabels: { enabled: false },
+    xaxis: {
+      categories: reportsSnapshot.scopeSizeRows.slice(0, 6).map((item) => item.topic),
+      labels: {
+        style: { colors: '#94a3b8' },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: '#94a3b8', fontSize: '11px' },
+      },
+    },
+    colors: ['#8b5cf6'],
+    grid: {
+      borderColor: 'rgba(148, 163, 184, 0.16)',
+    },
+  }
+
+  const scopeSizeSeries = [
+    {
+      name: 'Bölüm',
+      data: reportsSnapshot.scopeSizeRows.slice(0, 6).map((item) => item.sectionCount),
+    },
+  ]
+
   return (
     <>
       <section className="row g-4 mb-4">
@@ -1302,6 +1387,104 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="row g-4 mt-4 mb-4">
+        <div className="col-12 col-xl-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Sessiz Dersler</h3>
+                  <p>Son hareketi en geride kalan dersleri hızlıca görün.</p>
+                </div>
+              </div>
+              <div className="report-insight-list mt-3">
+                {reportsSnapshot.silentSubjects.slice(0, 5).map((item) => (
+                  <article key={item.code} className="report-insight-item">
+                    <div className="report-insight-copy">
+                      <strong>{item.name}</strong>
+                      <span>{item.totalGames} kayıt · {item.completionRate}% tamamlanma</span>
+                    </div>
+                    <div className="report-insight-badge">
+                      <strong>{item.daysSinceActivity}</strong>
+                      <small>gündür sessiz</small>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>En Hızlı İlerleyen Dersler</h3>
+                  <p>Tamamlanma ve aşama hızı birlikte en güçlü giden dersler.</p>
+                </div>
+              </div>
+              <div className="report-insight-list mt-3">
+                {reportsSnapshot.fastestSubjects.slice(0, 5).map((item) => (
+                  <article key={item.code} className="report-insight-item">
+                    <div className="report-insight-copy">
+                      <strong>{item.name}</strong>
+                      <span>{item.completionRate}% tamamlanma · {item.stageVelocity}% aşama hızı</span>
+                    </div>
+                    <div className="report-insight-badge good">
+                      <strong>{item.momentumScore}</strong>
+                      <small>ivme puanı</small>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="row g-4 mb-2">
+        <div className="col-12 col-xl-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Son 7 Gün Aktivitesi</h3>
+                  <p>Yeni eklenen ve güncellenen kayıt hareketi gün bazında izlenir.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="bar"
+                  height={320}
+                  series={last7DaysActivitySeries}
+                  options={last7DaysActivityOptions}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Kapsam Büyüklüğü</h3>
+                  <p>Bölüm sayısı en yüksek oyunlar toplam üretim yükünü öne çıkarır.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="bar"
+                  height={320}
+                  series={scopeSizeSeries}
+                  options={scopeSizeOptions}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>

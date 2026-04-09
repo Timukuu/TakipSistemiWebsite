@@ -950,6 +950,68 @@ a {
   background: linear-gradient(90deg, #2563eb, #10b981);
 }
 
+.report-insight-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.report-insight-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.92));
+}
+
+.report-insight-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.report-insight-copy strong {
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.report-insight-copy span {
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.report-insight-badge {
+  min-width: 98px;
+  padding: 0.8rem 0.85rem;
+  border-radius: 1rem;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  text-align: center;
+}
+
+.report-insight-badge strong {
+  display: block;
+  color: #1d4ed8;
+  font-size: 1rem;
+}
+
+.report-insight-badge small {
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+.report-insight-badge.good {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.18);
+}
+
+.report-insight-badge.good strong {
+  color: #059669;
+}
+
 .health-score-list {
   display: grid;
   gap: 0.85rem;

@@ -388,6 +388,84 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
     .map(([label, value]) => ({ label, value }))
     .sort((leftItem, rightItem) => rightItem.value - leftItem.value)
 
+  const silentSubjects = subjectSummaries
+    .filter((item) => item.totalGames > 0)
+    .map((item) => {
+      const subjectGames = games.filter((game) => game.subject === item.code)
+      const lastActivityAt = subjectGames
+        .map((game) => new Date(game.updated_at || game.created_at || 0).getTime())
+        .reduce((latest, value) => Math.max(latest, value), 0)
+      const daysSinceActivity = lastActivityAt
+        ? Math.max(0, Math.floor((referenceDate.getTime() - lastActivityAt) / ONE_DAY_IN_MS))
+        : 0
+
+      return {
+        code: item.code,
+        name: item.name,
+        daysSinceActivity,
+        totalGames: item.totalGames,
+        completionRate: item.completionRate,
+      }
+    })
+    .sort((leftItem, rightItem) => rightItem.daysSinceActivity - leftItem.daysSinceActivity)
+
+  const fastestSubjects = subjectSummaries
+    .filter((item) => item.totalGames > 0)
+    .map((item) => {
+      const subjectGames = games.filter((game) => game.subject === item.code)
+      const stageVelocity = subjectGames.length
+        ? Math.round(
+            (subjectGames.reduce(
+              (sum, game) =>
+                sum +
+                STAGE_ORDER.reduce((stageSum, stageKey) => stageSum + STATUS_PROGRESS_SCORE[game[stageKey]], 0),
+              0,
+            ) /
+              (subjectGames.length * STAGE_ORDER.length * 3)) *
+              100,
+          )
+        : 0
+
+      return {
+        code: item.code,
+        name: item.name,
+        completionRate: item.completionRate,
+        stageVelocity,
+        momentumScore: Math.round(item.completionRate * 0.6 + stageVelocity * 0.4),
+      }
+    })
+    .sort((leftItem, rightItem) => rightItem.momentumScore - leftItem.momentumScore)
+
+  const last7DaysActivity = Array.from({ length: 7 }, (_, index) => {
+    const currentDate = new Date(referenceDate)
+    currentDate.setHours(0, 0, 0, 0)
+    currentDate.setDate(currentDate.getDate() - (6 - index))
+    const dateKey = currentDate.toISOString().slice(0, 10)
+
+    return {
+      label: new Intl.DateTimeFormat('tr-TR', {
+        day: '2-digit',
+        month: 'short',
+      }).format(currentDate),
+      createdCount: games.filter((game) => (game.created_at || '').slice(0, 10) === dateKey).length,
+      updatedCount: games.filter((game) => {
+        const updatedKey = (game.updated_at || '').slice(0, 10)
+        const createdKey = (game.created_at || '').slice(0, 10)
+        return updatedKey === dateKey && updatedKey !== createdKey
+      }).length,
+    }
+  })
+
+  const scopeSizeRows = [...games]
+    .map((game) => ({
+      id: game.id,
+      topic: game.topic,
+      subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
+      sectionCount: Number(game.interface_count || 0),
+      classLevel: game.class_level || '-',
+    }))
+    .sort((leftItem, rightItem) => rightItem.sectionCount - leftItem.sectionCount)
+
   const responsibleWorkload = users
     .filter((user) => user.role === 'user')
     .map((user) => {
@@ -502,6 +580,10 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
     funnelSeries,
     stageHeatmap,
     healthScoreRows,
+    silentSubjects,
+    fastestSubjects,
+    last7DaysActivity,
+    scopeSizeRows,
   }
 }
 
