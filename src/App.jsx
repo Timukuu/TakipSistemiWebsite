@@ -134,6 +134,11 @@ function App() {
     [scopedGames],
   )
 
+  const totalSectionCount = useMemo(
+    () => scopedGames.reduce((sum, game) => sum + Number(game.interface_count || 0), 0),
+    [scopedGames],
+  )
+
   const recentActivities = useMemo(
     () =>
       [...scopedGames]
@@ -501,6 +506,10 @@ function App() {
                       <article className="operation-summary-card">
                         <span>Onay Bekleyen</span>
                         <strong>{dashboardSummary.awaitingApprovalStages}</strong>
+                      </article>
+                      <article className="operation-summary-card">
+                        <span>Toplam Bölüm</span>
+                        <strong>{totalSectionCount}</strong>
                       </article>
                     </div>
                   </div>
@@ -884,7 +893,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
 
   const classDistributionOptions = {
     chart: {
-      type: 'pie',
+      type: 'donut',
       toolbar: { show: false },
       fontFamily: 'Comfortaa, Noto Sans, sans-serif',
     },
@@ -898,6 +907,23 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     colors: ['#14b8a6', '#22c55e', '#f59e0b', '#3b82f6', '#8b5cf6', '#f97316', '#ef4444'],
     stroke: { width: 0 },
     tooltip: sharedTooltip,
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '70%',
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: 'Toplam',
+              color: '#64748b',
+              formatter: () =>
+                String(reportsSnapshot.classDistribution.reduce((sum, item) => sum + item.value, 0)),
+            },
+          },
+        },
+      },
+    },
   }
 
   const workloadOptions = {
@@ -1336,45 +1362,21 @@ function ReportsView({ reportsSnapshot, roleMode }) {
         </div>
       </section>
 
-      <section className="row g-4 mb-4">
-        <div className="col-12 col-xl-8">
-          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
-            <div className="card-body">
-              <div className="section-heading">
-                <div>
-                  <h3>Aşama Isı Haritası</h3>
-                  <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
-                </div>
-              </div>
-              <div className="report-chart-wrap">
-                <ReactApexChart
-                  type="heatmap"
-                  height={320}
-                  series={reportsSnapshot.stageHeatmap}
-                  options={heatmapOptions}
-                />
-              </div>
+      <section className="card rounded-4 border-0 shadow-sm mb-4">
+        <div className="card-body">
+          <div className="section-heading">
+            <div>
+              <h3>Aşama Isı Haritası</h3>
+              <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
             </div>
           </div>
-        </div>
-        <div className="col-12 col-xl-4">
-          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
-            <div className="card-body">
-              <div className="section-heading">
-                <div>
-                  <h3>Sınıf Yoğunluk Dağılımı</h3>
-                  <p>Isı haritasının yanında içerik yoğunluğunu sınıf bazında karşılaştırın.</p>
-                </div>
-              </div>
-              <div className="report-chart-wrap">
-                <ReactApexChart
-                  type="pie"
-                  height={320}
-                  series={reportsSnapshot.classDistribution.map((item) => item.value)}
-                  options={classDistributionOptions}
-                />
-              </div>
-            </div>
+          <div className="report-chart-wrap">
+            <ReactApexChart
+              type="heatmap"
+              height={320}
+              series={reportsSnapshot.stageHeatmap}
+              options={heatmapOptions}
+            />
           </div>
         </div>
       </section>
