@@ -581,7 +581,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     legend: {
       position: 'bottom',
       fontSize: '12px',
-      labels: { colors: '#475569' },
+      labels: { colors: '#94a3b8' },
     },
     colors: ['#2563eb', '#10b981', '#f59e0b', '#0ea5e9', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316'],
     stroke: { width: 0 },
@@ -622,7 +622,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       categories: reportsSnapshot.stageDistribution.map((item) => item.label),
       labels: {
         style: {
-          colors: '#475569',
+          colors: '#94a3b8',
           fontSize: '11px',
         },
       },
@@ -637,7 +637,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     legend: {
       position: 'top',
       horizontalAlign: 'left',
-      labels: { colors: '#475569' },
+      labels: { colors: '#94a3b8' },
     },
     colors: ['#e2e8f0', '#f59e0b', '#2563eb', '#10b981'],
     grid: {

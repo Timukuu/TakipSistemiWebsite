@@ -188,7 +188,7 @@ a {
 .phase-banner span {
   font-size: 0.82rem;
   line-height: 1.5;
-  color: #475569;
+  color: #94a3b8;
 }
 
 .nav-button {
@@ -245,7 +245,7 @@ a {
   margin: 0;
   font-size: 0.83rem;
   line-height: 1.45;
-  color: #475569;
+  color: #94a3b8;
 }
 
 .page-breadcrumb-content {
@@ -386,7 +386,7 @@ a {
 .subject-summary-bottom span {
   margin: 0.25rem 0 0;
   font-size: 0.88rem;
-  color: #475569 !important;
+  color: #94a3b8 !important;
 }
 
 .subject-summary-meta {
@@ -655,7 +655,7 @@ a {
   align-items: center;
   text-align: center;
   gap: 0.85rem;
-  color: #475569;
+  color: #94a3b8;
 }
 
 .reports-locked-state .material-icons-outlined {
@@ -692,7 +692,7 @@ a {
 }
 
 .report-table tbody td {
-  color: #334155;
+  color: #cbd5e1;
 }
 
 .report-progress {
@@ -719,7 +719,7 @@ a {
 .highlight-item p,
 .highlight-meta {
   margin: 0;
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.82rem;
   line-height: 1.45;
 }
