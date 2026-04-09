@@ -649,6 +649,67 @@ a {
   background: linear-gradient(180deg, #fff, #f8fbff);
 }
 
+.reports-locked-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  color: #475569;
+}
+
+.reports-locked-state .material-icons-outlined {
+  font-size: 2.25rem;
+  color: #2563eb;
+}
+
+.reports-locked-state h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.2rem;
+}
+
+.reports-locked-state p {
+  margin: 0;
+  max-width: 32rem;
+  line-height: 1.6;
+}
+
+.report-chart-card .card-body {
+  min-height: 100%;
+}
+
+.report-chart-wrap {
+  margin-top: 1rem;
+}
+
+.report-table thead th {
+  white-space: nowrap;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.report-table tbody td {
+  color: #334155;
+}
+
+.report-progress {
+  width: 100%;
+  height: 8px;
+  margin-bottom: 0.45rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.report-progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, #10b981);
+}
+
 .highlight-item h4 {
   margin: 0.25rem 0 0.45rem;
   font-size: 0.98rem;

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import ReactApexChart from 'react-apexcharts'
 import gamesData from '../data/games.json'
 import subjectsData from '../data/subjects.json'
 import usersData from '../data/users.json'
@@ -7,6 +8,7 @@ import {
   COMPLETION_FILTER_OPTIONS,
   DEFAULT_FILTERS,
   NAV_ITEMS,
+  REPORTS_NAV_ITEM,
   ROLE_OPTIONS,
   STAGE_LABELS,
   STAGE_ORDER,
@@ -18,6 +20,7 @@ import {
 import {
   buildDashboardSummary,
   buildOperationalHighlights,
+  buildReportsSnapshot,
   buildStageSummary,
   createEmptyGame,
   formatDate,
@@ -86,6 +89,16 @@ function App() {
   const operationalHighlights = useMemo(
     () => buildOperationalHighlights(scopedGames, usersData),
     [scopedGames],
+  )
+
+  const reportsSnapshot = useMemo(
+    () => buildReportsSnapshot(scopedGames, subjectsData, usersData),
+    [scopedGames],
+  )
+
+  const navigationItems = useMemo(
+    () => (roleMode === 'admin' ? [...NAV_ITEMS, REPORTS_NAV_ITEM] : NAV_ITEMS),
+    [roleMode],
   )
 
   useEffect(() => {
@@ -296,7 +309,7 @@ function App() {
         <div className="sidebar-nav">
           <ul className="metismenu">
             <li className="menu-label">Genel Menu</li>
-            {NAV_ITEMS.map((item) => (
+            {navigationItems.map((item) => (
               <li key={item.id} className={currentView === item.id ? 'mm-active' : ''}>
                 <button
                   type="button"
@@ -321,7 +334,11 @@ function App() {
         <div className="main-content">
           <div className="page-breadcrumb d-flex flex-column flex-lg-row align-items-lg-center gap-3 mb-4">
             <div className="breadcrumb-title pe-lg-3">
-              {currentView === 'dashboard' ? 'Ana Panel' : 'Oyun Listesi'}
+              {currentView === 'dashboard'
+                ? 'Ana Panel'
+                : currentView === 'reports'
+                  ? 'Raporlar'
+                  : 'Oyun Listesi'}
             </div>
             <div className="page-breadcrumb-content">
               <span className="crumb-pill">
@@ -383,6 +400,11 @@ function App() {
               operationalHighlights={operationalHighlights}
               stageSummary={stageSummary}
               subjectSummaries={subjectSummaries}
+            />
+          ) : currentView === 'reports' ? (
+            <ReportsView
+              reportsSnapshot={reportsSnapshot}
+              roleMode={roleMode}
             />
           ) : (
             <GamesView
@@ -528,6 +550,220 @@ function DashboardView({ dashboardSummary, operationalHighlights, stageSummary, 
           items={operationalHighlights.missingFieldQueue}
           emptyMessage="Veri doğrulama uyarısı bulunmuyor."
         />
+      </section>
+    </>
+  )
+}
+
+function ReportsView({ reportsSnapshot, roleMode }) {
+  if (roleMode !== 'admin') {
+    return (
+      <section className="card rounded-4 border-0 shadow-sm">
+        <div className="card-body py-5">
+          <div className="reports-locked-state">
+            <span className="material-icons-outlined">lock</span>
+            <h3>Raporlar Yalnızca Yönetici Görünümünde Açılır</h3>
+            <p>Detaylı istatistikler ve grafik ekranları yalnızca yönetici görünümünde erişilebilir.</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  const donutOptions = {
+    chart: {
+      type: 'donut',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    labels: reportsSnapshot.subjectDistribution.map((item) => item.label),
+    dataLabels: { enabled: false },
+    legend: {
+      position: 'bottom',
+      fontSize: '12px',
+      labels: { colors: '#475569' },
+    },
+    colors: ['#2563eb', '#10b981', '#f59e0b', '#0ea5e9', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316'],
+    stroke: { width: 0 },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '70%',
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: 'Toplam',
+              color: '#64748b',
+              formatter: () => String(reportsSnapshot.kpis.totalGames),
+            },
+          },
+        },
+      },
+    },
+  }
+
+  const stackedBarOptions = {
+    chart: {
+      type: 'bar',
+      stacked: true,
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '42%',
+        borderRadius: 6,
+      },
+    },
+    dataLabels: { enabled: false },
+    xaxis: {
+      categories: reportsSnapshot.stageDistribution.map((item) => item.label),
+      labels: {
+        style: {
+          colors: '#475569',
+          fontSize: '11px',
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#64748b',
+        },
+      },
+    },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'left',
+      labels: { colors: '#475569' },
+    },
+    colors: ['#e2e8f0', '#f59e0b', '#2563eb', '#10b981'],
+    grid: {
+      borderColor: 'rgba(148, 163, 184, 0.16)',
+    },
+  }
+
+  const stackedBarSeries = [
+    {
+      name: 'Başlamadı',
+      data: reportsSnapshot.stageDistribution.map((item) => item.baslamadi),
+    },
+    {
+      name: 'Devam Ediyor',
+      data: reportsSnapshot.stageDistribution.map((item) => item.devam_ediyor),
+    },
+    {
+      name: 'Onaya Gönderildi',
+      data: reportsSnapshot.stageDistribution.map((item) => item.onaya_gonderildi),
+    },
+    {
+      name: 'Onaylandı',
+      data: reportsSnapshot.stageDistribution.map((item) => item.onaylandi),
+    },
+  ]
+
+  return (
+    <>
+      <section className="row g-4 mb-4">
+        <MetricCard icon="analytics" label="Toplam Oyun" value={reportsSnapshot.kpis.totalGames} tone="primary" helper="Rapor kapsamındaki tüm kayıtlar" />
+        <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={reportsSnapshot.kpis.completedGames} tone="success" helper="Yayına en yakın veya tamamlanan içerikler" />
+        <MetricCard icon="approval" label="Onay Bekleyen" value={reportsSnapshot.kpis.awaitingApprovalStages} tone="warning" helper="Onaya gönderilmiş aşama sayısı" />
+        <MetricCard icon="warning" label="Geciken Kayıt" value={reportsSnapshot.kpis.overdueGames} tone="danger" helper="Bitiş tarihi geçmiş açık kayıtlar" />
+      </section>
+
+      <section className="row g-4 mb-4">
+        <div className="col-12 col-xl-5">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Ders Bazlı Dağılım</h3>
+                  <p>Toplam oyun yükünün derslere göre dağılımı.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="donut"
+                  height={340}
+                  series={reportsSnapshot.subjectDistribution.map((item) => item.value)}
+                  options={donutOptions}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-7">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Aşama Bazlı Üretim Dağılımı</h3>
+                  <p>Her üretim adımındaki genel durum yükünü birlikte görün.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="bar"
+                  height={340}
+                  series={stackedBarSeries}
+                  options={stackedBarOptions}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="card rounded-4 border-0 shadow-sm">
+        <div className="card-body">
+          <div className="section-heading mb-3">
+            <div>
+              <h3>Ders Bazlı Performans Tablosu</h3>
+              <p>Yönetici görünümünde operasyon yoğunluğu ve risk göstergeleri.</p>
+            </div>
+          </div>
+          <div className="table-responsive">
+            <table className="table align-middle mb-0 report-table">
+              <thead>
+                <tr>
+                  <th>Ders</th>
+                  <th>Toplam</th>
+                  <th>Aktif</th>
+                  <th>Tamamlanan</th>
+                  <th>Onay Bekleyen</th>
+                  <th>Eksik Bilgi</th>
+                  <th>Geciken</th>
+                  <th>Yaklaşan</th>
+                  <th>Ortalama Bölüm</th>
+                  <th>Tamamlanma</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reportsSnapshot.reportTableRows.map((row) => (
+                  <tr key={row.code}>
+                    <td className="fw-semibold">{row.name}</td>
+                    <td>{row.totalGames}</td>
+                    <td>{row.inProgressGames}</td>
+                    <td>{row.completedGames}</td>
+                    <td>{row.awaitingApprovalStages}</td>
+                    <td>{row.missingInfoGames}</td>
+                    <td>{row.overdueGames}</td>
+                    <td>{row.dueSoonGames}</td>
+                    <td>{row.averageSections}</td>
+                    <td>
+                      <div className="report-progress">
+                        <div className="report-progress-bar" style={{ width: `${row.completionRate}%` }} />
+                      </div>
+                      <span>{row.completionRate}%</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
     </>
   )

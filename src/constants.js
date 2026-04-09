@@ -8,6 +8,8 @@ export const NAV_ITEMS = [
   { id: 'games', label: 'Oyun Listesi', icon: 'table_rows' },
 ]
 
+export const REPORTS_NAV_ITEM = { id: 'reports', label: 'Raporlar', icon: 'pie_chart' }
+
 export const STAGE_ORDER = [
   'scenario_status',
   'design_status',

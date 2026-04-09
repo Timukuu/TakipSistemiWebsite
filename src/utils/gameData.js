@@ -306,6 +306,67 @@ export function buildOperationalHighlights(games, users, referenceDate = new Dat
   }
 }
 
+export function buildReportsSnapshot(games, subjects, users, referenceDate = new Date()) {
+  const dashboardSummary = buildDashboardSummary(games, users)
+  const subjectSummaries = getSubjectSummaries(games, subjects, users)
+  const openGames = games.filter((game) => !game.is_completed)
+  const overdueGames = openGames.filter((game) => safeDateDifference(game.end_date, referenceDate) < 0).length
+  const dueSoonGames = openGames.filter((game) => {
+    const diff = safeDateDifference(game.end_date, referenceDate)
+    return diff >= 0 && diff <= 10
+  }).length
+
+  const subjectDistribution = subjectSummaries
+    .filter((item) => item.totalGames > 0)
+    .map((item) => ({
+      label: item.name,
+      value: item.totalGames,
+    }))
+
+  const stageDistribution = STAGE_ORDER.map((stageKey) => ({
+    label: STAGE_LABELS[stageKey],
+    baslamadi: games.filter((game) => game[stageKey] === 'baslamadi').length,
+    devam_ediyor: games.filter((game) => game[stageKey] === 'devam_ediyor').length,
+    onaya_gonderildi: games.filter((game) => game[stageKey] === 'onaya_gonderildi').length,
+    onaylandi: games.filter((game) => game[stageKey] === 'onaylandi').length,
+  }))
+
+  const reportTableRows = subjectSummaries
+    .filter((item) => item.totalGames > 0)
+    .map((item) => ({
+      ...item,
+      overdueGames: games.filter(
+        (game) =>
+          game.subject === item.code &&
+          !game.is_completed &&
+          safeDateDifference(game.end_date, referenceDate) < 0,
+      ).length,
+      dueSoonGames: games.filter((game) => {
+        const diff = safeDateDifference(game.end_date, referenceDate)
+        return game.subject === item.code && !game.is_completed && diff >= 0 && diff <= 10
+      }).length,
+      averageSections: item.totalGames
+        ? (
+            games
+              .filter((game) => game.subject === item.code)
+              .reduce((sum, game) => sum + Number(game.interface_count || 0), 0) / item.totalGames
+          ).toFixed(1)
+        : '0.0',
+    }))
+    .sort((leftItem, rightItem) => rightItem.totalGames - leftItem.totalGames)
+
+  return {
+    kpis: {
+      ...dashboardSummary,
+      overdueGames,
+      dueSoonGames,
+    },
+    subjectDistribution,
+    stageDistribution,
+    reportTableRows,
+  }
+}
+
 export function getResponsibleUserName(users, responsibleUserId) {
   return users.find((user) => user.id === responsibleUserId)?.name ?? '-'
 }
