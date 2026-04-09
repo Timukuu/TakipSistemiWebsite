@@ -191,6 +191,53 @@ a {
   color: #94a3b8;
 }
 
+.utility-panel {
+  background: linear-gradient(180deg, rgba(8, 22, 47, 0.96), rgba(16, 40, 73, 0.94));
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.utility-panel .form-label {
+  color: #dbeafe !important;
+}
+
+.utility-panel .form-select,
+.utility-panel .form-control {
+  color: #f8fbff;
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.utility-panel .form-select::placeholder,
+.utility-panel .form-control::placeholder {
+  color: #93c5fd;
+}
+
+.utility-panel .form-select:focus,
+.utility-panel .form-control:focus {
+  color: #f8fbff;
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 0 0 0.18rem rgba(59, 130, 246, 0.18);
+}
+
+.utility-panel .section-heading h3,
+.utility-panel .section-heading p {
+  color: #eff6ff;
+}
+
+.filter-reset-button {
+  border-color: rgba(191, 219, 254, 0.28) !important;
+  background: rgba(148, 163, 184, 0.14) !important;
+  color: #e2e8f0 !important;
+}
+
+.filter-reset-button:hover,
+.filter-reset-button:focus {
+  border-color: rgba(191, 219, 254, 0.38) !important;
+  background: rgba(148, 163, 184, 0.22) !important;
+  color: #f8fafc !important;
+}
+
 .nav-button {
   width: 100%;
   border: 0;
@@ -609,6 +656,11 @@ a {
   font-weight: 700;
   line-height: 1.2;
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+}
+
+.detail-icon-pill .material-icons-outlined {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .table-action-pill:hover,

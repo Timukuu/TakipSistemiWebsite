@@ -384,7 +384,7 @@ function App() {
             </div>
           </div>
 
-          <section className="card rounded-4 border-0 shadow-sm mb-4">
+          <section className="card rounded-4 border-0 shadow-sm mb-4 utility-panel">
             <div className="card-body">
               <div className="row g-3 align-items-end">
                 <div className="col-12 col-xl-3">
@@ -1242,7 +1242,7 @@ function GamesView({
 
   return (
     <>
-      <section className="card rounded-4 border-0 shadow-sm mb-4">
+      <section className="card rounded-4 border-0 shadow-sm mb-4 utility-panel utility-panel-filters">
         <div className="card-body">
           <div className="row g-3">
             <div className="col-12 col-xl-4">
@@ -1300,13 +1300,13 @@ function GamesView({
               </select>
             </div>
             <div className="col-6 col-md-3 col-xl-1 d-flex align-items-end">
-              <button type="button" className="btn btn-outline-secondary w-100" onClick={onResetFilters}>
+              <button type="button" className="btn btn-outline-secondary w-100 filter-reset-button" onClick={onResetFilters}>
                 Sıfırla
               </button>
             </div>
             <div className="col-6 col-md-3 col-xl-1 d-flex align-items-end">
               <button type="button" className="btn btn-primary w-100" onClick={onCreateGame}>
-                Yeni
+                Yeni Ekle
               </button>
             </div>
           </div>
@@ -1398,8 +1398,16 @@ function GamesView({
                       </td>
                       <td>
                         <div className="table-secondary-stack">
-                          <button type="button" className="btn table-action-pill" onClick={() => onOpenGame(game.id)}>
-                            Detay
+                          <button
+                            type="button"
+                            className="btn table-action-pill detail-icon-pill"
+                            onClick={() => onOpenGame(game.id)}
+                            aria-label={`${game.topic} detaylarını aç`}
+                            title="Detayı Aç"
+                          >
+                            <span className="material-icons-outlined" aria-hidden="true">
+                              settings
+                            </span>
                           </button>
                         </div>
                       </td>
