@@ -378,14 +378,6 @@ function App() {
           <div className="logo-name flex-grow-1">
             <h5 className="mb-0">MEB Takip</h5>
           </div>
-          <button
-            type="button"
-            className="sidebar-close"
-            onClick={() => setIsMobileSidebarOpen(false)}
-            aria-label="Yan menüyü kapat"
-          >
-            <span className="material-icons-outlined">close</span>
-          </button>
         </div>
         <div className="sidebar-nav">
           <ul className="metismenu">

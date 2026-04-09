@@ -100,7 +100,6 @@ a {
 
 .sidebar-wrapper .sidebar-header .logo-name h5,
 .sidebar-wrapper .menu-label,
-.sidebar-wrapper .sidebar-header .sidebar-close,
 .sidebar-wrapper .sidebar-nav .metismenu a,
 .sidebar-wrapper .sidebar-nav .metismenu a .menu-title,
 .sidebar-wrapper .sidebar-nav .metismenu a .parent-icon,
@@ -404,6 +403,19 @@ a {
   font-size: 1rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+@media screen and (min-width: 1199px) {
+  body.toggled:not(.sidebar-hovered) .sidebar-wrapper .metismenu .nav-button {
+    width: calc(100% - 12px);
+    margin-inline: auto;
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  body.toggled:not(.sidebar-hovered) .sidebar-wrapper .metismenu .nav-button .parent-icon {
+    transform: translateX(3px);
+  }
 }
 
 .sidebar-note {
