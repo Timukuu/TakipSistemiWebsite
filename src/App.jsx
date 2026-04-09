@@ -1322,21 +1322,45 @@ function ReportsView({ reportsSnapshot, roleMode }) {
         </div>
       </section>
 
-      <section className="card rounded-4 border-0 shadow-sm mb-4">
-        <div className="card-body">
-          <div className="section-heading">
-            <div>
-              <h3>Aşama Isı Haritası</h3>
-              <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
+      <section className="row g-4 mb-4">
+        <div className="col-12 col-xl-8">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Aşama Isı Haritası</h3>
+                  <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="heatmap"
+                  height={320}
+                  series={reportsSnapshot.stageHeatmap}
+                  options={heatmapOptions}
+                />
+              </div>
             </div>
           </div>
-          <div className="report-chart-wrap">
-            <ReactApexChart
-              type="heatmap"
-              height={320}
-              series={reportsSnapshot.stageHeatmap}
-              options={heatmapOptions}
-            />
+        </div>
+        <div className="col-12 col-xl-4">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Sınıf Yoğunluk Dağılımı</h3>
+                  <p>Isı haritasının yanında içerik yoğunluğunu sınıf bazında karşılaştırın.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="pie"
+                  height={320}
+                  series={reportsSnapshot.classDistribution.map((item) => item.value)}
+                  options={classDistributionOptions}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
