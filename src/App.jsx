@@ -673,8 +673,8 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
                   <p>Beş üretim adımının anlık dağılımı.</p>
                 </div>
               </div>
-              <div className="table-responsive mt-3">
-                <table className="table align-middle mb-0">
+              <div className="table-responsive mt-3 stage-summary-table-wrap">
+                <table className="table align-middle mb-0 stage-summary-table">
                   <thead>
                     <tr>
                       <th>Aşama</th>
