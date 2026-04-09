@@ -1570,7 +1570,7 @@ function GamePlayerModal({ game, onClose, playUrl }) {
         </div>
         <div className="player-modal-body">
           <div className="player-note">
-            Bazı bağlantılar iframe içinde açılmayabilir. Böyle bir durumda `Yeni Sekmede Aç` seçeneğini kullanabilirsiniz.
+            Unity Play bağlantılarında yükleme çubuğu anlık güncellenmeyebilir. Oyun açılmıyor gibi görünse bile 10-15 saniye bekleyin; sorun devam ederse `Yeni Sekmede Aç` seçeneğini kullanın.
           </div>
           <div className="player-frame-wrap">
             <iframe
