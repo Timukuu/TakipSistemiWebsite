@@ -19,6 +19,7 @@ import {
 } from './constants'
 import {
   buildDashboardSummary,
+  buildDashboardPieSnapshot,
   buildOperationalHighlights,
   buildReportsSnapshot,
   buildStageSummary,
@@ -102,6 +103,11 @@ function App() {
 
   const operationalHighlights = useMemo(
     () => buildOperationalHighlights(scopedGames, usersData),
+    [scopedGames],
+  )
+
+  const dashboardPieSnapshot = useMemo(
+    () => buildDashboardPieSnapshot(scopedGames, subjectsData),
     [scopedGames],
   )
 
@@ -423,6 +429,7 @@ function App() {
           {currentView === 'dashboard' ? (
             <DashboardView
               dashboardSummary={dashboardSummary}
+              dashboardPieSnapshot={dashboardPieSnapshot}
               operationalHighlights={operationalHighlights}
               stageSummary={stageSummary}
               subjectSummaries={subjectSummaries}
@@ -481,7 +488,43 @@ function App() {
   )
 }
 
-function DashboardView({ dashboardSummary, operationalHighlights, stageSummary, subjectSummaries }) {
+function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHighlights, stageSummary, subjectSummaries }) {
+  const sharedPieColors = ['#10b981', '#e2e8f0', '#2563eb', '#f59e0b', '#8b5cf6', '#14b8a6', '#ef4444', '#0ea5e9']
+  const buildDonutOptions = (labels, totalLabel) => ({
+    chart: {
+      type: 'donut',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    labels,
+    dataLabels: { enabled: false },
+    legend: {
+      position: 'bottom',
+      fontSize: '11px',
+      labels: { colors: '#94a3b8' },
+    },
+    colors: sharedPieColors,
+    stroke: { width: 0 },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '68%',
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: totalLabel,
+              color: '#94a3b8',
+              formatter: (w) => String(
+                w.globals.seriesTotals.reduce((sum, value) => sum + value, 0),
+              ),
+            },
+          },
+        },
+      },
+    },
+  })
+
   return (
     <>
       <section className="row g-4 mb-4">
@@ -561,6 +604,56 @@ function DashboardView({ dashboardSummary, operationalHighlights, stageSummary, 
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="dashboard-pie-grid">
+                <div className="dashboard-pie-card">
+                  <div className="dashboard-pie-heading">
+                    <h4>Senaryo Durumu</h4>
+                    <p>Tamamlanan ve tamamlanmayan senaryo sayısı.</p>
+                  </div>
+                  <ReactApexChart
+                    type="donut"
+                    height={250}
+                    series={dashboardPieSnapshot.scenarioStatusSeries}
+                    options={buildDonutOptions(['Tamamlanan Senaryo', 'Tamamlanmayan Senaryo'], 'Senaryo')}
+                  />
+                </div>
+                <div className="dashboard-pie-card">
+                  <div className="dashboard-pie-heading">
+                    <h4>Onaylı Senaryolar</h4>
+                    <p>Ders bazında onay almış senaryo dağılımı.</p>
+                  </div>
+                  <ReactApexChart
+                    type="donut"
+                    height={250}
+                    series={dashboardPieSnapshot.scenarioBySubject.map((item) => item.value)}
+                    options={buildDonutOptions(dashboardPieSnapshot.scenarioBySubject.map((item) => item.label), 'Onaylı')}
+                  />
+                </div>
+                <div className="dashboard-pie-card">
+                  <div className="dashboard-pie-heading">
+                    <h4>Oyun Durumu</h4>
+                    <p>Tamamlanan ve tamamlanmayan oyun sayısı.</p>
+                  </div>
+                  <ReactApexChart
+                    type="donut"
+                    height={250}
+                    series={dashboardPieSnapshot.gameStatusSeries}
+                    options={buildDonutOptions(['Tamamlanan Oyun', 'Tamamlanmayan Oyun'], 'Oyun')}
+                  />
+                </div>
+                <div className="dashboard-pie-card">
+                  <div className="dashboard-pie-heading">
+                    <h4>Tamamlanan Oyunlar</h4>
+                    <p>Ders bazında tamamlanan oyunların dağılımı.</p>
+                  </div>
+                  <ReactApexChart
+                    type="donut"
+                    height={250}
+                    series={dashboardPieSnapshot.completedBySubject.map((item) => item.value)}
+                    options={buildDonutOptions(dashboardPieSnapshot.completedBySubject.map((item) => item.label), 'Tamamlanan')}
+                  />
+                </div>
               </div>
             </div>
           </div>

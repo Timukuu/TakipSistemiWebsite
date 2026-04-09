@@ -505,6 +505,38 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
   }
 }
 
+export function buildDashboardPieSnapshot(games, subjects) {
+  const activeSubjects = subjects.filter((subject) => subject.is_active)
+
+  const scenarioCompleted = games.filter((game) => game.scenario_status === 'onaylandi').length
+  const scenarioOpen = Math.max(games.length - scenarioCompleted, 0)
+  const completedGames = games.filter((game) => game.is_completed).length
+  const openGames = Math.max(games.length - completedGames, 0)
+
+  const scenarioBySubject = activeSubjects
+    .map((subject) => ({
+      label: SUBJECT_LABELS[subject.code] ?? subject.name,
+      value: games.filter(
+        (game) => game.subject === subject.code && game.scenario_status === 'onaylandi',
+      ).length,
+    }))
+    .filter((item) => item.value > 0)
+
+  const completedBySubject = activeSubjects
+    .map((subject) => ({
+      label: SUBJECT_LABELS[subject.code] ?? subject.name,
+      value: games.filter((game) => game.subject === subject.code && game.is_completed).length,
+    }))
+    .filter((item) => item.value > 0)
+
+  return {
+    scenarioStatusSeries: [scenarioCompleted, scenarioOpen],
+    scenarioBySubject,
+    gameStatusSeries: [completedGames, openGames],
+    completedBySubject,
+  }
+}
+
 export function getResponsibleUserName(users, responsibleUserId) {
   return users.find((user) => user.id === responsibleUserId)?.name ?? '-'
 }
