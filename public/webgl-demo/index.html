@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebGL Demo</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top, rgba(37, 99, 235, 0.22), transparent 30%),
+          linear-gradient(180deg, #08162f 0%, #0f2448 100%);
+        color: #eff6ff;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      .demo-shell {
+        width: min(920px, calc(100vw - 32px));
+        border-radius: 24px;
+        border: 1px solid rgba(191, 219, 254, 0.18);
+        background: rgba(15, 23, 42, 0.82);
+        box-shadow: 0 24px 80px rgba(2, 6, 23, 0.45);
+        overflow: hidden;
+      }
+
+      .demo-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+        background: rgba(15, 23, 42, 0.88);
+        border-bottom: 1px solid rgba(191, 219, 254, 0.12);
+      }
+
+      .demo-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.18);
+        color: #bfdbfe;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .demo-stage {
+        aspect-ratio: 16 / 9;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(28px, 4vw, 44px);
+      }
+
+      p {
+        margin: 0;
+        color: #cbd5e1;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="demo-shell">
+      <div class="demo-bar">
+        <span class="demo-pill">Unity WebGL Demo</span>
+        <span class="demo-pill" id="game-id">Hazırlanıyor</span>
+      </div>
+      <section class="demo-stage">
+        <div>
+          <h1>Oyun Önizleme Alanı</h1>
+          <p>
+            Bu sayfa, popup içindeki iframe oynatma akışını test etmek için hazırlanmış geçici WebGL yer tutucusudur.
+          </p>
+        </div>
+      </section>
+    </main>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const gameId = params.get('game') || 'webgl-demo';
+      document.getElementById('game-id').textContent = gameId.replaceAll('-', ' ');
+    </script>
+  </body>
+</html>

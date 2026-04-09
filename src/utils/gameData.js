@@ -15,6 +15,23 @@ function normalizeText(value) {
     .replace(/[\u0300-\u036f]/g, '')
 }
 
+function isValidOptionalUrl(value) {
+  if (!value?.trim()) {
+    return true
+  }
+
+  if (/^(https?:)?\/\//i.test(value)) {
+    try {
+      const parsedUrl = new URL(value)
+      return ['http:', 'https:'].includes(parsedUrl.protocol)
+    } catch {
+      return false
+    }
+  }
+
+  return !value.includes(' ')
+}
+
 function safeDateDifference(dateValue, referenceDate) {
   if (!dateValue) {
     return Number.POSITIVE_INFINITY
@@ -63,6 +80,7 @@ export function createEmptyGame(subjectCode, userId) {
     responsible_user_id: userId ?? '',
     kazanimlar: '',
     eba_link: '',
+    play_url: '',
     notes: '',
     created_at: now.toISOString(),
     updated_at: now.toISOString(),
@@ -147,15 +165,12 @@ export function validateGameDraft(game, users) {
     errors.end_date = 'Bitiş tarihi başlangıç tarihinden önce olamaz.'
   }
 
-  if (game?.eba_link?.trim()) {
-    try {
-      const parsedUrl = new URL(game.eba_link)
-      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-        errors.eba_link = 'Link alanı geçerli bir http veya https adresi olmalıdır.'
-      }
-    } catch {
-      errors.eba_link = 'Link alanı geçerli bir URL olmalıdır.'
-    }
+  if (game?.eba_link?.trim() && !isValidOptionalUrl(game.eba_link)) {
+    errors.eba_link = 'EBA Link alanı geçerli bir URL olmalıdır.'
+  }
+
+  if (game?.play_url?.trim() && !isValidOptionalUrl(game.play_url)) {
+    errors.play_url = 'Play URL alanı geçerli bir adres olmalıdır.'
   }
 
   if (game?.is_completed) {

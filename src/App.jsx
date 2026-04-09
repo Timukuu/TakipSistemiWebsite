@@ -34,6 +34,19 @@ import {
   validateGameDraft,
 } from './utils/gameData'
 
+function resolvePlayableUrl(playUrl, baseUrl) {
+  if (!playUrl) {
+    return ''
+  }
+
+  if (/^(https?:)?\/\//i.test(playUrl)) {
+    return playUrl
+  }
+
+  const normalizedBase = `${window.location.origin}${baseUrl}`
+  return new URL(playUrl.replace(/^\//, ''), normalizedBase).toString()
+}
+
 function App() {
   const baseUrl = import.meta.env.BASE_URL
   const initialRoleState = useMemo(() => getInitialRoleState(usersData), [])
@@ -48,6 +61,7 @@ function App() {
   const [drawerMode, setDrawerMode] = useState('edit')
   const [formErrors, setFormErrors] = useState({})
   const [saveMessage, setSaveMessage] = useState('')
+  const [playerGame, setPlayerGame] = useState(null)
 
   const nonAdminUsers = useMemo(() => usersData.filter((user) => user.role === 'user'), [])
 
@@ -208,6 +222,18 @@ function App() {
     setDrawerMode('edit')
     setFormErrors({})
     setSaveMessage('')
+  }
+
+  const handleOpenPlayer = (game) => {
+    if (!game?.play_url) {
+      return
+    }
+
+    setPlayerGame(game)
+  }
+
+  const handleClosePlayer = () => {
+    setPlayerGame(null)
   }
 
   const handleSaveDraft = () => {
@@ -413,6 +439,7 @@ function App() {
               onCreateGame={handleCreateGame}
               onFilterChange={handleFilterChange}
               onOpenGame={handleOpenGame}
+              onOpenPlayer={handleOpenPlayer}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
               roleMode={roleMode}
               subjectOptions={subjectOptions}
@@ -436,9 +463,18 @@ function App() {
           formErrors={formErrors}
           onChange={handleDraftChange}
           onClose={handleCloseGame}
+          onOpenPlayer={handleOpenPlayer}
           onSave={handleSaveDraft}
           saveMessage={saveMessage}
           subjectOptions={subjectOptions}
+        />
+      ) : null}
+
+      {playerGame ? (
+        <GamePlayerModal
+          game={playerGame}
+          onClose={handleClosePlayer}
+          playUrl={resolvePlayableUrl(playerGame.play_url, baseUrl)}
         />
       ) : null}
     </>
@@ -1103,6 +1139,7 @@ function GamesView({
   onCreateGame,
   onFilterChange,
   onOpenGame,
+  onOpenPlayer,
   onResetFilters,
   roleMode,
   subjectOptions,
@@ -1203,7 +1240,8 @@ function GamesView({
                   <th>Üretim Akışı</th>
                   <th>Başlangıç</th>
                   <th>Bitiş</th>
-                  <th>Link</th>
+                  <th>Oyna</th>
+                  <th>EBA</th>
                   <th>Durum</th>
                   <th></th>
                 </tr>
@@ -1231,6 +1269,21 @@ function GamesView({
                       </td>
                       <td>
                         <div className="table-secondary-stack">{formatDate(game.end_date)}</div>
+                      </td>
+                      <td>
+                        <div className="table-secondary-stack">
+                          {game.play_url ? (
+                            <button
+                              type="button"
+                              className="btn table-action-pill play-pill"
+                              onClick={() => onOpenPlayer(game)}
+                            >
+                              Oyna
+                            </button>
+                          ) : (
+                            <span className="badge rounded-pill text-bg-light link-badge table-pill disabled">Yok</span>
+                          )}
+                        </div>
                       </td>
                       <td>
                         <div className="table-secondary-stack">
@@ -1262,7 +1315,7 @@ function GamesView({
                 })}
                 {filteredGames.length === 0 ? (
                   <tr>
-                    <td colSpan={11}>
+                    <td colSpan={12}>
                       <div className="empty-state">Seçili filtrelerle eşleşen kayıt bulunamadı.</div>
                     </td>
                   </tr>
@@ -1348,6 +1401,7 @@ function GameDetailDrawer({
   formErrors,
   onChange,
   onClose,
+  onOpenPlayer,
   onSave,
   saveMessage,
   subjectOptions,
@@ -1451,8 +1505,27 @@ function GameDetailDrawer({
               <FormField label="Kazanımlar" error={formErrors.kazanimlar} fullWidth>
                 <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun desteklediği kazanımları yazın" />
               </FormField>
-              <FormField label="Link" error={formErrors.eba_link} fullWidth>
+              <FormField label="EBA Link" error={formErrors.eba_link} fullWidth>
                 <input className={`form-control ${formErrors.eba_link ? 'is-invalid' : ''}`} type="url" value={draftGame.eba_link} onChange={(event) => onChange('eba_link', event.target.value)} placeholder="https://" />
+              </FormField>
+              <FormField label="Play URL" error={formErrors.play_url} fullWidth>
+                <div className="play-link-row">
+                  <input className={`form-control ${formErrors.play_url ? 'is-invalid' : ''}`} type="text" value={draftGame.play_url ?? ''} onChange={(event) => onChange('play_url', event.target.value)} placeholder="https:// veya webgl-demo/index.html" />
+                  <button type="button" className="btn table-action-pill play-preview-pill" onClick={() => onOpenPlayer(draftGame)} disabled={!draftGame.play_url}>
+                    Önizle
+                  </button>
+                </div>
+              </FormField>
+              <FormField label="Dosya Yükleme" fullWidth>
+                <div className="upload-placeholder-card">
+                  <div>
+                    <strong>WebGL Dosya Yükleme Yakında</strong>
+                    <p>Sunucu ve veritabanı entegrasyonu sonrası kullanıcılar build dosyasını yükleyip oyunu native olarak çalıştırabilecek.</p>
+                  </div>
+                  <button type="button" className="btn btn-light" disabled>
+                    Dosya Yükle
+                  </button>
+                </div>
               </FormField>
               <FormField label="Notlar" fullWidth>
                 <textarea className="form-control" rows="4" value={draftGame.notes} onChange={(event) => onChange('notes', event.target.value)} placeholder="Üretim ekibinin bilmesi gereken operasyon notlarını ekleyin" />
@@ -1469,6 +1542,44 @@ function GameDetailDrawer({
           <button type="button" className="btn btn-primary" onClick={onSave}>
             {drawerMode === 'create' ? 'Kaydı Ekle' : 'Kaydı Güncelle'}
           </button>
+        </div>
+      </aside>
+    </>
+  )
+}
+
+function GamePlayerModal({ game, onClose, playUrl }) {
+  return (
+    <>
+      <div className="drawer-backdrop" onClick={onClose} aria-hidden="true" />
+      <aside className="player-modal-shell">
+        <div className="player-modal-header">
+          <div>
+            <span className="eyebrow">Unity Play</span>
+            <h3>{game.topic}</h3>
+            <p>{SUBJECT_LABELS[game.subject]} · {game.class_level}</p>
+          </div>
+          <div className="player-modal-actions">
+            <a className="btn btn-light" href={playUrl} target="_blank" rel="noreferrer">
+              Yeni Sekmede Aç
+            </a>
+            <button type="button" className="theme-icon-button" onClick={onClose} aria-label="Player Penceresini Kapat">
+              <span className="material-icons-outlined">close</span>
+            </button>
+          </div>
+        </div>
+        <div className="player-modal-body">
+          <div className="player-note">
+            Bazı bağlantılar iframe içinde açılmayabilir. Böyle bir durumda `Yeni Sekmede Aç` seçeneğini kullanabilirsiniz.
+          </div>
+          <div className="player-frame-wrap">
+            <iframe
+              title={`${game.topic} Unity Player`}
+              src={playUrl}
+              className="player-frame"
+              allow="fullscreen; autoplay"
+            />
+          </div>
         </div>
       </aside>
     </>
