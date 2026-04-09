@@ -590,6 +590,30 @@ a {
   text-decoration: none;
 }
 
+.table-action-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  min-height: 34px;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+}
+
+.table-action-pill:hover,
+.table-action-pill:focus {
+  border-color: rgba(37, 99, 235, 0.28);
+  background: rgba(37, 99, 235, 0.14);
+  color: #1d4ed8;
+}
+
 .table-secondary-stack {
   min-height: calc(1.85rem + 0.35rem + 24px);
   display: flex;

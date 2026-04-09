@@ -687,9 +687,11 @@ function GamesView({
                         </div>
                       </td>
                       <td>
-                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => onOpenGame(game.id)}>
-                          Detay
-                        </button>
+                        <div className="table-secondary-stack">
+                          <button type="button" className="btn table-action-pill" onClick={() => onOpenGame(game.id)}>
+                            Detay
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
