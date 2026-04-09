@@ -591,7 +591,7 @@ a {
 }
 
 .table-secondary-stack {
-  min-height: calc(1.85rem + 0.35rem + 28px);
+  min-height: calc(1.85rem + 0.35rem + 24px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
