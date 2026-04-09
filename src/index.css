@@ -990,6 +990,17 @@ a {
   gap: 0.75rem;
 }
 
+.player-modal-actions .theme-icon-button {
+  color: #fca5a5;
+  background: rgba(244, 63, 94, 0.12);
+}
+
+.player-modal-actions .theme-icon-button:hover,
+.player-modal-actions .theme-icon-button:focus {
+  color: #fecaca;
+  background: rgba(244, 63, 94, 0.18);
+}
+
 .player-modal-body {
   display: flex;
   flex-direction: column;
