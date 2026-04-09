@@ -481,6 +481,27 @@ function App() {
                       )}
                     </div>
                   </div>
+                  <div className="operation-banner">
+                    <strong>Operasyon Özeti</strong>
+                    <div className="operation-summary-grid">
+                      <article className="operation-summary-card">
+                        <span>Toplam Kayıt</span>
+                        <strong>{dashboardSummary.totalGames}</strong>
+                      </article>
+                      <article className="operation-summary-card">
+                        <span>Açık Kayıt</span>
+                        <strong>{dashboardSummary.inProgressGames}</strong>
+                      </article>
+                      <article className="operation-summary-card">
+                        <span>Tamamlanan</span>
+                        <strong>{dashboardSummary.completedGames}</strong>
+                      </article>
+                      <article className="operation-summary-card">
+                        <span>Onay Bekleyen</span>
+                        <strong>{dashboardSummary.awaitingApprovalStages}</strong>
+                      </article>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
