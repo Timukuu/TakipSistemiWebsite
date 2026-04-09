@@ -1201,7 +1201,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       </section>
 
       <section className="row g-4 mb-4">
-        <MetricCard icon="monitoring" label="Sağlık Skoru" value={reportsSnapshot.kpis.averageHealthScore} tone="success" helper="Tüm portföyün ortalama üretim sağlığı" />
+        <MetricCard icon="health_and_safety" label="Sağlık Skoru" value={reportsSnapshot.kpis.averageHealthScore} tone="success" helper="Tüm portföyün ortalama üretim sağlığı" />
         <MetricCard icon="event" label="Yaklaşan Termin" value={reportsSnapshot.kpis.dueSoonGames} tone="warning" helper="Önümüzdeki 10 günde kapanması beklenen kayıtlar" />
         <MetricCard icon="error_outline" label="Eksik Bilgili" value={reportsSnapshot.kpis.missingInfoGames} tone="danger" helper="Doğrulama uyarısı taşıyan oyunlar" />
         <MetricCard icon="grid_view" label="Ders Sayısı" value={reportsSnapshot.subjectDistribution.length} tone="primary" helper="Aktif üretim görülen ders adedi" />
