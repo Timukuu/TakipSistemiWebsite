@@ -22,6 +22,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --soft-card-bg: linear-gradient(180deg, rgba(223, 232, 248, 0.98) 0%, rgba(210, 221, 241, 0.96) 100%);
+  --soft-card-bg-alt: linear-gradient(180deg, rgba(217, 228, 247, 0.96) 0%, rgba(204, 216, 238, 0.94) 100%);
+  --soft-card-border: rgba(148, 163, 184, 0.24);
+  --soft-card-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  --soft-card-text: #162338;
+  --soft-card-muted: #4b5f7a;
 }
 
 * {
@@ -542,10 +548,10 @@ a {
 .subject-summary-card {
   padding: 1rem;
   border-radius: 1.15rem;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  color: #0f172a !important;
+  border: 1px solid var(--soft-card-border);
+  background: var(--soft-card-bg);
+  box-shadow: var(--soft-card-shadow);
+  color: var(--soft-card-text) !important;
 }
 
 .subject-summary-card * {
@@ -563,14 +569,14 @@ a {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #1e293b !important;
+  color: var(--soft-card-text) !important;
 }
 
 .subject-summary-top p,
 .subject-summary-bottom span {
   margin: 0.25rem 0 0;
   font-size: 0.88rem;
-  color: #94a3b8 !important;
+  color: var(--soft-card-muted) !important;
 }
 
 .subject-summary-meta {
@@ -582,7 +588,7 @@ a {
   gap: 1rem;
   border-top: 1px dashed rgba(148, 163, 184, 0.28);
   font-size: 0.8rem;
-  color: #64748b !important;
+  color: var(--soft-card-muted) !important;
 }
 
 .subject-progress {
@@ -606,8 +612,8 @@ a {
   justify-content: center;
   min-height: 3rem;
   padding: 0.55rem 0.9rem;
-  background: #e9eef5 !important;
-  color: #334155 !important;
+  background: rgba(234, 241, 251, 0.9) !important;
+  color: #2b3b52 !important;
   border: 0 !important;
   box-shadow: none !important;
   text-align: center;
@@ -868,8 +874,9 @@ a {
 .highlight-item {
   padding: 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: linear-gradient(180deg, #fff, #f8fbff);
+  border: 1px solid var(--soft-card-border);
+  background: var(--soft-card-bg-alt);
+  box-shadow: var(--soft-card-shadow);
 }
 
 .reports-locked-state {
@@ -1017,8 +1024,9 @@ a {
   gap: 1rem;
   padding: 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.92));
+  border: 1px solid var(--soft-card-border);
+  background: var(--soft-card-bg-alt);
+  box-shadow: var(--soft-card-shadow);
 }
 
 .report-insight-copy {
@@ -1088,8 +1096,9 @@ a {
   gap: 1rem;
   padding: 0.95rem 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  border: 1px solid var(--soft-card-border);
+  background: var(--soft-card-bg-alt);
+  box-shadow: var(--soft-card-shadow);
 }
 
 .health-score-copy {
@@ -1099,13 +1108,13 @@ a {
 }
 
 .health-score-copy strong {
-  color: #0f172a;
+  color: var(--soft-card-text);
   font-size: 0.9rem;
 }
 
 .health-score-copy span,
 .health-score-copy small {
-  color: #475569;
+  color: var(--soft-card-muted);
 }
 
 .health-score-pill {
@@ -1137,13 +1146,13 @@ a {
 .highlight-item h4 {
   margin: 0.25rem 0 0.45rem;
   font-size: 0.98rem;
-  color: #0f172a;
+  color: var(--soft-card-text);
 }
 
 .highlight-item p,
 .highlight-meta {
   margin: 0;
-  color: #94a3b8;
+  color: var(--soft-card-muted);
   font-size: 0.82rem;
   line-height: 1.45;
 }
@@ -1156,12 +1165,12 @@ a {
 
 .highlight-item.tone-danger {
   border-color: rgba(244, 63, 94, 0.25);
-  background: linear-gradient(180deg, #fff5f7, #fff);
+  background: linear-gradient(180deg, rgba(255, 235, 241, 0.96), rgba(227, 233, 246, 0.96));
 }
 
 .highlight-item.tone-warning {
   border-color: rgba(245, 158, 11, 0.28);
-  background: linear-gradient(180deg, #fffaf0, #fff);
+  background: linear-gradient(180deg, rgba(255, 244, 224, 0.96), rgba(227, 233, 246, 0.96));
 }
 
 .highlight-item.tone-secondary {
