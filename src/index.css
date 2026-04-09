@@ -229,6 +229,10 @@ a {
   line-height: 1.45;
 }
 
+.recent-activity-copy small + small {
+  color: #93c5fd;
+}
+
 .recent-activity-meta {
   align-items: flex-end;
   text-align: right;
@@ -685,7 +689,7 @@ a {
 .stage-progress-label {
   font-size: 0.74rem;
   font-weight: 700;
-  color: #334155;
+  color: #dbeafe;
   text-align: center;
   line-height: 1.35;
   min-height: 1.85rem;

@@ -152,6 +152,7 @@ function App() {
             id: game.id,
             topic: game.topic,
             subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
+            responsibleLabel: getResponsibleUserName(usersData, game.responsible_user_id),
             actionLabel: isNewRecord ? 'Yeni Kayıt' : 'Güncellendi',
             timestampLabel: formatActivityTimestamp(game.updated_at || game.created_at),
           }
@@ -469,6 +470,7 @@ function App() {
                             <div className="recent-activity-copy">
                               <span>{activity.topic}</span>
                               <small>{activity.subjectLabel}</small>
+                              <small>{activity.responsibleLabel}</small>
                             </div>
                             <div className="recent-activity-meta">
                               <strong>{activity.actionLabel}</strong>
