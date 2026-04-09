@@ -893,14 +893,7 @@ a {
 
 .report-chart-wrap {
   margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.report-chart-wrap .apexcharts-canvas,
-.report-chart-wrap .apexcharts-svg {
-  margin-inline: auto;
+  width: 100%;
 }
 
 .report-chart-card .section-heading {
@@ -914,6 +907,9 @@ a {
 
 .radar-chart-wrap {
   min-height: 380px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .radar-chart-wrap .apexcharts-canvas {
