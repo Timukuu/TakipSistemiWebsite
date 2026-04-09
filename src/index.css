@@ -407,14 +407,13 @@ a {
 
 @media screen and (min-width: 1199px) {
   body.toggled:not(.sidebar-hovered) .sidebar-wrapper .metismenu .nav-button {
-    width: calc(100% - 12px);
+    width: 56px;
+    min-width: 56px;
+    height: 56px;
     margin-inline: auto;
     justify-content: center;
-    padding-inline: 0;
-  }
-
-  body.toggled:not(.sidebar-hovered) .sidebar-wrapper .metismenu .nav-button .parent-icon {
-    transform: translateX(3px);
+    padding: 0;
+    border-radius: 1.2rem;
   }
 }
 
