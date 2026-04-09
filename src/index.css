@@ -312,15 +312,18 @@ a {
 
 .utility-panel .row.g-3.align-items-end > .col-xl-6 {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   grid-column: 1 / -1;
   width: 100%;
   max-width: 100%;
+  align-items: stretch;
 }
 
-.utility-panel .row.g-3.align-items-end > .col-xl-6 .phase-banner {
+.utility-panel .row.g-3.align-items-end > .col-xl-6 .phase-banner,
+.utility-panel .row.g-3.align-items-end > .col-xl-6 .operation-banner {
   width: 100%;
+  min-height: 100%;
 }
 
 .utility-panel .row.g-3.align-items-end > [class*='col-'] {
