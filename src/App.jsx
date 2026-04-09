@@ -782,6 +782,10 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     )
   }
 
+  const sharedTooltip = {
+    theme: 'light',
+  }
+
   const donutOptions = {
     chart: {
       type: 'donut',
@@ -797,6 +801,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     },
     colors: ['#2563eb', '#10b981', '#f59e0b', '#0ea5e9', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316'],
     stroke: { width: 0 },
+    tooltip: sharedTooltip,
     plotOptions: {
       pie: {
         donut: {
@@ -852,6 +857,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       labels: { colors: '#94a3b8' },
     },
     colors: ['#e2e8f0', '#f59e0b', '#2563eb', '#10b981'],
+    tooltip: sharedTooltip,
     grid: {
       borderColor: 'rgba(148, 163, 184, 0.16)',
     },
@@ -891,6 +897,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     },
     colors: ['#14b8a6', '#22c55e', '#f59e0b', '#3b82f6', '#8b5cf6', '#f97316', '#ef4444'],
     stroke: { width: 0 },
+    tooltip: sharedTooltip,
   }
 
   const workloadOptions = {
@@ -919,6 +926,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       },
     },
     colors: ['#2563eb', '#10b981'],
+    tooltip: sharedTooltip,
     legend: {
       position: 'top',
       horizontalAlign: 'left',
@@ -945,7 +953,9 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       type: 'radar',
       toolbar: { show: false },
       fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+      parentHeightOffset: 0,
     },
+    tooltip: sharedTooltip,
     xaxis: {
       categories: reportsSnapshot.stageEfficiency.map((item) => item.label),
       labels: {
@@ -1014,6 +1024,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       },
     },
     colors: ['#2563eb', '#0ea5e9', '#f59e0b', '#8b5cf6', '#10b981'],
+    tooltip: sharedTooltip,
     grid: {
       borderColor: 'rgba(148, 163, 184, 0.16)',
     },
@@ -1064,6 +1075,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       show: true,
       labels: { colors: '#94a3b8' },
     },
+    tooltip: sharedTooltip,
   }
 
   const last7DaysActivityOptions = {
@@ -1097,6 +1109,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       labels: { colors: '#94a3b8' },
     },
     colors: ['#2563eb', '#10b981'],
+    tooltip: sharedTooltip,
     grid: {
       borderColor: 'rgba(148, 163, 184, 0.16)',
     },
@@ -1139,6 +1152,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       },
     },
     colors: ['#8b5cf6'],
+    tooltip: sharedTooltip,
     grid: {
       borderColor: 'rgba(148, 163, 184, 0.16)',
     },
@@ -1263,10 +1277,10 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                   <p>Aşamaların ne kadar ileri taşındığını tek grafikte karşılaştırın.</p>
                 </div>
               </div>
-              <div className="report-chart-wrap">
+              <div className="report-chart-wrap radar-chart-wrap">
                 <ReactApexChart
                   type="radar"
-                  height={320}
+                  height={380}
                   series={efficiencySeries}
                   options={efficiencyOptions}
                 />

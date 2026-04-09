@@ -888,10 +888,57 @@ a {
 
 .report-chart-card .card-body {
   min-height: 100%;
+  text-align: center;
 }
 
 .report-chart-wrap {
   margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.report-chart-wrap .apexcharts-canvas,
+.report-chart-wrap .apexcharts-svg {
+  margin-inline: auto;
+}
+
+.report-chart-card .section-heading {
+  justify-content: center;
+  text-align: center;
+}
+
+.report-chart-card .section-heading > div {
+  width: 100%;
+}
+
+.radar-chart-wrap {
+  min-height: 380px;
+}
+
+.radar-chart-wrap .apexcharts-canvas {
+  margin-inline: auto !important;
+}
+
+.apexcharts-tooltip,
+.apexcharts-xaxistooltip,
+.apexcharts-yaxistooltip {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18) !important;
+}
+
+.apexcharts-tooltip-title,
+.apexcharts-tooltip-text,
+.apexcharts-tooltip-text-y-label,
+.apexcharts-tooltip-text-y-value,
+.apexcharts-tooltip-text-z-label,
+.apexcharts-tooltip-text-z-value,
+.apexcharts-xaxistooltip-text,
+.apexcharts-yaxistooltip-text {
+  color: #0f172a !important;
+  fill: #0f172a !important;
 }
 
 .dashboard-pie-grid {
