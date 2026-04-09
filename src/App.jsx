@@ -1295,46 +1295,6 @@ function ReportsView({ reportsSnapshot, roleMode }) {
 
       <section className="row g-4 mb-4">
         <div className="col-12 col-xl-4">
-          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
-            <div className="card-body">
-              <div className="section-heading">
-                <div>
-                  <h3>Süreç Verimlilik Raporu</h3>
-                  <p>Aşamaların ne kadar ileri taşındığını tek grafikte karşılaştırın.</p>
-                </div>
-              </div>
-              <div className="report-chart-wrap radar-chart-wrap">
-                <ReactApexChart
-                  type="radar"
-                  height={380}
-                  series={efficiencySeries}
-                  options={efficiencyOptions}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-12 col-xl-4">
-          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
-            <div className="card-body">
-              <div className="section-heading">
-                <div>
-                  <h3>Tamamlanma Hunisi</h3>
-                  <p>Toplam portföyün üretimden yayına giden yolculuğu.</p>
-                </div>
-              </div>
-              <div className="report-chart-wrap">
-                <ReactApexChart
-                  type="bar"
-                  height={320}
-                  series={funnelSeries}
-                  options={funnelOptions}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-12 col-xl-4">
           <div className="card rounded-4 border-0 shadow-sm h-100">
             <div className="card-body">
               <div className="section-heading">
@@ -1360,24 +1320,21 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             </div>
           </div>
         </div>
-      </section>
-
-      <section className="row g-4 mb-4">
-        <div className="col-12 col-xl-8">
+        <div className="col-12 col-xl-4">
           <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Aşama Isı Haritası</h3>
-                  <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
+                  <h3>Tamamlanma Hunisi</h3>
+                  <p>Toplam portföyün üretimden yayına giden yolculuğu.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
                 <ReactApexChart
-                  type="heatmap"
+                  type="bar"
                   height={320}
-                  series={reportsSnapshot.stageHeatmap}
-                  options={heatmapOptions}
+                  series={funnelSeries}
+                  options={funnelOptions}
                 />
               </div>
             </div>
