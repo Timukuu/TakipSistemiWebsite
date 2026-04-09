@@ -1059,6 +1059,15 @@ a {
   color: #059669;
 }
 
+.report-insight-badge.danger {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.18);
+}
+
+.report-insight-badge.danger strong {
+  color: #e11d48;
+}
+
 .health-score-list {
   display: grid;
   gap: 0.85rem;

@@ -1362,21 +1362,51 @@ function ReportsView({ reportsSnapshot, roleMode }) {
         </div>
       </section>
 
-      <section className="card rounded-4 border-0 shadow-sm mb-4">
-        <div className="card-body">
-          <div className="section-heading">
-            <div>
-              <h3>Aşama Isı Haritası</h3>
-              <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
+      <section className="row g-4 mb-4">
+        <div className="col-12 col-xl-8">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Aşama Isı Haritası</h3>
+                  <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="heatmap"
+                  height={320}
+                  series={reportsSnapshot.stageHeatmap}
+                  options={heatmapOptions}
+                />
+              </div>
             </div>
           </div>
-          <div className="report-chart-wrap">
-            <ReactApexChart
-              type="heatmap"
-              height={320}
-              series={reportsSnapshot.stageHeatmap}
-              options={heatmapOptions}
-            />
+        </div>
+        <div className="col-12 col-xl-4">
+          <div className="card rounded-4 border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Ders Risk Sıralaması</h3>
+                  <p>Gecikme, eksik veri ve açık yük yoğunluğuna göre öncelik sırası.</p>
+                </div>
+              </div>
+              <div className="report-insight-list mt-3">
+                {reportsSnapshot.riskRanking.slice(0, 5).map((item) => (
+                  <article key={item.code} className="report-insight-item">
+                    <div className="report-insight-copy">
+                      <strong>{item.name}</strong>
+                      <span>{item.overdueCount} gecikme · {item.missingCount} eksik bilgi · {item.openCount} açık kayıt</span>
+                    </div>
+                    <div className="report-insight-badge danger">
+                      <strong>{item.riskScore}</strong>
+                      <small>risk puanı</small>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

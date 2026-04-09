@@ -388,6 +388,33 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
     .map(([label, value]) => ({ label, value }))
     .sort((leftItem, rightItem) => rightItem.value - leftItem.value)
 
+  const riskRanking = subjectSummaries
+    .filter((item) => item.totalGames > 0)
+    .map((item) => {
+      const subjectGames = games.filter((game) => game.subject === item.code)
+      const overdueCount = subjectGames.filter(
+        (game) => !game.is_completed && safeDateDifference(game.end_date, referenceDate) < 0,
+      ).length
+      const missingCount = subjectGames.filter((game) => getGameHealthIssues(game, users).length > 0).length
+      const awaitingCount = subjectGames.reduce(
+        (count, game) =>
+          count + STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length,
+        0,
+      )
+      const openCount = subjectGames.filter((game) => !game.is_completed).length
+      const riskScore = overdueCount * 35 + missingCount * 18 + awaitingCount * 8 + openCount * 5
+
+      return {
+        code: item.code,
+        name: item.name,
+        riskScore,
+        overdueCount,
+        missingCount,
+        openCount,
+      }
+    })
+    .sort((leftItem, rightItem) => rightItem.riskScore - leftItem.riskScore)
+
   const silentSubjects = subjectSummaries
     .filter((item) => item.totalGames > 0)
     .map((item) => {
@@ -580,6 +607,7 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
     funnelSeries,
     stageHeatmap,
     healthScoreRows,
+    riskRanking,
     silentSubjects,
     fastestSubjects,
     last7DaysActivity,
