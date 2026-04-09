@@ -664,6 +664,196 @@ function ReportsView({ reportsSnapshot, roleMode }) {
     },
   ]
 
+  const classDistributionOptions = {
+    chart: {
+      type: 'pie',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    labels: reportsSnapshot.classDistribution.map((item) => item.label),
+    dataLabels: { enabled: false },
+    legend: {
+      position: 'bottom',
+      fontSize: '12px',
+      labels: { colors: '#94a3b8' },
+    },
+    colors: ['#14b8a6', '#22c55e', '#f59e0b', '#3b82f6', '#8b5cf6', '#f97316', '#ef4444'],
+    stroke: { width: 0 },
+  }
+
+  const workloadOptions = {
+    chart: {
+      type: 'bar',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        borderRadius: 6,
+        barHeight: '56%',
+      },
+    },
+    dataLabels: { enabled: false },
+    xaxis: {
+      categories: reportsSnapshot.responsibleWorkload.map((item) => item.name),
+      labels: {
+        style: { colors: '#94a3b8' },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: '#94a3b8', fontSize: '11px' },
+      },
+    },
+    colors: ['#2563eb', '#10b981'],
+    legend: {
+      position: 'top',
+      horizontalAlign: 'left',
+      labels: { colors: '#94a3b8' },
+    },
+    grid: {
+      borderColor: 'rgba(148, 163, 184, 0.16)',
+    },
+  }
+
+  const workloadSeries = [
+    {
+      name: 'Açık Kayıt',
+      data: reportsSnapshot.responsibleWorkload.map((item) => item.openGames),
+    },
+    {
+      name: 'Toplam Bölüm',
+      data: reportsSnapshot.responsibleWorkload.map((item) => item.totalSections),
+    },
+  ]
+
+  const efficiencyOptions = {
+    chart: {
+      type: 'radar',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    xaxis: {
+      categories: reportsSnapshot.stageEfficiency.map((item) => item.label),
+      labels: {
+        style: {
+          colors: Array.from({ length: reportsSnapshot.stageEfficiency.length }, () => '#94a3b8'),
+          fontSize: '11px',
+        },
+      },
+    },
+    yaxis: {
+      show: false,
+      max: 100,
+    },
+    stroke: {
+      width: 3,
+      colors: ['#10b981'],
+    },
+    fill: {
+      opacity: 0.24,
+      colors: ['#10b981'],
+    },
+    markers: {
+      size: 4,
+      colors: ['#10b981'],
+    },
+  }
+
+  const efficiencySeries = [
+    {
+      name: 'Verimlilik Skoru',
+      data: reportsSnapshot.stageEfficiency.map((item) => item.efficiencyScore),
+    },
+  ]
+
+  const funnelOptions = {
+    chart: {
+      type: 'bar',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        distributed: true,
+        borderRadius: 8,
+        barHeight: '70%',
+      },
+    },
+    legend: { show: false },
+    dataLabels: {
+      enabled: true,
+      style: {
+        colors: ['#fff'],
+        fontSize: '11px',
+      },
+    },
+    xaxis: {
+      categories: reportsSnapshot.funnelSeries.map((item) => item.label),
+      labels: {
+        style: { colors: '#94a3b8' },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: '#94a3b8', fontSize: '11px' },
+      },
+    },
+    colors: ['#2563eb', '#0ea5e9', '#f59e0b', '#8b5cf6', '#10b981'],
+    grid: {
+      borderColor: 'rgba(148, 163, 184, 0.16)',
+    },
+  }
+
+  const funnelSeries = [
+    {
+      name: 'Kayıt Sayısı',
+      data: reportsSnapshot.funnelSeries.map((item) => item.value),
+    },
+  ]
+
+  const heatmapOptions = {
+    chart: {
+      type: 'heatmap',
+      toolbar: { show: false },
+      fontFamily: 'Comfortaa, Noto Sans, sans-serif',
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    colors: ['#2563eb'],
+    xaxis: {
+      labels: {
+        style: { colors: '#94a3b8', fontSize: '11px' },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: '#94a3b8', fontSize: '11px' },
+      },
+    },
+    plotOptions: {
+      heatmap: {
+        shadeIntensity: 0.75,
+        radius: 6,
+        colorScale: {
+          ranges: [
+            { from: 0, to: 25, color: '#e2e8f0', name: 'Düşük' },
+            { from: 26, to: 50, color: '#f59e0b', name: 'Orta' },
+            { from: 51, to: 75, color: '#3b82f6', name: 'İleri' },
+            { from: 76, to: 100, color: '#10b981', name: 'Yüksek' },
+          ],
+        },
+      },
+    },
+    legend: {
+      show: true,
+      labels: { colors: '#94a3b8' },
+    },
+  }
+
   return (
     <>
       <section className="row g-4 mb-4">
@@ -671,6 +861,13 @@ function ReportsView({ reportsSnapshot, roleMode }) {
         <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={reportsSnapshot.kpis.completedGames} tone="success" helper="Yayına en yakın veya tamamlanan içerikler" />
         <MetricCard icon="approval" label="Onay Bekleyen" value={reportsSnapshot.kpis.awaitingApprovalStages} tone="warning" helper="Onaya gönderilmiş aşama sayısı" />
         <MetricCard icon="warning" label="Geciken Kayıt" value={reportsSnapshot.kpis.overdueGames} tone="danger" helper="Bitiş tarihi geçmiş açık kayıtlar" />
+      </section>
+
+      <section className="row g-4 mb-4">
+        <MetricCard icon="monitoring" label="Sağlık Skoru" value={reportsSnapshot.kpis.averageHealthScore} tone="success" helper="Tüm portföyün ortalama üretim sağlığı" />
+        <MetricCard icon="event_upcoming" label="Yaklaşan Termin" value={reportsSnapshot.kpis.dueSoonGames} tone="warning" helper="Önümüzdeki 10 günde kapanması beklenen kayıtlar" />
+        <MetricCard icon="error_outline" label="Eksik Bilgili" value={reportsSnapshot.kpis.missingInfoGames} tone="danger" helper="Doğrulama uyarısı taşıyan oyunlar" />
+        <MetricCard icon="grid_view" label="Ders Sayısı" value={reportsSnapshot.subjectDistribution.length} tone="primary" helper="Aktif üretim görülen ders adedi" />
       </section>
 
       <section className="row g-4 mb-4">
@@ -712,6 +909,137 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="row g-4 mb-4">
+        <div className="col-12 col-xl-5">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Sınıf Bazlı Dağılım</h3>
+                  <p>Üretim portföyünün sınıf seviyelerine göre ağırlığı.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="pie"
+                  height={320}
+                  series={reportsSnapshot.classDistribution.map((item) => item.value)}
+                  options={classDistributionOptions}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-7">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Sorumlu Kişi İş Yükü</h3>
+                  <p>Açık kayıt ve bölüm yoğunluğunu kişi bazında birlikte görün.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="bar"
+                  height={320}
+                  series={workloadSeries}
+                  options={workloadOptions}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="row g-4 mb-4">
+        <div className="col-12 col-xl-4">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Süreç Verimlilik Raporu</h3>
+                  <p>Aşamaların ne kadar ileri taşındığını tek grafikte karşılaştırın.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="radar"
+                  height={320}
+                  series={efficiencySeries}
+                  options={efficiencyOptions}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-4">
+          <div className="card rounded-4 border-0 shadow-sm h-100 report-chart-card">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Tamamlanma Hunisi</h3>
+                  <p>Toplam portföyün üretimden yayına giden yolculuğu.</p>
+                </div>
+              </div>
+              <div className="report-chart-wrap">
+                <ReactApexChart
+                  type="bar"
+                  height={320}
+                  series={funnelSeries}
+                  options={funnelOptions}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-4">
+          <div className="card rounded-4 border-0 shadow-sm h-100">
+            <div className="card-body">
+              <div className="section-heading">
+                <div>
+                  <h3>Üretim Sağlık Skoru</h3>
+                  <p>En düşük sağlık skoruna sahip kayıtlar öncelikli iyileştirme alanını gösterir.</p>
+                </div>
+              </div>
+              <div className="health-score-list mt-3">
+                {reportsSnapshot.healthScoreRows.slice(0, 5).map((item) => (
+                  <article key={item.id} className="health-score-item">
+                    <div className="health-score-copy">
+                      <strong>{item.topic}</strong>
+                      <span>{item.subjectLabel}</span>
+                      <small>{item.issues[0] ?? 'Risk görünmüyor'}</small>
+                    </div>
+                    <div className={`health-score-pill score-${item.healthScore >= 75 ? 'good' : item.healthScore >= 50 ? 'medium' : 'bad'}`}>
+                      {item.healthScore}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="card rounded-4 border-0 shadow-sm mb-4">
+        <div className="card-body">
+          <div className="section-heading">
+            <div>
+              <h3>Aşama Isı Haritası</h3>
+              <p>Ders bazında her üretim aşamasının ne kadar olgunlaştığını yoğunluk haritası ile görün.</p>
+            </div>
+          </div>
+          <div className="report-chart-wrap">
+            <ReactApexChart
+              type="heatmap"
+              height={320}
+              series={reportsSnapshot.stageHeatmap}
+              options={heatmapOptions}
+            />
           </div>
         </div>
       </section>

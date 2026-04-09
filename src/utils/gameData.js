@@ -1,6 +1,12 @@
 import { STAGE_LABELS, STAGE_ORDER, SUBJECT_LABELS } from '../constants'
 
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000
+const STATUS_PROGRESS_SCORE = {
+  baslamadi: 0,
+  devam_ediyor: 1,
+  onaya_gonderildi: 2,
+  onaylandi: 3,
+}
 
 function normalizeText(value) {
   return String(value ?? '')
@@ -355,15 +361,132 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
     }))
     .sort((leftItem, rightItem) => rightItem.totalGames - leftItem.totalGames)
 
+  const classDistribution = [...games]
+    .reduce((accumulator, game) => {
+      const key = game.class_level || 'Belirtilmemiş'
+      accumulator.set(key, (accumulator.get(key) ?? 0) + 1)
+      return accumulator
+    }, new Map())
+    .entries()
+
+  const classDistributionSeries = Array.from(classDistribution)
+    .map(([label, value]) => ({ label, value }))
+    .sort((leftItem, rightItem) => rightItem.value - leftItem.value)
+
+  const responsibleWorkload = users
+    .filter((user) => user.role === 'user')
+    .map((user) => {
+      const assignedGames = games.filter((game) => game.responsible_user_id === user.id)
+      return {
+        name: user.name,
+        subjectLabel: SUBJECT_LABELS[user.subject] ?? user.subject,
+        openGames: assignedGames.filter((game) => !game.is_completed).length,
+        totalSections: assignedGames.reduce((sum, game) => sum + Number(game.interface_count || 0), 0),
+      }
+    })
+    .sort((leftItem, rightItem) => rightItem.openGames - leftItem.openGames)
+
+  const stageEfficiency = STAGE_ORDER.map((stageKey) => {
+    const progressedGames = games.filter(
+      (game) => game[stageKey] === 'onaya_gonderildi' || game[stageKey] === 'onaylandi',
+    ).length
+    const efficiencyScore = games.length
+      ? Math.round((progressedGames / games.length) * 100)
+      : 0
+
+    return {
+      stageKey,
+      label: STAGE_LABELS[stageKey],
+      efficiencyScore,
+      activeCount: games.filter((game) => game[stageKey] === 'devam_ediyor').length,
+    }
+  })
+
+  const funnelSeries = [
+    { label: 'Toplam Oyun', value: games.length },
+    { label: 'Üretimde', value: openGames.length },
+    {
+      label: 'Onaya Giden',
+      value: openGames.filter((game) =>
+        STAGE_ORDER.some((stageKey) => game[stageKey] === 'onaya_gonderildi'),
+      ).length,
+    },
+    {
+      label: 'Yayına Yakın',
+      value: openGames.filter(
+        (game) =>
+          game.webgl_scorm_status === 'onaylandi' ||
+          game.eba_status === 'onaya_gonderildi' ||
+          game.eba_status === 'onaylandi',
+      ).length,
+    },
+    { label: 'Tamamlanan', value: dashboardSummary.completedGames },
+  ]
+
+  const stageHeatmap = subjectSummaries
+    .filter((summary) => summary.totalGames > 0)
+    .map((summary) => ({
+      name: summary.name,
+      data: STAGE_ORDER.map((stageKey) => {
+        const subjectGames = games.filter((game) => game.subject === summary.code)
+        const stageAverage = subjectGames.length
+          ? subjectGames.reduce(
+              (sum, game) => sum + STATUS_PROGRESS_SCORE[game[stageKey]],
+              0,
+            ) / subjectGames.length
+          : 0
+
+        return {
+          x: STAGE_LABELS[stageKey],
+          y: Math.round((stageAverage / 3) * 100),
+        }
+      }),
+    }))
+
+  const healthScoreRows = games
+    .map((game) => {
+      const issues = getGameHealthIssues(game, users)
+      const overduePenalty = safeDateDifference(game.end_date, referenceDate) < 0 && !game.is_completed ? 20 : 0
+      const approvalBoost =
+        STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaylandi').length * 8
+      const completionBoost = game.is_completed ? 25 : 0
+      const healthScore = Math.max(
+        0,
+        Math.min(100, 55 + approvalBoost + completionBoost - issues.length * 12 - overduePenalty),
+      )
+
+      return {
+        id: game.id,
+        topic: game.topic,
+        subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
+        healthScore,
+        issues,
+      }
+    })
+    .sort((leftItem, rightItem) => leftItem.healthScore - rightItem.healthScore)
+
+  const averageHealthScore = healthScoreRows.length
+    ? Math.round(
+        healthScoreRows.reduce((sum, item) => sum + item.healthScore, 0) / healthScoreRows.length,
+      )
+    : 0
+
   return {
     kpis: {
       ...dashboardSummary,
       overdueGames,
       dueSoonGames,
+      averageHealthScore,
     },
     subjectDistribution,
     stageDistribution,
     reportTableRows,
+    classDistribution: classDistributionSeries,
+    responsibleWorkload,
+    stageEfficiency,
+    funnelSeries,
+    stageHeatmap,
+    healthScoreRows,
   }
 }
 

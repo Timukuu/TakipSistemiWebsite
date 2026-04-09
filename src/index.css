@@ -714,6 +714,64 @@ a {
   background: linear-gradient(90deg, #2563eb, #10b981);
 }
 
+.health-score-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.health-score-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.health-score-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.health-score-copy strong {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.health-score-copy span,
+.health-score-copy small {
+  color: #94a3b8;
+}
+
+.health-score-pill {
+  min-width: 58px;
+  min-height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.health-score-pill.score-good {
+  background: rgba(16, 185, 129, 0.16);
+  color: #10b981;
+}
+
+.health-score-pill.score-medium {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+}
+
+.health-score-pill.score-bad {
+  background: rgba(244, 63, 94, 0.16);
+  color: #f43f5e;
+}
+
 .highlight-item h4 {
   margin: 0.25rem 0 0.45rem;
   font-size: 0.98rem;
