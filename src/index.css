@@ -495,6 +495,18 @@ a {
   font-weight: 600;
 }
 
+.metric-top .material-icons-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 .metric-card strong {
   display: block;
   margin-top: 1rem;
