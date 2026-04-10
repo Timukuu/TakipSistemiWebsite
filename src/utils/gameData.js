@@ -149,7 +149,7 @@ export function validateGameDraft(game, users) {
   }
 
   if (!game?.oyun_ozeti?.trim()) {
-    errors.oyun_ozeti = 'Oyun Özeti alanı zorunludur.'
+    errors.oyun_ozeti = 'Özet alanı zorunludur.'
   }
 
   if (!game?.responsible_user_id) {
@@ -207,7 +207,7 @@ export function getGameHealthIssues(game, users) {
   }
 
   if (!game.oyun_ozeti?.trim()) {
-    issues.push('Oyun özeti eksik')
+    issues.push('Özet bilgisi eksik')
   }
 
   if (!game.end_date) {
@@ -342,7 +342,7 @@ export function buildOperationalHighlights(games, users, referenceDate = new Dat
   }
 }
 
-export function buildReportsSnapshot(games, subjects, users, referenceDate = new Date()) {
+export function buildReportsSnapshot(games, subjects, users, referenceDate = new Date(), contentTypeLabel = 'Oyun') {
   const dashboardSummary = buildDashboardSummary(games, users)
   const subjectSummaries = getSubjectSummaries(games, subjects, users)
   const openGames = games.filter((game) => !game.is_completed)
@@ -540,7 +540,7 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
   })
 
   const funnelSeries = [
-    { label: 'Toplam Oyun', value: games.length },
+    { label: `Toplam ${contentTypeLabel}`, value: games.length },
     { label: 'Üretimde', value: openGames.length },
     {
       label: 'Onaya Giden',

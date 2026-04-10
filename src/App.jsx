@@ -140,6 +140,7 @@ function App() {
   }, [subjects])
 
   const currentInsightLevel = insightScope === 'simulations_temel' ? 'temel_egitim' : insightScope === 'simulations_orta' ? 'orta_ogretim' : ''
+  const contentTypeLabel = insightScope === 'games' ? 'Oyun' : 'Simülasyon'
 
   const scopedGames = useMemo(
     () => getScopedGames(games, roleMode, activeUser),
@@ -210,8 +211,8 @@ function App() {
   )
 
   const reportsSnapshot = useMemo(
-    () => buildReportsSnapshot(scopedInsightRecords, insightSubjects, users),
-    [insightSubjects, scopedInsightRecords, users],
+    () => buildReportsSnapshot(scopedInsightRecords, insightSubjects, users, new Date(), contentTypeLabel),
+    [contentTypeLabel, insightSubjects, scopedInsightRecords, users],
   )
 
   const currentUtilityRecords = useMemo(
@@ -591,7 +592,7 @@ function App() {
           <div className="search-bar flex-grow-1">
             <div className="page-title-wrap">
               <span className="eyebrow">MEB Üretim Paneli</span>
-              <h1 className="page-title">Oyun Üretim Takip Sistemi</h1>
+              <h1 className="page-title">Üretim Takip Sistemi</h1>
             </div>
           </div>
           <ul className="navbar-nav gap-2 nav-right-links align-items-center ms-auto">
@@ -621,7 +622,7 @@ function App() {
             <img
               src={`${baseUrl}theme/assets/images/logo-icon.png`}
               className="logo-img"
-              alt="MEB Oyun Üretim Takip Sistemi"
+              alt="MEB Üretim Takip Sistemi"
             />
           </div>
           <div className="logo-name flex-grow-1">
@@ -783,6 +784,7 @@ function App() {
 
           {currentView === 'dashboard' ? (
             <DashboardView
+              contentTypeLabel={contentTypeLabel}
               dashboardSummary={dashboardSummary}
               dashboardPieSnapshot={dashboardPieSnapshot}
               operationalHighlights={operationalHighlights}
@@ -791,6 +793,7 @@ function App() {
             />
           ) : currentView === 'reports' ? (
             <ReportsView
+              contentTypeLabel={contentTypeLabel}
               reportsSnapshot={reportsSnapshot}
               roleMode={roleMode}
             />
@@ -877,7 +880,7 @@ function App() {
   )
 }
 
-function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHighlights, stageSummary, subjectSummaries }) {
+function DashboardView({ contentTypeLabel, dashboardSummary, dashboardPieSnapshot, operationalHighlights, stageSummary, subjectSummaries }) {
   const sharedPieColors = ['#10b981', '#e2e8f0', '#2563eb', '#f59e0b', '#8b5cf6', '#14b8a6', '#ef4444', '#0ea5e9']
   const buildDonutOptions = (labels, totalLabel) => ({
     chart: {
@@ -917,9 +920,9 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
   return (
     <>
       <section className="row g-4 mb-4">
-        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel kapsamındaki tüm kayıtlar" />
-        <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={dashboardSummary.completedGames} tone="success" helper="Tüm aşamaları kapanan oyunlar" />
-        <MetricCard icon="autorenew" label="Aktif Kayıt" value={dashboardSummary.inProgressGames} tone="warning" helper="Tamamlanmamış oyunlar" />
+        <MetricCard icon="sports_esports" label={`Toplam ${contentTypeLabel}`} value={dashboardSummary.totalGames} tone="primary" helper="Panel kapsamındaki tüm kayıtlar" />
+        <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={dashboardSummary.completedGames} tone="success" helper={`Tüm aşamaları kapanan ${contentTypeLabel.toLowerCase()}lar`} />
+        <MetricCard icon="autorenew" label="Aktif Kayıt" value={dashboardSummary.inProgressGames} tone="warning" helper={`Tamamlanmamış ${contentTypeLabel.toLowerCase()}lar`} />
         <MetricCard icon="warning" label="Eksik Bilgi" value={dashboardSummary.missingInfoGames} tone="danger" helper="Veri doğrulama uyarısı taşıyan kayıtlar" />
       </section>
 
@@ -940,7 +943,7 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
                       <div className="subject-summary-top">
                         <div>
                           <h4>{subjectSummary.name}</h4>
-                          <p>{subjectSummary.totalGames} Oyun Kaydı</p>
+                          <p>{subjectSummary.totalGames} {contentTypeLabel} Kaydı</p>
                         </div>
                       </div>
                       <div className="subject-progress">
@@ -1021,20 +1024,20 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
                 </div>
                 <div className="dashboard-pie-card">
                   <div className="dashboard-pie-heading">
-                    <h4>Oyun Durumu</h4>
-                    <p>Tamamlanan ve tamamlanmayan oyun sayısı.</p>
+                    <h4>{contentTypeLabel} Durumu</h4>
+                    <p>Tamamlanan ve tamamlanmayan {contentTypeLabel.toLowerCase()} sayısı.</p>
                   </div>
                   <ReactApexChart
                     type="donut"
                     height={250}
                     series={dashboardPieSnapshot.gameStatusSeries}
-                    options={buildDonutOptions(['Tamamlanan Oyun', 'Tamamlanmayan Oyun'], 'Oyun')}
+                    options={buildDonutOptions([`Tamamlanan ${contentTypeLabel}`, `Tamamlanmayan ${contentTypeLabel}`], contentTypeLabel)}
                   />
                 </div>
                 <div className="dashboard-pie-card">
                   <div className="dashboard-pie-heading">
-                    <h4>Tamamlanan Oyunlar</h4>
-                    <p>Ders bazında tamamlanan oyunların dağılımı.</p>
+                    <h4>Tamamlanan {contentTypeLabel}lar</h4>
+                    <p>Ders bazında tamamlanan {contentTypeLabel.toLowerCase()}ların dağılımı.</p>
                   </div>
                   <ReactApexChart
                     type="donut"
@@ -1073,7 +1076,7 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
   )
 }
 
-function ReportsView({ reportsSnapshot, roleMode }) {
+function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
   if (roleMode !== 'admin') {
     return (
       <section className="card rounded-4 border-0 shadow-sm">
@@ -1408,7 +1411,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
   return (
     <>
       <section className="row g-4 mb-4">
-        <MetricCard icon="analytics" label="Toplam Oyun" value={reportsSnapshot.kpis.totalGames} tone="primary" helper="Rapor kapsamındaki tüm kayıtlar" />
+        <MetricCard icon="analytics" label={`Toplam ${contentTypeLabel}`} value={reportsSnapshot.kpis.totalGames} tone="primary" helper="Rapor kapsamındaki tüm kayıtlar" />
         <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={reportsSnapshot.kpis.completedGames} tone="success" helper="Yayına en yakın veya tamamlanan içerikler" />
         <MetricCard icon="approval" label="Onay Bekleyen" value={reportsSnapshot.kpis.awaitingApprovalStages} tone="warning" helper="Onaya gönderilmiş aşama sayısı" />
         <MetricCard icon="warning" label="Geciken Kayıt" value={reportsSnapshot.kpis.overdueGames} tone="danger" helper="Bitiş tarihi geçmiş açık kayıtlar" />
@@ -1417,7 +1420,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       <section className="row g-4 mb-4">
         <MetricCard icon="health_and_safety" label="Sağlık Skoru" value={reportsSnapshot.kpis.averageHealthScore} tone="success" helper="Tüm portföyün ortalama üretim sağlığı" />
         <MetricCard icon="event" label="Yaklaşan Termin" value={reportsSnapshot.kpis.dueSoonGames} tone="warning" helper="Önümüzdeki 10 günde kapanması beklenen kayıtlar" />
-        <MetricCard icon="error_outline" label="Eksik Bilgili" value={reportsSnapshot.kpis.missingInfoGames} tone="danger" helper="Doğrulama uyarısı taşıyan oyunlar" />
+        <MetricCard icon="error_outline" label="Eksik Bilgili" value={reportsSnapshot.kpis.missingInfoGames} tone="danger" helper={`Doğrulama uyarısı taşıyan ${contentTypeLabel.toLowerCase()}lar`} />
         <MetricCard icon="grid_view" label="Ders Sayısı" value={reportsSnapshot.subjectDistribution.length} tone="primary" helper="Aktif üretim görülen ders adedi" />
       </section>
 
@@ -1428,7 +1431,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
               <div className="section-heading">
                 <div>
                   <h3>Ders Bazlı Dağılım</h3>
-                  <p>Toplam oyun yükünün derslere göre dağılımı.</p>
+                  <p>Toplam {contentTypeLabel.toLowerCase()} yükünün derslere göre dağılımı.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1714,7 +1717,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
               <div className="section-heading">
                 <div>
                   <h3>Kapsam Büyüklüğü</h3>
-                  <p>Bölüm sayısı en yüksek oyunlar toplam üretim yükünü öne çıkarır.</p>
+                  <p>Bölüm sayısı en yüksek {contentTypeLabel.toLowerCase()}lar toplam üretim yükünü öne çıkarır.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -2163,7 +2166,7 @@ function GameDetailDrawer({
                 <textarea className={`form-control ${formErrors.oyun_ozeti ? 'is-invalid' : ''}`} rows="3" value={draftGame.oyun_ozeti ?? ''} onChange={(event) => onChange('oyun_ozeti', event.target.value)} placeholder={`${recordLabel} için kısa bir özet yazın`} />
               </FormField>
               <FormField label="Kazanımlar" error={formErrors.kazanimlar} fullWidth>
-                <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun desteklediği kazanımları yazın" />
+                <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder={`${recordLabel}un desteklediği kazanımları yazın`} />
               </FormField>
               <FormField label="EBA Link" error={formErrors.eba_link} fullWidth>
                 <input className={`form-control ${formErrors.eba_link ? 'is-invalid' : ''}`} type="url" value={draftGame.eba_link} onChange={(event) => onChange('eba_link', event.target.value)} placeholder="https://" />
@@ -2180,7 +2183,7 @@ function GameDetailDrawer({
                 <div className="upload-placeholder-card">
                   <div>
                     <strong>WebGL Dosya Yükleme Yakında</strong>
-                    <p>Sunucu ve veritabanı entegrasyonu sonrası kullanıcılar build dosyasını yükleyip oyunu native olarak çalıştırabilecek.</p>
+                    <p>Sunucu ve veritabanı entegrasyonu sonrası kullanıcılar build dosyasını yükleyip içeriği native olarak çalıştırabilecek.</p>
                   </div>
                   <button type="button" className="btn btn-light" disabled>
                     Dosya Yükle
@@ -2331,7 +2334,7 @@ function GamePlayerModal({ game, onClose, playUrl }) {
         </div>
         <div className="player-modal-body">
           <div className="player-note">
-            Unity Play bağlantılarında yükleme çubuğu anlık güncellenmeyebilir. Oyun açılmıyor gibi görünse bile 10-15 saniye bekleyin; sorun devam ederse `Yeni Sekmede Aç` seçeneğini kullanın.
+            Unity Play bağlantılarında yükleme çubuğu anlık güncellenmeyebilir. İçerik açılmıyor gibi görünse bile 10-15 saniye bekleyin; sorun devam ederse `Yeni Sekmede Aç` seçeneğini kullanın.
           </div>
           <div className="player-frame-wrap">
             <iframe
