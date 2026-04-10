@@ -305,7 +305,7 @@ export function buildOperationalHighlights(games, users, referenceDate = new Dat
       id: game.id,
       topic: game.topic,
       subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
-      meta: game.end_date ? `${formatDate(game.end_date)} terminli` : 'Biti�x tarihi eksik',
+      meta: game.end_date ? `${formatDate(game.end_date)} terminli` : 'Bitiş tarihi eksik',
       tone: safeDateDifference(game.end_date, referenceDate) < 0 ? 'danger' : 'warning',
     }))
 
@@ -517,8 +517,10 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
         subjectLabel: SUBJECT_LABELS[user.subject] ?? user.subject,
         openGames: assignedGames.filter((game) => !game.is_completed).length,
         totalSections: assignedGames.reduce((sum, game) => sum + Number(game.interface_count || 0), 0),
+        totalAssigned: assignedGames.length,
       }
     })
+    .filter((entry) => entry.totalAssigned > 0)
     .sort((leftItem, rightItem) => rightItem.openGames - leftItem.openGames)
 
   const stageEfficiency = STAGE_ORDER.map((stageKey) => {

@@ -694,7 +694,7 @@ function App() {
                   </select>
                 </div>
                 <div className="col-12 col-xl-3">
-                  <label className="form-label">Mock Kullan?c?</label>
+                  <label className="form-label">Mock Kullanıcı</label>
                   <select
                     className="form-select"
                     value={selectedUserId}
@@ -710,7 +710,7 @@ function App() {
                 </div>
                 {currentView === 'dashboard' || currentView === 'reports' ? (
                   <div className="col-12 col-xl-3">
-                    <label className="form-label">Içerik Kapsam?</label>
+                    <label className="form-label">İçerik Kapsamı</label>
                     <select
                       className="form-select"
                       value={insightScope}
@@ -726,7 +726,7 @@ function App() {
                 ) : null}
                 <div className="col-12 utility-panel-summary">
                   <div className="phase-banner">
-                    <strong>Son ??lemler</strong>
+                    <strong>Son İşlemler</strong>
                     <div className="recent-activity-list">
                       {recentActivities.length > 0 ? (
                         recentActivities.map((activity) => (
@@ -743,7 +743,7 @@ function App() {
                           </article>
                         ))
                       ) : (
-                        <div className="recent-activity-empty">Henüz gösterilecek bir i?lem bulunmuyor.</div>
+                        <div className="recent-activity-empty">Henüz gösterilecek bir işlem bulunmuyor.</div>
                       )}
                     </div>
                   </div>
@@ -751,11 +751,11 @@ function App() {
                     <strong>Operasyon Özeti</strong>
                     <div className="operation-summary-grid">
                       <article className="operation-summary-card">
-                        <span>Toplam Kay?t</span>
+                        <span>Toplam Kayıt</span>
                         <strong>{utilitySummary.totalGames}</strong>
                       </article>
                       <article className="operation-summary-card">
-                        <span>Açik Kay?t</span>
+                        <span>Açık Kayıt</span>
                         <strong>{utilitySummary.inProgressGames}</strong>
                       </article>
                       <article className="operation-summary-card">
@@ -2044,7 +2044,7 @@ function GameDetailDrawer({
   saveMessage,
   subjectOptions,
 }) {
-  const recordLabel = draftGame.content_type === 'simulation' ? 'Sim�lasyon' : 'Oyun'
+  const recordLabel = draftGame.content_type === 'simulation' ? 'Simülasyon' : 'Oyun'
   const classLevelOptions = getClassLevelOptions(draftGame.content_type, draftGame.education_level)
 
   return (
@@ -2053,7 +2053,7 @@ function GameDetailDrawer({
       <aside className="detail-drawer">
         <div className="detail-drawer-header">
           <div>
-            <span className="eyebrow">{drawerMode === 'create' ? `Yeni ${recordLabel} Kayd1` : `${recordLabel} Detay / D�zenleme`}</span>
+            <span className="eyebrow">{drawerMode === 'create' ? `Yeni ${recordLabel} Kaydı` : `${recordLabel} Detay / Düzenleme`}</span>
             <h3>{draftGame.topic || `Yeni ${recordLabel} Hazırlanıyor`}</h3>
           </div>
           <button type="button" className="theme-icon-button" onClick={onClose} aria-label="Detay Panelini Kapat">
@@ -2113,7 +2113,7 @@ function GameDetailDrawer({
                 </select>
               </FormField>
               <FormField label="Konu" error={formErrors.topic}>
-                <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} placeholder="�rnek: Kesirler Parkuru" />
+                <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} placeholder="Örnek: Kesirler Parkuru" />
               </FormField>
               <FormField label="Bölüm Sayısı" error={formErrors.interface_count}>
                 <input className={`form-control ${formErrors.interface_count ? 'is-invalid' : ''}`} type="number" min="0" value={draftGame.interface_count} onChange={(event) => onChange('interface_count', Number(event.target.value))} />
@@ -2160,10 +2160,10 @@ function GameDetailDrawer({
             </div>
             <div className="row g-3">
               <FormField label={`${recordLabel} Özeti`} error={formErrors.oyun_ozeti} fullWidth>
-                <textarea className={`form-control ${formErrors.oyun_ozeti ? 'is-invalid' : ''}`} rows="3" value={draftGame.oyun_ozeti ?? ''} onChange={(event) => onChange('oyun_ozeti', event.target.value)} placeholder={`${recordLabel} i�in k1sa bir �zet yaz1n`} />
+                <textarea className={`form-control ${formErrors.oyun_ozeti ? 'is-invalid' : ''}`} rows="3" value={draftGame.oyun_ozeti ?? ''} onChange={(event) => onChange('oyun_ozeti', event.target.value)} placeholder={`${recordLabel} için kısa bir özet yazın`} />
               </FormField>
               <FormField label="Kazanımlar" error={formErrors.kazanimlar} fullWidth>
-                <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun destekledi�xi kazanımları yazın" />
+                <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun desteklediği kazanımları yazın" />
               </FormField>
               <FormField label="EBA Link" error={formErrors.eba_link} fullWidth>
                 <input className={`form-control ${formErrors.eba_link ? 'is-invalid' : ''}`} type="url" value={draftGame.eba_link} onChange={(event) => onChange('eba_link', event.target.value)} placeholder="https://" />
