@@ -388,17 +388,42 @@ a {
   color: #eff6ff;
 }
 
-.filter-reset-button {
+.filter-action-group {
+  margin-left: auto;
+}
+
+.filter-action-btn {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.filter-reset-button,
+.btn-outline-secondary.filter-action-btn {
   border-color: rgba(191, 219, 254, 0.28) !important;
   background: rgba(148, 163, 184, 0.14) !important;
   color: #e2e8f0 !important;
 }
 
 .filter-reset-button:hover,
-.filter-reset-button:focus {
+.filter-reset-button:focus,
+.btn-outline-secondary.filter-action-btn:hover,
+.btn-outline-secondary.filter-action-btn:focus {
   border-color: rgba(191, 219, 254, 0.38) !important;
   background: rgba(148, 163, 184, 0.22) !important;
   color: #f8fafc !important;
+}
+
+.btn-pastel-green {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.24);
+  color: #10b981;
+}
+
+.btn-pastel-green:hover,
+.btn-pastel-green:focus {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.36);
+  color: #10b981;
 }
 
 .nav-button {

@@ -1832,21 +1832,17 @@ function GamesView({
                 </select>
               </div>
             ) : null}
-            <div className="col-6 col-md-3 col-xl-1 d-flex align-items-end">
-              <button type="button" className="btn btn-outline-secondary w-100 filter-reset-button" onClick={onResetFilters}>
+            <div className="col-12 col-xl-auto d-flex align-items-end gap-2 filter-action-group">
+              <button type="button" className="btn btn-outline-secondary filter-action-btn" onClick={onResetFilters}>
                 Sıfırla
               </button>
-            </div>
-            {canManageSubjects ? (
-              <div className="col-6 col-md-3 col-xl-2 d-flex align-items-end">
-                <button type="button" className="btn btn-outline-light w-100" onClick={onOpenSubjectManager}>
+              {canManageSubjects ? (
+                <button type="button" className="btn btn-pastel-green filter-action-btn" onClick={onOpenSubjectManager}>
                   Ders Ekle
                 </button>
-              </div>
-            ) : null}
-            <div className="col-6 col-md-3 col-xl-1 d-flex align-items-end">
-              <button type="button" className="btn btn-primary w-100" onClick={onCreateGame}>
-                Yeni Ekle
+              ) : null}
+              <button type="button" className="btn btn-primary filter-action-btn" onClick={onCreateGame}>
+                Senaryo Ekle
               </button>
             </div>
           </div>
