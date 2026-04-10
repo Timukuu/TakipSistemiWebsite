@@ -607,6 +607,29 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
       )
     : 0
 
+  const subjectAvgDuration = subjects
+    .filter((subject) => subject.is_active)
+    .map((subject) => {
+      const subjectGames = games.filter((game) => game.subject === subject.code)
+      const durationsInDays = subjectGames
+        .filter((game) => game.start_date && game.end_date)
+        .map((game) => {
+          const start = new Date(game.start_date)
+          const end = new Date(game.end_date)
+          return Math.max(0, Math.round((end.getTime() - start.getTime()) / ONE_DAY_IN_MS))
+        })
+      const avgDays = durationsInDays.length
+        ? Math.round(durationsInDays.reduce((sum, d) => sum + d, 0) / durationsInDays.length)
+        : null
+      return {
+        code: subject.code,
+        name: SUBJECT_LABELS[subject.code] ?? subject.name,
+        avgDays,
+        sampleCount: durationsInDays.length,
+      }
+    })
+    .filter((entry) => entry.avgDays !== null)
+
   return {
     kpis: {
       ...dashboardSummary,
@@ -628,6 +651,7 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
     fastestSubjects,
     last7DaysActivity,
     scopeSizeRows,
+    subjectAvgDuration,
   }
 }
 

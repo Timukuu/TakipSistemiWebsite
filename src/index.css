@@ -1003,6 +1003,33 @@ a {
   width: 100%;
 }
 
+.avg-duration-card .card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.25rem;
+}
+
+.avg-duration-subject {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 0.5rem;
+}
+
+.avg-duration-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.avg-duration-meta {
+  color: #64748b;
+  font-size: 0.72rem;
+  margin-top: 0.25rem;
+}
+
 .radar-chart-wrap {
   min-height: 380px;
   display: flex;

@@ -1732,6 +1732,30 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
           </div>
         </div>
       </section>
+
+      {reportsSnapshot.subjectAvgDuration.length > 0 ? (
+        <section className="row g-3 mb-4">
+          <div className="col-12">
+            <div className="section-heading">
+              <div>
+                <h3>Ders Bazlı Ortalama Üretim Süresi</h3>
+                <p>Başlangıç ve bitiş tarihlerine göre hesaplanan ortalama tamamlama süresi.</p>
+              </div>
+            </div>
+          </div>
+          {reportsSnapshot.subjectAvgDuration.map((item) => (
+            <div className="col-6 col-md-4 col-xl-3" key={item.code}>
+              <div className="card rounded-4 border-0 shadow-sm h-100 avg-duration-card">
+                <div className="card-body">
+                  <h4 className="avg-duration-subject">{item.name}</h4>
+                  <div className="avg-duration-value">{item.avgDays} gün</div>
+                  <small className="avg-duration-meta">{item.sampleCount} kayıt üzerinden</small>
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      ) : null}
     </>
   )
 }
