@@ -93,7 +93,7 @@
   },
   {
     "id": "subject_turkce",
-    "name": "T?rk?e",
+    "name": "Türkçe",
     "code": "turkce",
     "is_active": true,
     "catalogs": [

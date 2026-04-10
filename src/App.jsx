@@ -248,7 +248,7 @@ function App() {
             topic: game.topic,
             subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
             responsibleLabel: getResponsibleUserName(users, game.responsible_user_id),
-            actionLabel: isNewRecord ? 'Yeni KayÄ±t' : 'GÃ¼ncellendi',
+            actionLabel: isNewRecord ? 'Yeni Kayıt' : 'Güncellendi',
             timestampLabel: formatActivityTimestamp(game.updated_at || game.created_at),
           }
         }),
@@ -458,7 +458,7 @@ function App() {
       (subjectDraft.code || normalizedName)
         .trim()
         .toLocaleLowerCase('tr-TR')
-        .replace(/[^a-z0-9Ã§ÄŸÄ±Ã¶ÅŸÃ¼\s_-]/gi, '')
+        .replace(/[^a-z0-9çğıöşü\s_-]/gi, '')
         .replace(/\s+/g, '_')
         .replace(/_{2,}/g, '_')
 
@@ -482,7 +482,7 @@ function App() {
     }
 
     if (!normalizedName) {
-      nextErrors.name = 'Ders adÄ± zorunludur.'
+      nextErrors.name = 'Ders adı zorunludur.'
     }
 
     if (!normalizedCode) {
@@ -490,15 +490,15 @@ function App() {
     }
 
     if (!normalizedResponsibleName) {
-      nextErrors.responsible_name = 'VarsayÄ±lan sorumlu adÄ± zorunludur.'
+      nextErrors.responsible_name = 'Varsayılan sorumlu adı zorunludur.'
     }
 
     if (catalogs.length === 0) {
-      nextErrors.catalogs = 'En az bir kullanÄ±m alanÄ± seÃ§in.'
+      nextErrors.catalogs = 'En az bir kullanım alanı seçin.'
     }
 
     if (subjects.some((subject) => subject.code === normalizedCode)) {
-      nextErrors.code = 'Bu ders kodu zaten kullanÄ±lÄ±yor.'
+      nextErrors.code = 'Bu ders kodu zaten kullanılıyor.'
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -568,8 +568,8 @@ function App() {
 
     setSaveMessage(
       drawerMode === 'create'
-        ? 'Yeni kayÄ±t panel Ã¼zerinde eklendi. KalÄ±cÄ± yayÄ±n iÃ§in JSON verisini repo Ã¼zerinden gÃ¼ncellemeniz gerekir.'
-        : 'KayÄ±t panel Ã¼zerinde gÃ¼ncellendi. KalÄ±cÄ± yayÄ±n iÃ§in JSON verisini repo Ã¼zerinden gÃ¼ncellemeniz gerekir.',
+        ? 'Yeni kayıt panel üzerinde eklendi. Kalıcı yayın için JSON verisini repo üzerinden güncellemeniz gerekir.'
+        : 'Kayıt panel üzerinde güncellendi. Kalıcı yayın için JSON verisini repo üzerinden güncellemeniz gerekir.',
     )
     setDrawerMode('edit')
   }
@@ -583,15 +583,15 @@ function App() {
               type="button"
               className="theme-icon-button"
               onClick={() => setIsSidebarCollapsed((current) => !current)}
-              aria-label="Yan menÃ¼yÃ¼ daralt"
+              aria-label="Yan menüyü daralt"
             >
               <span className="material-icons-outlined">menu</span>
             </button>
           </div>
           <div className="search-bar flex-grow-1">
             <div className="page-title-wrap">
-              <span className="eyebrow">MEB Ãœretim Paneli</span>
-              <h1 className="page-title">Oyun Ãœretim Takip Sistemi</h1>
+              <span className="eyebrow">MEB Üretim Paneli</span>
+              <h1 className="page-title">Oyun Üretim Takip Sistemi</h1>
             </div>
           </div>
           <ul className="navbar-nav gap-2 nav-right-links align-items-center ms-auto">
@@ -600,7 +600,7 @@ function App() {
                 type="button"
                 className="theme-icon-button"
                 onClick={() => setIsMobileSidebarOpen(true)}
-                aria-label="Mobil menÃ¼yÃ¼ aÃ§"
+                aria-label="Mobil menüyü aç"
               >
                 <span className="material-icons-outlined">dashboard</span>
               </button>
@@ -621,7 +621,7 @@ function App() {
             <img
               src={`${baseUrl}theme/assets/images/logo-icon.png`}
               className="logo-img"
-              alt="MEB Oyun Ãœretim Takip Sistemi"
+              alt="MEB Oyun Üretim Takip Sistemi"
             />
           </div>
           <div className="logo-name flex-grow-1">
@@ -661,16 +661,16 @@ function App() {
                 : currentView === 'reports'
                   ? 'Raporlar'
                   : currentView === 'simulations'
-                    ? 'SimÃ¼lasyon Listesi'
+                    ? 'Simülasyon Listesi'
                     : 'Oyun Listesi'}
             </div>
             <div className="page-breadcrumb-content">
               <span className="crumb-pill">
-                {roleMode === 'admin' ? 'YÃ¶netici GÃ¶rÃ¼nÃ¼mÃ¼' : 'Ders Sorumlusu GÃ¶rÃ¼nÃ¼mÃ¼'}
+                {roleMode === 'admin' ? 'Yönetici Görünümü' : 'Ders Sorumlusu Görünümü'}
               </span>
               {roleMode === 'user' && activeUser ? (
                 <span className="crumb-pill muted">
-                  {activeUser.name} Â· {SUBJECT_LABELS[activeUser.subject]}
+                  {activeUser.name} · {SUBJECT_LABELS[activeUser.subject]}
                 </span>
               ) : null}
             </div>
@@ -694,7 +694,7 @@ function App() {
                   </select>
                 </div>
                 <div className="col-12 col-xl-3">
-                  <label className="form-label">Mock Kullanici</label>
+                  <label className="form-label">Mock Kullan?c?</label>
                   <select
                     className="form-select"
                     value={selectedUserId}
@@ -710,7 +710,7 @@ function App() {
                 </div>
                 {currentView === 'dashboard' || currentView === 'reports' ? (
                   <div className="col-12 col-xl-3">
-                    <label className="form-label">Içerik Kapsami</label>
+                    <label className="form-label">Içerik Kapsam?</label>
                     <select
                       className="form-select"
                       value={insightScope}
@@ -726,7 +726,7 @@ function App() {
                 ) : null}
                 <div className="col-12 utility-panel-summary">
                   <div className="phase-banner">
-                    <strong>Son Islemler</strong>
+                    <strong>Son ??lemler</strong>
                     <div className="recent-activity-list">
                       {recentActivities.length > 0 ? (
                         recentActivities.map((activity) => (
@@ -743,7 +743,7 @@ function App() {
                           </article>
                         ))
                       ) : (
-                        <div className="recent-activity-empty">Henüz gösterilecek bir islem bulunmuyor.</div>
+                        <div className="recent-activity-empty">Henüz gösterilecek bir i?lem bulunmuyor.</div>
                       )}
                     </div>
                   </div>
@@ -751,11 +751,11 @@ function App() {
                     <strong>Operasyon Özeti</strong>
                     <div className="operation-summary-grid">
                       <article className="operation-summary-card">
-                        <span>Toplam Kayit</span>
+                        <span>Toplam Kay?t</span>
                         <strong>{utilitySummary.totalGames}</strong>
                       </article>
                       <article className="operation-summary-card">
-                        <span>Açik Kayit</span>
+                        <span>Açik Kay?t</span>
                         <strong>{utilitySummary.inProgressGames}</strong>
                       </article>
                       <article className="operation-summary-card">
@@ -807,11 +807,11 @@ function App() {
               onOpenPlayer={handleOpenPlayer}
               onOpenSubjectManager={handleOpenSubjectManager}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
-              recordTypeLabel="SimÃ¼lasyon"
+              recordTypeLabel="Simülasyon"
               roleMode={roleMode}
               showLevelFilter
               subjectOptions={simulationSubjectOptions}
-              title="SimÃ¼lasyon Listesi"
+              title="Simülasyon Listesi"
               users={users}
             />
           ) : (
@@ -917,10 +917,10 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
   return (
     <>
       <section className="row g-4 mb-4">
-        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel kapsamÄ±ndaki tÃ¼m kayÄ±tlar" />
-        <MetricCard icon="task_alt" label="Tamamlanan KayÄ±t" value={dashboardSummary.completedGames} tone="success" helper="TÃ¼m aÅŸamalarÄ± kapanan oyunlar" />
-        <MetricCard icon="autorenew" label="Aktif KayÄ±t" value={dashboardSummary.inProgressGames} tone="warning" helper="TamamlanmamÄ±ÅŸ oyunlar" />
-        <MetricCard icon="warning" label="Eksik Bilgi" value={dashboardSummary.missingInfoGames} tone="danger" helper="Veri doÄŸrulama uyarÄ±sÄ± taÅŸÄ±yan kayÄ±tlar" />
+        <MetricCard icon="sports_esports" label="Toplam Oyun" value={dashboardSummary.totalGames} tone="primary" helper="Panel kapsamındaki tüm kayıtlar" />
+        <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={dashboardSummary.completedGames} tone="success" helper="Tüm aşamaları kapanan oyunlar" />
+        <MetricCard icon="autorenew" label="Aktif Kayıt" value={dashboardSummary.inProgressGames} tone="warning" helper="Tamamlanmamış oyunlar" />
+        <MetricCard icon="warning" label="Eksik Bilgi" value={dashboardSummary.missingInfoGames} tone="danger" helper="Veri doğrulama uyarısı taşıyan kayıtlar" />
       </section>
 
       <section className="row g-4 mb-4">
@@ -929,8 +929,8 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Ders BazlÄ± Ã–zet</h3>
-                  <p>Her ders iÃ§in toplam, tamamlanan, aktif ve eksik alanlÄ± kayÄ±t gÃ¶rÃ¼nÃ¼mÃ¼.</p>
+                  <h3>Ders Bazlı Özet</h3>
+                  <p>Her ders için toplam, tamamlanan, aktif ve eksik alanlı kayıt görünümü.</p>
                 </div>
               </div>
               <div className="row g-3 mt-1">
@@ -940,19 +940,19 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
                       <div className="subject-summary-top">
                         <div>
                           <h4>{subjectSummary.name}</h4>
-                          <p>{subjectSummary.totalGames} Oyun KaydÄ±</p>
+                          <p>{subjectSummary.totalGames} Oyun Kaydı</p>
                         </div>
                       </div>
                       <div className="subject-progress">
                         <div className="subject-progress-bar" style={{ width: `${subjectSummary.completionRate}%` }} />
                       </div>
                       <div className="subject-summary-bottom">
-                        <span>{subjectSummary.inProgressGames} Aktif KayÄ±t</span>
-                        <span>{subjectSummary.awaitingApprovalStages} Onay Bekleyen AÅŸama</span>
+                        <span>{subjectSummary.inProgressGames} Aktif Kayıt</span>
+                        <span>{subjectSummary.awaitingApprovalStages} Onay Bekleyen Aşama</span>
                       </div>
                       <div className="subject-summary-meta">
-                        <span>{subjectSummary.missingInfoGames} Eksik Bilgili KayÄ±t</span>
-                        <span className="badge text-bg-light">{subjectSummary.completedGames} TamamlandÄ±</span>
+                        <span>{subjectSummary.missingInfoGames} Eksik Bilgili Kayıt</span>
+                        <span className="badge text-bg-light">{subjectSummary.completedGames} Tamamlandı</span>
                       </div>
                     </div>
                   </div>
@@ -966,16 +966,16 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>AÅŸama Durum Ã–zeti</h3>
-                  <p>BeÅŸ Ã¼retim adÄ±mÄ±nÄ±n anlÄ±k daÄŸÄ±lÄ±mÄ±.</p>
+                  <h3>Aşama Durum Özeti</h3>
+                  <p>Beş üretim adımının anlık dağılımı.</p>
                 </div>
               </div>
               <div className="table-responsive mt-3 stage-summary-table-wrap">
                 <table className="table align-middle mb-0 stage-summary-table">
                   <thead>
                     <tr>
-                      <th>AÅŸama</th>
-                      <th>BaÅŸlamadÄ±</th>
+                      <th>Aşama</th>
+                      <th>Başlamadı</th>
                       <th>Devam</th>
                       <th>Onay</th>
                       <th>Tamam</th>
@@ -998,7 +998,7 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
                 <div className="dashboard-pie-card">
                   <div className="dashboard-pie-heading">
                     <h4>Senaryo Durumu</h4>
-                    <p>Tamamlanan ve tamamlanmayan senaryo sayÄ±sÄ±.</p>
+                    <p>Tamamlanan ve tamamlanmayan senaryo sayısı.</p>
                   </div>
                   <ReactApexChart
                     type="donut"
@@ -1009,20 +1009,20 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
                 </div>
                 <div className="dashboard-pie-card">
                   <div className="dashboard-pie-heading">
-                    <h4>OnaylÄ± Senaryolar</h4>
-                    <p>Ders bazÄ±nda onay almÄ±ÅŸ senaryo daÄŸÄ±lÄ±mÄ±.</p>
+                    <h4>Onaylı Senaryolar</h4>
+                    <p>Ders bazında onay almış senaryo dağılımı.</p>
                   </div>
                   <ReactApexChart
                     type="donut"
                     height={250}
                     series={dashboardPieSnapshot.scenarioBySubject.map((item) => item.value)}
-                    options={buildDonutOptions(dashboardPieSnapshot.scenarioBySubject.map((item) => item.label), 'OnaylÄ±')}
+                    options={buildDonutOptions(dashboardPieSnapshot.scenarioBySubject.map((item) => item.label), 'Onaylı')}
                   />
                 </div>
                 <div className="dashboard-pie-card">
                   <div className="dashboard-pie-heading">
                     <h4>Oyun Durumu</h4>
-                    <p>Tamamlanan ve tamamlanmayan oyun sayÄ±sÄ±.</p>
+                    <p>Tamamlanan ve tamamlanmayan oyun sayısı.</p>
                   </div>
                   <ReactApexChart
                     type="donut"
@@ -1034,7 +1034,7 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
                 <div className="dashboard-pie-card">
                   <div className="dashboard-pie-heading">
                     <h4>Tamamlanan Oyunlar</h4>
-                    <p>Ders bazÄ±nda tamamlanan oyunlarÄ±n daÄŸÄ±lÄ±mÄ±.</p>
+                    <p>Ders bazında tamamlanan oyunların dağılımı.</p>
                   </div>
                   <ReactApexChart
                     type="donut"
@@ -1051,22 +1051,22 @@ function DashboardView({ dashboardSummary, dashboardPieSnapshot, operationalHigh
 
       <section className="row g-4 mb-4">
         <HighlightListCard
-          title="YaklaÅŸan Terminler"
-          description="BitiÅŸ tarihi yakÄ±n veya geÃ§miÅŸ olan aÃ§Ä±k kayÄ±tlar."
+          title="Yaklaşan Terminler"
+          description="Bitiş tarihi yakın veya geçmiş olan açık kayıtlar."
           items={operationalHighlights.dueSoonGames}
-          emptyMessage="YaklaÅŸan veya geciken aÃ§Ä±k kayÄ±t bulunmuyor."
+          emptyMessage="Yaklaşan veya geciken açık kayıt bulunmuyor."
         />
         <HighlightListCard
-          title="Onay KuyruÄŸu"
-          description="En az bir aÅŸamasÄ± onaya gÃ¶nderilmiÅŸ kayÄ±tlar."
+          title="Onay Kuyruğu"
+          description="En az bir aşaması onaya gönderilmiş kayıtlar."
           items={operationalHighlights.approvalQueue}
-          emptyMessage="Onay bekleyen kayÄ±t bulunmuyor."
+          emptyMessage="Onay bekleyen kayıt bulunmuyor."
         />
         <HighlightListCard
-          title="Veri UyarÄ±larÄ±"
-          description="Eksik alan veya tutarsÄ±zlÄ±k taÅŸÄ±yan kayÄ±tlar."
+          title="Veri Uyarıları"
+          description="Eksik alan veya tutarsızlık taşıyan kayıtlar."
           items={operationalHighlights.missingFieldQueue}
-          emptyMessage="Veri doÄŸrulama uyarÄ±sÄ± bulunmuyor."
+          emptyMessage="Veri doğrulama uyarısı bulunmuyor."
         />
       </section>
     </>
@@ -1080,8 +1080,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
         <div className="card-body py-5">
           <div className="reports-locked-state">
             <span className="material-icons-outlined">lock</span>
-            <h3>Raporlar YalnÄ±zca YÃ¶netici GÃ¶rÃ¼nÃ¼mÃ¼nde AÃ§Ä±lÄ±r</h3>
-            <p>DetaylÄ± istatistikler ve grafik ekranlarÄ± yalnÄ±zca yÃ¶netici gÃ¶rÃ¼nÃ¼mÃ¼nde eriÅŸilebilir.</p>
+            <h3>Raporlar Yalnızca Yönetici Görünümünde Açılır</h3>
+            <p>Detaylı istatistikler ve grafik ekranları yalnızca yönetici görünümünde erişilebilir.</p>
           </div>
         </div>
       </section>
@@ -1171,7 +1171,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
 
   const stackedBarSeries = [
     {
-      name: 'BaÅŸlamadÄ±',
+      name: 'Başlamadı',
       data: reportsSnapshot.stageDistribution.map((item) => item.baslamadi),
     },
     {
@@ -1179,11 +1179,11 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       data: reportsSnapshot.stageDistribution.map((item) => item.devam_ediyor),
     },
     {
-      name: 'Onaya GÃ¶nderildi',
+      name: 'Onaya Gönderildi',
       data: reportsSnapshot.stageDistribution.map((item) => item.onaya_gonderildi),
     },
     {
-      name: 'OnaylandÄ±',
+      name: 'Onaylandı',
       data: reportsSnapshot.stageDistribution.map((item) => item.onaylandi),
     },
   ]
@@ -1262,11 +1262,11 @@ function ReportsView({ reportsSnapshot, roleMode }) {
 
   const workloadSeries = [
     {
-      name: 'AÃ§Ä±k KayÄ±t',
+      name: 'Açık Kayıt',
       data: reportsSnapshot.responsibleWorkload.map((item) => item.openGames),
     },
     {
-      name: 'Toplam BÃ¶lÃ¼m',
+      name: 'Toplam Bölüm',
       data: reportsSnapshot.responsibleWorkload.map((item) => item.totalSections),
     },
   ]
@@ -1313,7 +1313,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
 
   const funnelSeries = [
     {
-      name: 'KayÄ±t SayÄ±sÄ±',
+      name: 'Kayıt Sayısı',
       data: reportsSnapshot.funnelSeries.map((item) => item.value),
     },
   ]
@@ -1361,7 +1361,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
       data: reportsSnapshot.last7DaysActivity.map((item) => item.createdCount),
     },
     {
-      name: 'GÃ¼ncellendi',
+      name: 'Güncellendi',
       data: reportsSnapshot.last7DaysActivity.map((item) => item.updatedCount),
     },
   ]
@@ -1400,7 +1400,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
 
   const scopeSizeSeries = [
     {
-      name: 'BÃ¶lÃ¼m',
+      name: 'Bölüm',
       data: reportsSnapshot.scopeSizeRows.slice(0, 6).map((item) => item.sectionCount),
     },
   ]
@@ -1408,17 +1408,17 @@ function ReportsView({ reportsSnapshot, roleMode }) {
   return (
     <>
       <section className="row g-4 mb-4">
-        <MetricCard icon="analytics" label="Toplam Oyun" value={reportsSnapshot.kpis.totalGames} tone="primary" helper="Rapor kapsamÄ±ndaki tÃ¼m kayÄ±tlar" />
-        <MetricCard icon="task_alt" label="Tamamlanan KayÄ±t" value={reportsSnapshot.kpis.completedGames} tone="success" helper="YayÄ±na en yakÄ±n veya tamamlanan iÃ§erikler" />
-        <MetricCard icon="approval" label="Onay Bekleyen" value={reportsSnapshot.kpis.awaitingApprovalStages} tone="warning" helper="Onaya gÃ¶nderilmiÅŸ aÅŸama sayÄ±sÄ±" />
-        <MetricCard icon="warning" label="Geciken KayÄ±t" value={reportsSnapshot.kpis.overdueGames} tone="danger" helper="BitiÅŸ tarihi geÃ§miÅŸ aÃ§Ä±k kayÄ±tlar" />
+        <MetricCard icon="analytics" label="Toplam Oyun" value={reportsSnapshot.kpis.totalGames} tone="primary" helper="Rapor kapsamındaki tüm kayıtlar" />
+        <MetricCard icon="task_alt" label="Tamamlanan Kayıt" value={reportsSnapshot.kpis.completedGames} tone="success" helper="Yayına en yakın veya tamamlanan içerikler" />
+        <MetricCard icon="approval" label="Onay Bekleyen" value={reportsSnapshot.kpis.awaitingApprovalStages} tone="warning" helper="Onaya gönderilmiş aşama sayısı" />
+        <MetricCard icon="warning" label="Geciken Kayıt" value={reportsSnapshot.kpis.overdueGames} tone="danger" helper="Bitiş tarihi geçmiş açık kayıtlar" />
       </section>
 
       <section className="row g-4 mb-4">
-        <MetricCard icon="health_and_safety" label="SaÄŸlÄ±k Skoru" value={reportsSnapshot.kpis.averageHealthScore} tone="success" helper="TÃ¼m portfÃ¶yÃ¼n ortalama Ã¼retim saÄŸlÄ±ÄŸÄ±" />
-        <MetricCard icon="event" label="YaklaÅŸan Termin" value={reportsSnapshot.kpis.dueSoonGames} tone="warning" helper="Ã–nÃ¼mÃ¼zdeki 10 gÃ¼nde kapanmasÄ± beklenen kayÄ±tlar" />
-        <MetricCard icon="error_outline" label="Eksik Bilgili" value={reportsSnapshot.kpis.missingInfoGames} tone="danger" helper="DoÄŸrulama uyarÄ±sÄ± taÅŸÄ±yan oyunlar" />
-        <MetricCard icon="grid_view" label="Ders SayÄ±sÄ±" value={reportsSnapshot.subjectDistribution.length} tone="primary" helper="Aktif Ã¼retim gÃ¶rÃ¼len ders adedi" />
+        <MetricCard icon="health_and_safety" label="Sağlık Skoru" value={reportsSnapshot.kpis.averageHealthScore} tone="success" helper="Tüm portföyün ortalama üretim sağlığı" />
+        <MetricCard icon="event" label="Yaklaşan Termin" value={reportsSnapshot.kpis.dueSoonGames} tone="warning" helper="Önümüzdeki 10 günde kapanması beklenen kayıtlar" />
+        <MetricCard icon="error_outline" label="Eksik Bilgili" value={reportsSnapshot.kpis.missingInfoGames} tone="danger" helper="Doğrulama uyarısı taşıyan oyunlar" />
+        <MetricCard icon="grid_view" label="Ders Sayısı" value={reportsSnapshot.subjectDistribution.length} tone="primary" helper="Aktif üretim görülen ders adedi" />
       </section>
 
       <section className="row g-4 mb-4">
@@ -1427,8 +1427,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Ders BazlÄ± DaÄŸÄ±lÄ±m</h3>
-                  <p>Toplam oyun yÃ¼kÃ¼nÃ¼n derslere gÃ¶re daÄŸÄ±lÄ±mÄ±.</p>
+                  <h3>Ders Bazlı Dağılım</h3>
+                  <p>Toplam oyun yükünün derslere göre dağılımı.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1447,8 +1447,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>AÅŸama BazlÄ± Ãœretim DaÄŸÄ±lÄ±mÄ±</h3>
-                  <p>Her Ã¼retim adÄ±mÄ±ndaki genel durum yÃ¼kÃ¼nÃ¼ birlikte gÃ¶rÃ¼n.</p>
+                  <h3>Aşama Bazlı Üretim Dağılımı</h3>
+                  <p>Her üretim adımındaki genel durum yükünü birlikte görün.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1470,8 +1470,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>SÄ±nÄ±f BazlÄ± DaÄŸÄ±lÄ±m</h3>
-                  <p>Ãœretim portfÃ¶yÃ¼nÃ¼n sÄ±nÄ±f seviyelerine gÃ¶re aÄŸÄ±rlÄ±ÄŸÄ±.</p>
+                  <h3>Sınıf Bazlı Dağılım</h3>
+                  <p>Üretim portföyünün sınıf seviyelerine göre ağırlığı.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1490,8 +1490,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Sorumlu KiÅŸi Ä°ÅŸ YÃ¼kÃ¼</h3>
-                  <p>AÃ§Ä±k kayÄ±t ve bÃ¶lÃ¼m yoÄŸunluÄŸunu kiÅŸi bazÄ±nda birlikte gÃ¶rÃ¼n.</p>
+                  <h3>Sorumlu Kişi İş Yükü</h3>
+                  <p>Açık kayıt ve bölüm yoğunluğunu kişi bazında birlikte görün.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1513,8 +1513,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Ãœretim SaÄŸlÄ±k Skoru</h3>
-                  <p>En dÃ¼ÅŸÃ¼k saÄŸlÄ±k skoruna sahip kayÄ±tlar Ã¶ncelikli iyileÅŸtirme alanÄ±nÄ± gÃ¶sterir.</p>
+                  <h3>Üretim Sağlık Skoru</h3>
+                  <p>En düşük sağlık skoruna sahip kayıtlar öncelikli iyileştirme alanını gösterir.</p>
                 </div>
               </div>
               <div className="health-score-list mt-3">
@@ -1523,7 +1523,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                     <div className="health-score-copy">
                       <strong>{item.topic}</strong>
                       <span>{item.subjectLabel}</span>
-                      <small>{item.issues[0] ?? 'Risk gÃ¶rÃ¼nmÃ¼yor'}</small>
+                      <small>{item.issues[0] ?? 'Risk görünmüyor'}</small>
                     </div>
                     <div className={`health-score-pill score-${item.healthScore >= 75 ? 'good' : item.healthScore >= 50 ? 'medium' : 'bad'}`}>
                       {item.healthScore}
@@ -1540,7 +1540,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
               <div className="section-heading">
                 <div>
                   <h3>Tamamlanma Hunisi</h3>
-                  <p>Toplam portfÃ¶yÃ¼n Ã¼retimden yayÄ±na giden yolculuÄŸu.</p>
+                  <p>Toplam portföyün üretimden yayına giden yolculuğu.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1559,8 +1559,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Ders Risk SÄ±ralamasÄ±</h3>
-                  <p>Gecikme, eksik veri ve aÃ§Ä±k yÃ¼k yoÄŸunluÄŸuna gÃ¶re Ã¶ncelik sÄ±rasÄ±.</p>
+                  <h3>Ders Risk Sıralaması</h3>
+                  <p>Gecikme, eksik veri ve açık yük yoğunluğuna göre öncelik sırası.</p>
                 </div>
               </div>
               <div className="report-insight-list mt-3">
@@ -1568,11 +1568,11 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                   <article key={item.code} className="report-insight-item">
                     <div className="report-insight-copy">
                       <strong>{item.name}</strong>
-                      <span>{item.overdueCount} gecikme Â· {item.missingCount} eksik bilgi Â· {item.openCount} aÃ§Ä±k kayÄ±t</span>
+                      <span>{item.overdueCount} gecikme · {item.missingCount} eksik bilgi · {item.openCount} açık kayıt</span>
                     </div>
                     <div className="report-insight-badge danger">
                       <strong>{item.riskScore}</strong>
-                      <small>risk puanÄ±</small>
+                      <small>risk puanı</small>
                     </div>
                   </article>
                 ))}
@@ -1586,8 +1586,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
         <div className="card-body">
           <div className="section-heading mb-3">
             <div>
-              <h3>Ders BazlÄ± Performans Tablosu</h3>
-              <p>YÃ¶netici gÃ¶rÃ¼nÃ¼mÃ¼nde operasyon yoÄŸunluÄŸu ve risk gÃ¶stergeleri.</p>
+              <h3>Ders Bazlı Performans Tablosu</h3>
+              <p>Yönetici görünümünde operasyon yoğunluğu ve risk göstergeleri.</p>
             </div>
           </div>
           <div className="table-responsive">
@@ -1601,8 +1601,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                   <th>Onay Bekleyen</th>
                   <th>Eksik Bilgi</th>
                   <th>Geciken</th>
-                  <th>YaklaÅŸan</th>
-                  <th>Ortalama BÃ¶lÃ¼m</th>
+                  <th>Yaklaşan</th>
+                  <th>Ortalama Bölüm</th>
                   <th>Tamamlanma</th>
                 </tr>
               </thead>
@@ -1639,7 +1639,7 @@ function ReportsView({ reportsSnapshot, roleMode }) {
               <div className="section-heading">
                 <div>
                   <h3>Sessiz Dersler</h3>
-                  <p>Son hareketi en geride kalan dersleri hÄ±zlÄ±ca gÃ¶rÃ¼n.</p>
+                  <p>Son hareketi en geride kalan dersleri hızlıca görün.</p>
                 </div>
               </div>
               <div className="report-insight-list mt-3">
@@ -1647,11 +1647,11 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                   <article key={item.code} className="report-insight-item">
                     <div className="report-insight-copy">
                       <strong>{item.name}</strong>
-                      <span>{item.totalGames} kayÄ±t Â· {item.completionRate}% tamamlanma</span>
+                      <span>{item.totalGames} kayıt · {item.completionRate}% tamamlanma</span>
                     </div>
                     <div className="report-insight-badge">
                       <strong>{item.daysSinceActivity}</strong>
-                      <small>gÃ¼ndÃ¼r sessiz</small>
+                      <small>gündür sessiz</small>
                     </div>
                   </article>
                 ))}
@@ -1664,8 +1664,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>En HÄ±zlÄ± Ä°lerleyen Dersler</h3>
-                  <p>Tamamlanma ve aÅŸama hÄ±zÄ± birlikte en gÃ¼Ã§lÃ¼ giden dersler.</p>
+                  <h3>En Hızlı İlerleyen Dersler</h3>
+                  <p>Tamamlanma ve aşama hızı birlikte en güçlü giden dersler.</p>
                 </div>
               </div>
               <div className="report-insight-list mt-3">
@@ -1673,11 +1673,11 @@ function ReportsView({ reportsSnapshot, roleMode }) {
                   <article key={item.code} className="report-insight-item">
                     <div className="report-insight-copy">
                       <strong>{item.name}</strong>
-                      <span>{item.completionRate}% tamamlanma Â· {item.stageVelocity}% aÅŸama hÄ±zÄ±</span>
+                      <span>{item.completionRate}% tamamlanma · {item.stageVelocity}% aşama hızı</span>
                     </div>
                     <div className="report-insight-badge good">
                       <strong>{item.momentumScore}</strong>
-                      <small>ivme puanÄ±</small>
+                      <small>ivme puanı</small>
                     </div>
                   </article>
                 ))}
@@ -1693,8 +1693,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Son 7 GÃ¼n Aktivitesi</h3>
-                  <p>Yeni eklenen ve gÃ¼ncellenen kayÄ±t hareketi gÃ¼n bazÄ±nda izlenir.</p>
+                  <h3>Son 7 Gün Aktivitesi</h3>
+                  <p>Yeni eklenen ve güncellenen kayıt hareketi gün bazında izlenir.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1713,8 +1713,8 @@ function ReportsView({ reportsSnapshot, roleMode }) {
             <div className="card-body">
               <div className="section-heading">
                 <div>
-                  <h3>Kapsam BÃ¼yÃ¼klÃ¼ÄŸÃ¼</h3>
-                  <p>BÃ¶lÃ¼m sayÄ±sÄ± en yÃ¼ksek oyunlar toplam Ã¼retim yÃ¼kÃ¼nÃ¼ Ã¶ne Ã§Ä±karÄ±r.</p>
+                  <h3>Kapsam Büyüklüğü</h3>
+                  <p>Bölüm sayısı en yüksek oyunlar toplam üretim yükünü öne çıkarır.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">
@@ -1766,7 +1766,7 @@ function GamesView({
                 type="search"
                 value={formFilters.search}
                 onChange={(event) => onFilterChange('search', event.target.value)}
-                placeholder="Ã–rnek: Kuvvet ve Hareket"
+                placeholder="Örnek: Kuvvet ve Hareket"
               />
             </div>
             <div className="col-12 col-md-6 col-xl-2">
@@ -1777,7 +1777,7 @@ function GamesView({
                 onChange={(event) => onFilterChange('subject', event.target.value)}
                 disabled={roleMode === 'user'}
               >
-                <option value="">TÃ¼m Dersler</option>
+                <option value="">Tüm Dersler</option>
                 {subjectOptions.map((subject) => (
                   <option key={subject.id} value={subject.code}>
                     {SUBJECT_LABELS[subject.code] ?? subject.name}
@@ -1831,7 +1831,7 @@ function GamesView({
             ) : null}
             <div className="col-6 col-md-3 col-xl-1 d-flex align-items-end">
               <button type="button" className="btn btn-outline-secondary w-100 filter-reset-button" onClick={onResetFilters}>
-                SÄ±fÄ±rla
+                Sıfırla
               </button>
             </div>
             {canManageSubjects ? (
@@ -1863,13 +1863,13 @@ function GamesView({
               <thead>
                 <tr>
                   <th>Ders</th>
-                  <th>SÄ±nÄ±f</th>
+                  <th>Sınıf</th>
                   <th>Konu</th>
                   <th>Sorumlu</th>
-                  <th>BÃ¶lÃ¼m</th>
-                  <th>Ãœretim AkÄ±ÅŸÄ±</th>
-                  <th>BaÅŸlangÄ±Ã§</th>
-                  <th>BitiÅŸ</th>
+                  <th>Bölüm</th>
+                  <th>Üretim Akışı</th>
+                  <th>Başlangıç</th>
+                  <th>Bitiş</th>
                   <th>Oyna</th>
                   <th>EBA</th>
                   <th>Durum</th>
@@ -1887,7 +1887,7 @@ function GamesView({
                       <td>
                         <div className="table-title">{game.topic}</div>
                         <div className="table-subtitle">{game.oyun_ozeti}</div>
-                        {issues.length > 0 ? <div className="table-inline-note">{issues.length} Veri UyarÄ±sÄ±</div> : null}
+                        {issues.length > 0 ? <div className="table-inline-note">{issues.length} Veri Uyarısı</div> : null}
                       </td>
                       <td>{getResponsibleUserName(users, game.responsible_user_id)}</td>
                       <td>{game.interface_count}</td>
@@ -1919,7 +1919,7 @@ function GamesView({
                         <div className="table-secondary-stack">
                           {game.eba_link ? (
                             <a className="badge rounded-pill text-bg-primary link-badge table-pill" href={game.eba_link} target="_blank" rel="noreferrer">
-                              AÃ§
+                              Aç
                             </a>
                           ) : (
                             <span className="badge rounded-pill text-bg-light link-badge table-pill disabled">Yok</span>
@@ -1929,7 +1929,7 @@ function GamesView({
                       <td>
                         <div className="table-secondary-stack">
                           <span className={`badge rounded-pill table-pill ${game.is_completed ? 'text-bg-success' : 'text-bg-light'}`}>
-                            {game.is_completed ? 'TamamlandÄ±' : 'AÃ§Ä±k'}
+                            {game.is_completed ? 'Tamamlandı' : 'Açık'}
                           </span>
                         </div>
                       </td>
@@ -1939,8 +1939,8 @@ function GamesView({
                             type="button"
                             className="btn table-action-pill detail-icon-pill"
                             onClick={() => onOpenGame(game.id)}
-                            aria-label={`${game.topic} detaylarÄ±nÄ± aÃ§`}
-                            title="DetayÄ± AÃ§"
+                            aria-label={`${game.topic} detaylarını aç`}
+                            title="Detayı Aç"
                           >
                             <span className="material-icons-outlined" aria-hidden="true">
                               settings
@@ -1954,7 +1954,7 @@ function GamesView({
                 {filteredGames.length === 0 ? (
                   <tr>
                     <td colSpan={12}>
-                      <div className="empty-state">SeÃ§ili filtrelerle eÅŸleÅŸen kayÄ±t bulunamadÄ±.</div>
+                      <div className="empty-state">Seçili filtrelerle eşleşen kayıt bulunamadı.</div>
                     </td>
                   </tr>
                 ) : null}
@@ -1969,7 +1969,7 @@ function GamesView({
 
 function StageProgress({ game }) {
   return (
-    <div className="stage-progress-track" role="list" aria-label="Ãœretim AÅŸamalarÄ±">
+    <div className="stage-progress-track" role="list" aria-label="Üretim Aşamaları">
       {STAGE_ORDER.map((stageKey, index) => {
         const status = game[stageKey]
         return (
@@ -2044,7 +2044,7 @@ function GameDetailDrawer({
   saveMessage,
   subjectOptions,
 }) {
-  const recordLabel = draftGame.content_type === 'simulation' ? 'Simülasyon' : 'Oyun'
+  const recordLabel = draftGame.content_type === 'simulation' ? 'Sim�lasyon' : 'Oyun'
   const classLevelOptions = getClassLevelOptions(draftGame.content_type, draftGame.education_level)
 
   return (
@@ -2053,7 +2053,7 @@ function GameDetailDrawer({
       <aside className="detail-drawer">
         <div className="detail-drawer-header">
           <div>
-            <span className="eyebrow">{drawerMode === 'create' ? `Yeni ${recordLabel} Kaydı` : `${recordLabel} Detay / Düzenleme`}</span>
+            <span className="eyebrow">{drawerMode === 'create' ? `Yeni ${recordLabel} Kayd1` : `${recordLabel} Detay / D�zenleme`}</span>
             <h3>{draftGame.topic || `Yeni ${recordLabel} Hazırlanıyor`}</h3>
           </div>
           <button type="button" className="theme-icon-button" onClick={onClose} aria-label="Detay Panelini Kapat">
@@ -2064,7 +2064,7 @@ function GameDetailDrawer({
           <div className="drawer-section">
             <div className="drawer-section-title">
               <h4>Temel Bilgiler</h4>
-              <p>Ders, sÄ±nÄ±f, konu ve sorumlu atamalarÄ±nÄ± bu alanda yÃ¶netin.</p>
+              <p>Ders, sınıf, konu ve sorumlu atamalarını bu alanda yönetin.</p>
             </div>
             <div className="row g-3">
               <FormField label="Ders" error={formErrors.subject}>
@@ -2092,9 +2092,9 @@ function GameDetailDrawer({
                   </select>
                 </FormField>
               ) : null}
-              <FormField label="SÄ±nÄ±f" error={formErrors.class_level}>
+              <FormField label="Sınıf" error={formErrors.class_level}>
                 <select className={`form-select ${formErrors.class_level ? 'is-invalid' : ''}`} value={draftGame.class_level ?? ''} onChange={(event) => onChange('class_level', event.target.value)}>
-                  <option value="">SÄ±nÄ±f SeÃ§in</option>
+                  <option value="">Sınıf Seçin</option>
                   {classLevelOptions.map((classLevel) => (
                     <option key={classLevel} value={classLevel}>
                       {classLevel}
@@ -2104,7 +2104,7 @@ function GameDetailDrawer({
               </FormField>
               <FormField label="Sorumlu" error={formErrors.responsible_user_id}>
                 <select className={`form-select ${formErrors.responsible_user_id ? 'is-invalid' : ''}`} value={draftGame.responsible_user_id} onChange={(event) => onChange('responsible_user_id', event.target.value)}>
-                  <option value="">Sorumlu SeÃ§in</option>
+                  <option value="">Sorumlu Seçin</option>
                   {availableResponsibleUsers.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.name}
@@ -2113,15 +2113,15 @@ function GameDetailDrawer({
                 </select>
               </FormField>
               <FormField label="Konu" error={formErrors.topic}>
-                <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} placeholder="Ã–rnek: Kesirler Parkuru" />
+                <input className={`form-control ${formErrors.topic ? 'is-invalid' : ''}`} value={draftGame.topic} onChange={(event) => onChange('topic', event.target.value)} placeholder="�rnek: Kesirler Parkuru" />
               </FormField>
-              <FormField label="BÃ¶lÃ¼m SayÄ±sÄ±" error={formErrors.interface_count}>
+              <FormField label="Bölüm Sayısı" error={formErrors.interface_count}>
                 <input className={`form-control ${formErrors.interface_count ? 'is-invalid' : ''}`} type="number" min="0" value={draftGame.interface_count} onChange={(event) => onChange('interface_count', Number(event.target.value))} />
               </FormField>
-              <FormField label="TamamlandÄ± Uygula" error={formErrors.is_completed}>
+              <FormField label="Tamamlandı Uygula" error={formErrors.is_completed}>
                 <div className="completion-toggle">
                   <input id="is-completed" className="form-check-input" type="checkbox" checked={draftGame.is_completed} onChange={(event) => onChange('is_completed', event.target.checked)} />
-                  <label htmlFor="is-completed">TÃ¼m aÅŸamalar onaylandÄ±ysa kaydÄ± tamamlandÄ± olarak iÅŸaretle</label>
+                  <label htmlFor="is-completed">Tüm aşamalar onaylandıysa kaydı tamamlandı olarak işaretle</label>
                 </div>
               </FormField>
             </div>
@@ -2129,14 +2129,14 @@ function GameDetailDrawer({
 
           <div className="drawer-section">
             <div className="drawer-section-title">
-              <h4>Tarih ve AÅŸamalar</h4>
-              <p>Ãœretim akÄ±ÅŸÄ±ndaki zamanlamayÄ± ve aÅŸama durumlarÄ±nÄ± burada gÃ¼ncelleyin.</p>
+              <h4>Tarih ve Aşamalar</h4>
+              <p>Üretim akışındaki zamanlamayı ve aşama durumlarını burada güncelleyin.</p>
             </div>
             <div className="row g-3">
-              <FormField label="BaÅŸlangÄ±Ã§ Tarihi" error={formErrors.start_date}>
+              <FormField label="Başlangıç Tarihi" error={formErrors.start_date}>
                 <input className={`form-control ${formErrors.start_date ? 'is-invalid' : ''}`} type="date" value={draftGame.start_date} onChange={(event) => onChange('start_date', event.target.value)} />
               </FormField>
-              <FormField label="BitiÅŸ Tarihi" error={formErrors.end_date}>
+              <FormField label="Bitiş Tarihi" error={formErrors.end_date}>
                 <input className={`form-control ${formErrors.end_date ? 'is-invalid' : ''}`} type="date" value={draftGame.end_date} onChange={(event) => onChange('end_date', event.target.value)} />
               </FormField>
               {STAGE_ORDER.map((stageKey) => (
@@ -2155,15 +2155,15 @@ function GameDetailDrawer({
 
           <div className="drawer-section">
             <div className="drawer-section-title">
-              <h4>Ä°Ã§erik ve YayÄ±n Bilgileri</h4>
+              <h4>İçerik ve Yayın Bilgileri</h4>
               <p>{recordLabel} özeti, kazanım, link ve operasyon notları kaydın görünürlüğünü güçlendirir.</p>
             </div>
             <div className="row g-3">
               <FormField label={`${recordLabel} Özeti`} error={formErrors.oyun_ozeti} fullWidth>
-                <textarea className={`form-control ${formErrors.oyun_ozeti ? 'is-invalid' : ''}`} rows="3" value={draftGame.oyun_ozeti ?? ''} onChange={(event) => onChange('oyun_ozeti', event.target.value)} placeholder={`${recordLabel} için kısa bir özet yazın`} />
+                <textarea className={`form-control ${formErrors.oyun_ozeti ? 'is-invalid' : ''}`} rows="3" value={draftGame.oyun_ozeti ?? ''} onChange={(event) => onChange('oyun_ozeti', event.target.value)} placeholder={`${recordLabel} i�in k1sa bir �zet yaz1n`} />
               </FormField>
-              <FormField label="KazanÄ±mlar" error={formErrors.kazanimlar} fullWidth>
-                <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun desteklediÄŸi kazanÄ±mlarÄ± yazÄ±n" />
+              <FormField label="Kazanımlar" error={formErrors.kazanimlar} fullWidth>
+                <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun destekledi�xi kazanımları yazın" />
               </FormField>
               <FormField label="EBA Link" error={formErrors.eba_link} fullWidth>
                 <input className={`form-control ${formErrors.eba_link ? 'is-invalid' : ''}`} type="url" value={draftGame.eba_link} onChange={(event) => onChange('eba_link', event.target.value)} placeholder="https://" />
@@ -2172,23 +2172,23 @@ function GameDetailDrawer({
                 <div className="play-link-row">
                   <input className={`form-control ${formErrors.play_url ? 'is-invalid' : ''}`} type="text" value={draftGame.play_url ?? ''} onChange={(event) => onChange('play_url', event.target.value)} placeholder="https:// veya webgl-demo/index.html" />
                   <button type="button" className="btn table-action-pill play-preview-pill" onClick={() => onOpenPlayer(draftGame)} disabled={!draftGame.play_url}>
-                    Ã–nizle
+                    Önizle
                   </button>
                 </div>
               </FormField>
-              <FormField label="Dosya YÃ¼kleme" fullWidth>
+              <FormField label="Dosya Yükleme" fullWidth>
                 <div className="upload-placeholder-card">
                   <div>
-                    <strong>WebGL Dosya YÃ¼kleme YakÄ±nda</strong>
-                    <p>Sunucu ve veritabanÄ± entegrasyonu sonrasÄ± kullanÄ±cÄ±lar build dosyasÄ±nÄ± yÃ¼kleyip oyunu native olarak Ã§alÄ±ÅŸtÄ±rabilecek.</p>
+                    <strong>WebGL Dosya Yükleme Yakında</strong>
+                    <p>Sunucu ve veritabanı entegrasyonu sonrası kullanıcılar build dosyasını yükleyip oyunu native olarak çalıştırabilecek.</p>
                   </div>
                   <button type="button" className="btn btn-light" disabled>
-                    Dosya YÃ¼kle
+                    Dosya Yükle
                   </button>
                 </div>
               </FormField>
               <FormField label="Notlar" fullWidth>
-                <textarea className="form-control" rows="4" value={draftGame.notes} onChange={(event) => onChange('notes', event.target.value)} placeholder="Ãœretim ekibinin bilmesi gereken operasyon notlarÄ±nÄ± ekleyin" />
+                <textarea className="form-control" rows="4" value={draftGame.notes} onChange={(event) => onChange('notes', event.target.value)} placeholder="Üretim ekibinin bilmesi gereken operasyon notlarını ekleyin" />
               </FormField>
             </div>
           </div>
@@ -2200,7 +2200,7 @@ function GameDetailDrawer({
             Kapat
           </button>
           <button type="button" className="btn btn-primary" onClick={onSave}>
-            {drawerMode === 'create' ? 'KaydÄ± Ekle' : 'KaydÄ± GÃ¼ncelle'}
+            {drawerMode === 'create' ? 'Kaydı Ekle' : 'Kaydı Güncelle'}
           </button>
         </div>
       </aside>
@@ -2318,11 +2318,11 @@ function GamePlayerModal({ game, onClose, playUrl }) {
           <div>
             <span className="eyebrow">Unity Play</span>
             <h3>{game.topic}</h3>
-            <p>{SUBJECT_LABELS[game.subject]} Â· {game.class_level}</p>
+            <p>{SUBJECT_LABELS[game.subject]} · {game.class_level}</p>
           </div>
           <div className="player-modal-actions">
             <a className="btn btn-light" href={playUrl} target="_blank" rel="noreferrer">
-              Yeni Sekmede AÃ§
+              Yeni Sekmede Aç
             </a>
             <button type="button" className="theme-icon-button" onClick={onClose} aria-label="Player Penceresini Kapat">
               <span className="material-icons-outlined">close</span>
@@ -2331,7 +2331,7 @@ function GamePlayerModal({ game, onClose, playUrl }) {
         </div>
         <div className="player-modal-body">
           <div className="player-note">
-            Unity Play baÄŸlantÄ±larÄ±nda yÃ¼kleme Ã§ubuÄŸu anlÄ±k gÃ¼ncellenmeyebilir. Oyun aÃ§Ä±lmÄ±yor gibi gÃ¶rÃ¼nse bile 10-15 saniye bekleyin; sorun devam ederse `Yeni Sekmede AÃ§` seÃ§eneÄŸini kullanÄ±n.
+            Unity Play bağlantılarında yükleme çubuğu anlık güncellenmeyebilir. Oyun açılmıyor gibi görünse bile 10-15 saniye bekleyin; sorun devam ederse `Yeni Sekmede Aç` seçeneğini kullanın.
           </div>
           <div className="player-frame-wrap">
             <iframe

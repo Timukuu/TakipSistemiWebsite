@@ -133,7 +133,7 @@ export function validateGameDraft(game, users) {
   const responsibleUser = users.find((user) => user.id === game?.responsible_user_id)
 
   if (!game?.subject) {
-    errors.subject = 'Ders seÃ§imi zorunludur.'
+    errors.subject = 'Ders seçimi zorunludur.'
   }
 
   if (game?.content_type === 'simulation' && !game?.education_level?.trim()) {
@@ -141,53 +141,53 @@ export function validateGameDraft(game, users) {
   }
 
   if (!game?.class_level?.trim()) {
-    errors.class_level = 'SÄ±nÄ±f bilgisi zorunludur.'
+    errors.class_level = 'Sınıf bilgisi zorunludur.'
   }
 
   if (!game?.topic?.trim()) {
-    errors.topic = 'Konu alanÄ± zorunludur.'
+    errors.topic = 'Konu alanı zorunludur.'
   }
 
   if (!game?.oyun_ozeti?.trim()) {
-    errors.oyun_ozeti = 'Oyun Ã–zeti alanÄ± zorunludur.'
+    errors.oyun_ozeti = 'Oyun Özeti alanı zorunludur.'
   }
 
   if (!game?.responsible_user_id) {
-    errors.responsible_user_id = 'Sorumlu kullanÄ±cÄ± seÃ§imi zorunludur.'
+    errors.responsible_user_id = 'Sorumlu kullanıcı seçimi zorunludur.'
   }
 
   if (responsibleUser && game.subject && responsibleUser.subject !== game.subject) {
-    errors.responsible_user_id = 'SeÃ§ilen sorumlu kullanÄ±cÄ±nÄ±n dersi kayÄ±tla uyuÅŸmuyor.'
+    errors.responsible_user_id = 'Seçilen sorumlu kullanıcının dersi kayıtla uyuşmuyor.'
   }
 
   if (!Number.isInteger(Number(game?.interface_count)) || Number(game?.interface_count) < 0) {
-    errors.interface_count = 'BÃ¶lÃ¼m sayÄ±sÄ± 0 veya daha bÃ¼yÃ¼k bir sayÄ± olmalÄ±dÄ±r.'
+    errors.interface_count = 'Bölüm sayısı 0 veya daha büyük bir sayı olmalıdır.'
   }
 
   if (!game?.kazanimlar?.trim()) {
-    errors.kazanimlar = 'KazanÄ±mlar alanÄ± zorunludur.'
+    errors.kazanimlar = 'Kazanımlar alanı zorunludur.'
   }
 
   if (!game?.start_date) {
-    errors.start_date = 'BaÅŸlangÄ±Ã§ tarihi zorunludur.'
+    errors.start_date = 'Başlangıç tarihi zorunludur.'
   }
 
   if (game?.start_date && game?.end_date && game.start_date > game.end_date) {
-    errors.end_date = 'BitiÅŸ tarihi baÅŸlangÄ±Ã§ tarihinden Ã¶nce olamaz.'
+    errors.end_date = 'Bitiş tarihi başlangıç tarihinden önce olamaz.'
   }
 
   if (game?.eba_link?.trim() && !isValidOptionalUrl(game.eba_link)) {
-    errors.eba_link = 'EBA Link alanÄ± geÃ§erli bir URL olmalÄ±dÄ±r.'
+    errors.eba_link = 'EBA Link alanı geçerli bir URL olmalıdır.'
   }
 
   if (game?.play_url?.trim() && !isValidOptionalUrl(game.play_url)) {
-    errors.play_url = 'Play URL alanÄ± geÃ§erli bir adres olmalÄ±dÄ±r.'
+    errors.play_url = 'Play URL alanı geçerli bir adres olmalıdır.'
   }
 
   if (game?.is_completed) {
     const hasOpenStage = STAGE_ORDER.some((stageKey) => game[stageKey] !== 'onaylandi')
     if (hasOpenStage) {
-      errors.is_completed = 'TamamlandÄ± iÅŸaretli kayÄ±tlarÄ±n tÃ¼m aÅŸamalarÄ± OnaylandÄ± olmalÄ±dÄ±r.'
+      errors.is_completed = 'Tamamlandı işaretli kayıtların tüm aşamaları Onaylandı olmalıdır.'
     }
   }
 
@@ -199,29 +199,29 @@ export function getGameHealthIssues(game, users) {
   const responsibleUser = users.find((user) => user.id === game.responsible_user_id)
 
   if (!game.class_level?.trim()) {
-    issues.push('SÄ±nÄ±f bilgisi eksik')
+    issues.push('Sınıf bilgisi eksik')
   }
 
   if (!game.kazanimlar?.trim()) {
-    issues.push('KazanÄ±m bilgisi eksik')
+    issues.push('Kazanım bilgisi eksik')
   }
 
   if (!game.oyun_ozeti?.trim()) {
-    issues.push('Oyun Ã¶zeti eksik')
+    issues.push('Oyun özeti eksik')
   }
 
   if (!game.end_date) {
-    issues.push('BitiÅŸ tarihi eksik')
+    issues.push('Bitiş tarihi eksik')
   }
 
   if (!responsibleUser) {
-    issues.push('Sorumlu kullanÄ±cÄ± tanÄ±msÄ±z')
+    issues.push('Sorumlu kullanıcı tanımsız')
   } else if (responsibleUser.subject !== game.subject) {
-    issues.push('Ders-sorumlu eÅŸleÅŸmesi hatalÄ±')
+    issues.push('Ders-sorumlu eşleşmesi hatalı')
   }
 
   if (game.is_completed && STAGE_ORDER.some((stageKey) => game[stageKey] !== 'onaylandi')) {
-    issues.push('TamamlandÄ± kaydÄ± aÅŸamalarla uyumsuz')
+    issues.push('Tamamlandı kaydı aşamalarla uyumsuz')
   }
 
   return issues
@@ -305,7 +305,7 @@ export function buildOperationalHighlights(games, users, referenceDate = new Dat
       id: game.id,
       topic: game.topic,
       subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
-      meta: game.end_date ? `${formatDate(game.end_date)} terminli` : 'BitiÅŸ tarihi eksik',
+      meta: game.end_date ? `${formatDate(game.end_date)} terminli` : 'Biti�x tarihi eksik',
       tone: safeDateDifference(game.end_date, referenceDate) < 0 ? 'danger' : 'warning',
     }))
 
@@ -316,7 +316,7 @@ export function buildOperationalHighlights(games, users, referenceDate = new Dat
       id: game.id,
       topic: game.topic,
       subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
-      meta: `${STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length} aÅŸama onay bekliyor`,
+      meta: `${STAGE_ORDER.filter((stageKey) => game[stageKey] === 'onaya_gonderildi').length} aşama onay bekliyor`,
       tone: 'danger',
     }))
 
@@ -331,7 +331,7 @@ export function buildOperationalHighlights(games, users, referenceDate = new Dat
       id: game.id,
       topic: game.topic,
       subjectLabel: SUBJECT_LABELS[game.subject] ?? game.subject,
-      meta: issues.join(' Â· '),
+      meta: issues.join(' · '),
       tone: 'secondary',
     }))
 
@@ -393,7 +393,7 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
 
   const classDistribution = [...games]
     .reduce((accumulator, game) => {
-      const key = game.class_level || 'BelirtilmemiÅŸ'
+      const key = game.class_level || 'Belirtilmemiş'
       accumulator.set(key, (accumulator.get(key) ?? 0) + 1)
       return accumulator
     }, new Map())
@@ -539,7 +539,7 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
 
   const funnelSeries = [
     { label: 'Toplam Oyun', value: games.length },
-    { label: 'Ãœretimde', value: openGames.length },
+    { label: 'Üretimde', value: openGames.length },
     {
       label: 'Onaya Giden',
       value: openGames.filter((game) =>
@@ -547,7 +547,7 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
       ).length,
     },
     {
-      label: 'YayÄ±na YakÄ±n',
+      label: 'Yayına Yakın',
       value: openGames.filter(
         (game) =>
           game.webgl_scorm_status === 'onaylandi' ||
