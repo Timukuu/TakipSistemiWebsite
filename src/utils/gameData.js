@@ -68,6 +68,7 @@ export function createEmptyGame(subjectCode, userId) {
     subject: subjectCode ?? 'fizik',
     class_level: '',
     topic: '',
+    oyun_ozeti: '',
     interface_count: 0,
     scenario_status: 'baslamadi',
     design_status: 'baslamadi',
@@ -112,7 +113,7 @@ export function getEffectiveFilters(filters, roleMode, activeUser) {
 
 export function matchesFilters(game, filters) {
   const searchValue = normalizeText(filters.search.trim())
-  const searchTarget = normalizeText(`${game.topic} ${game.kazanimlar} ${game.class_level}`)
+  const searchTarget = normalizeText(`${game.topic} ${game.oyun_ozeti} ${game.kazanimlar} ${game.class_level}`)
   const topicMatches = !searchValue || searchTarget.includes(searchValue)
   const subjectMatches = !filters.subject || game.subject === filters.subject
   const completionMatches =
@@ -139,6 +140,10 @@ export function validateGameDraft(game, users) {
 
   if (!game?.topic?.trim()) {
     errors.topic = 'Konu alanı zorunludur.'
+  }
+
+  if (!game?.oyun_ozeti?.trim()) {
+    errors.oyun_ozeti = 'Oyun Özeti alanı zorunludur.'
   }
 
   if (!game?.responsible_user_id) {
@@ -193,6 +198,10 @@ export function getGameHealthIssues(game, users) {
 
   if (!game.kazanimlar?.trim()) {
     issues.push('Kazanım bilgisi eksik')
+  }
+
+  if (!game.oyun_ozeti?.trim()) {
+    issues.push('Oyun özeti eksik')
   }
 
   if (!game.end_date) {

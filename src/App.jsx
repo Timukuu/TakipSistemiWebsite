@@ -1634,7 +1634,7 @@ function GamesView({
                       <td>{game.class_level}</td>
                       <td>
                         <div className="table-title">{game.topic}</div>
-                        <div className="table-subtitle">{game.kazanimlar}</div>
+                        <div className="table-subtitle">{game.oyun_ozeti}</div>
                         {issues.length > 0 ? <div className="table-inline-note">{issues.length} Veri Uyarısı</div> : null}
                       </td>
                       <td>{getResponsibleUserName(users, game.responsible_user_id)}</td>
@@ -1885,9 +1885,12 @@ function GameDetailDrawer({
           <div className="drawer-section">
             <div className="drawer-section-title">
               <h4>İçerik ve Yayın Bilgileri</h4>
-              <p>Kazanım, link ve operasyon notları kaydın görünürlüğünü güçlendirir.</p>
+              <p>Oyun özeti, kazanım, link ve operasyon notları kaydın görünürlüğünü güçlendirir.</p>
             </div>
             <div className="row g-3">
+              <FormField label="Oyun Özeti" error={formErrors.oyun_ozeti} fullWidth>
+                <textarea className={`form-control ${formErrors.oyun_ozeti ? 'is-invalid' : ''}`} rows="3" value={draftGame.oyun_ozeti ?? ''} onChange={(event) => onChange('oyun_ozeti', event.target.value)} placeholder="Oyunun kısa özetini yazın" />
+              </FormField>
               <FormField label="Kazanımlar" error={formErrors.kazanimlar} fullWidth>
                 <textarea className={`form-control ${formErrors.kazanimlar ? 'is-invalid' : ''}`} rows="3" value={draftGame.kazanimlar} onChange={(event) => onChange('kazanimlar', event.target.value)} placeholder="Oyunun desteklediği kazanımları yazın" />
               </FormField>
