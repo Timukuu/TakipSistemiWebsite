@@ -1734,26 +1734,39 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
       </section>
 
       {reportsSnapshot.subjectAvgDuration.length > 0 ? (
-        <section className="row g-3 mb-4">
+        <section className="row g-4 mb-4">
           <div className="col-12">
-            <div className="section-heading">
-              <div>
-                <h3>Ders Bazlı Ortalama Üretim Süresi</h3>
-                <p>Başlangıç ve bitiş tarihlerine göre hesaplanan ortalama tamamlama süresi.</p>
-              </div>
-            </div>
-          </div>
-          {reportsSnapshot.subjectAvgDuration.map((item) => (
-            <div className="col-6 col-md-4 col-xl-3" key={item.code}>
-              <div className="card rounded-4 border-0 shadow-sm h-100 avg-duration-card">
-                <div className="card-body">
-                  <h4 className="avg-duration-subject">{item.name}</h4>
-                  <div className="avg-duration-value">{item.avgDays} gün</div>
-                  <small className="avg-duration-meta">{item.sampleCount} kayıt üzerinden</small>
+            <div className="card rounded-4 border-0 shadow-sm">
+              <div className="card-body">
+                <div className="section-heading mb-3">
+                  <div>
+                    <h3>Ders Bazlı Ortalama Üretim Süresi</h3>
+                    <p>Başlangıç ve bitiş tarihlerine göre hesaplanan ortalama tamamlama süresi.</p>
+                  </div>
+                </div>
+                <div className="row g-3">
+                  {reportsSnapshot.subjectAvgDuration.map((item) => (
+                    <div className="col-6 col-md-4 col-xl-3" key={item.code}>
+                      <div className="avg-duration-card">
+                        <h4 className="avg-duration-subject">{item.name}</h4>
+                        {item.avgDays !== null ? (
+                          <>
+                            <div className="avg-duration-value">{item.avgDays} gün</div>
+                            <small className="avg-duration-meta">{item.sampleCount} / {item.totalCount} kayıt üzerinden</small>
+                          </>
+                        ) : (
+                          <>
+                            <div className="avg-duration-value no-data">—</div>
+                            <small className="avg-duration-meta">Tarih bilgisi yok ({item.totalCount} kayıt)</small>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          ))}
+          </div>
         </section>
       ) : null}
     </>

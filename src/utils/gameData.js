@@ -626,9 +626,10 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
         name: SUBJECT_LABELS[subject.code] ?? subject.name,
         avgDays,
         sampleCount: durationsInDays.length,
+        totalCount: subjectGames.length,
       }
     })
-    .filter((entry) => entry.avgDays !== null)
+    .filter((entry) => entry.totalCount > 0)
 
   return {
     kpis: {
