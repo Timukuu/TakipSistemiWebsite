@@ -70,5 +70,77 @@
     "role": "user",
     "subject": "turkce",
     "created_at": "2026-04-08T08:10:00Z"
+  },
+  {
+    "id": "user_sim_berna_ozer_fen_bilimleri",
+    "name": "Berna Özer",
+    "email": "berna_ozer@meb.gov.tr",
+    "role": "user",
+    "subject": "fen_bilimleri",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_ayse_ar_kan_fen_bilimleri",
+    "name": "Ayşe Arıkan",
+    "email": "ayse_ar_kan@meb.gov.tr",
+    "role": "user",
+    "subject": "fen_bilimleri",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_tac_nur_ezgi_ang_celik_fen_bilimleri",
+    "name": "Tacınur Ezgi Angı Çelik",
+    "email": "tac_nur_ezgi_ang_celik@meb.gov.tr",
+    "role": "user",
+    "subject": "fen_bilimleri",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_tulin_kosukoglu_hayat_bilgisi",
+    "name": "Tülin Kosukoğlu",
+    "email": "tulin_kosukoglu@meb.gov.tr",
+    "role": "user",
+    "subject": "hayat_bilgisi",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_esengul_y_ld_z_matematik",
+    "name": "Esengül Yıldız",
+    "email": "esengul_y_ld_z@meb.gov.tr",
+    "role": "user",
+    "subject": "matematik",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_lokman_polat_sosyal_bilgiler",
+    "name": "Lokman Polat",
+    "email": "lokman_polat@meb.gov.tr",
+    "role": "user",
+    "subject": "sosyal_bilgiler",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_ozgur_kara_fizik",
+    "name": "özgür kara",
+    "email": "ozgur_kara@meb.gov.tr",
+    "role": "user",
+    "subject": "fizik",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_berna_ozer_kimya",
+    "name": "Berna Özer",
+    "email": "berna_ozer@meb.gov.tr",
+    "role": "user",
+    "subject": "kimya",
+    "created_at": "2026-04-10T09:00:00Z"
+  },
+  {
+    "id": "user_sim_tac_nur_ezgi_ang_celik_biyoloji",
+    "name": "Tacınur Ezgi Angı Çelik",
+    "email": "tac_nur_ezgi_ang_celik@meb.gov.tr",
+    "role": "user",
+    "subject": "biyoloji",
+    "created_at": "2026-04-10T09:00:00Z"
   }
 ]
