@@ -1265,12 +1265,12 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
 
   const workloadSeries = [
     {
-      name: 'Açık Kayıt',
+      name: `Açık ${contentTypeLabel}`,
       data: reportsSnapshot.responsibleWorkload.map((item) => item.openGames),
     },
     {
-      name: 'Toplam Bölüm',
-      data: reportsSnapshot.responsibleWorkload.map((item) => item.totalSections),
+      name: `Toplam ${contentTypeLabel}`,
+      data: reportsSnapshot.responsibleWorkload.map((item) => item.totalAssigned),
     },
   ]
 
@@ -1494,7 +1494,7 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
               <div className="section-heading">
                 <div>
                   <h3>Sorumlu Kişi İş Yükü</h3>
-                  <p>Açık kayıt ve bölüm yoğunluğunu kişi bazında birlikte görün.</p>
+                  <p>Açık ve toplam senaryo sayısını kişi bazında birlikte görün.</p>
                 </div>
               </div>
               <div className="report-chart-wrap">

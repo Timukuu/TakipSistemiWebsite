@@ -516,7 +516,6 @@ export function buildReportsSnapshot(games, subjects, users, referenceDate = new
         name: user.name,
         subjectLabel: SUBJECT_LABELS[user.subject] ?? user.subject,
         openGames: assignedGames.filter((game) => !game.is_completed).length,
-        totalSections: assignedGames.reduce((sum, game) => sum + Number(game.interface_count || 0), 0),
         totalAssigned: assignedGames.length,
       }
     })
