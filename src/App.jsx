@@ -317,6 +317,20 @@ function App() {
     handleCloseGame()
   }
 
+  const handleOpenSelectPicker = (selectId) => {
+    const selectEl = typeof document !== 'undefined' ? document.getElementById(selectId) : null
+    if (!selectEl || selectEl.disabled) return
+    if (typeof selectEl.showPicker === 'function') {
+      try {
+        selectEl.showPicker()
+        return
+      } catch {
+        // showPicker yoksa ya da başarısız olursa aşağıdaki geri-dönüşe düşeriz
+      }
+    }
+    selectEl.focus()
+  }
+
   const handleFilterChange = (field, value) => {
     setFilters((currentFilters) => ({
       ...currentFilters,
@@ -697,16 +711,18 @@ function App() {
                         </option>
                       ))}
                     </select>
-                    <label
-                      htmlFor="utility-role-mode-select"
+                    <button
+                      type="button"
                       className="input-group-text utility-select-hint"
-                      title="Seçim yapmak için tıklayın"
-                      aria-label="Seçim yapmak için tıklayın"
+                      title="Seçim listesini aç"
+                      aria-label="Seçim listesini aç"
+                      aria-controls="utility-role-mode-select"
+                      onClick={() => handleOpenSelectPicker('utility-role-mode-select')}
                     >
                       <span className="material-icons-outlined" aria-hidden="true">
                         ads_click
                       </span>
-                    </label>
+                    </button>
                   </div>
                 </div>
                 <div className="col-12 col-xl-3">
@@ -742,16 +758,18 @@ function App() {
                           </option>
                         ))}
                       </select>
-                      <label
-                        htmlFor="utility-insight-scope-select"
+                      <button
+                        type="button"
                         className="input-group-text utility-select-hint"
-                        title="Seçim yapmak için tıklayın"
-                        aria-label="Seçim yapmak için tıklayın"
+                        title="Seçim listesini aç"
+                        aria-label="Seçim listesini aç"
+                        aria-controls="utility-insight-scope-select"
+                        onClick={() => handleOpenSelectPicker('utility-insight-scope-select')}
                       >
                         <span className="material-icons-outlined" aria-hidden="true">
                           ads_click
                         </span>
-                      </label>
+                      </button>
                     </div>
                   </div>
                 ) : null}

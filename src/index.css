@@ -398,6 +398,7 @@ a {
   justify-content: center;
   padding: 0.25rem 0.65rem;
   margin-bottom: 0;
+  font: inherit;
   color: #bfdbfe;
   background: rgba(30, 58, 138, 0.55);
   border: 1px solid rgba(148, 163, 184, 0.22);
@@ -405,7 +406,14 @@ a {
   border-top-right-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.utility-panel .utility-select-hint:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.18rem rgba(59, 130, 246, 0.35);
 }
 
 .utility-panel .utility-select-hint:hover,
