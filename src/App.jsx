@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import gamesData from '../data/games.json'
 import simulationsData from '../data/simulations.json'
@@ -317,9 +317,17 @@ function App() {
     handleCloseGame()
   }
 
-  const handleOpenSelectPicker = (selectId) => {
+  const openSelectIdRef = useRef(null)
+
+  const handleToggleSelectPicker = (selectId) => {
     const selectEl = typeof document !== 'undefined' ? document.getElementById(selectId) : null
     if (!selectEl || selectEl.disabled) return
+    if (openSelectIdRef.current === selectId) {
+      openSelectIdRef.current = null
+      selectEl.blur()
+      return
+    }
+    openSelectIdRef.current = selectId
     if (typeof selectEl.showPicker === 'function') {
       try {
         selectEl.showPicker()
@@ -329,6 +337,12 @@ function App() {
       }
     }
     selectEl.focus()
+  }
+
+  const handleSelectPickerClosed = (selectId) => {
+    if (openSelectIdRef.current === selectId) {
+      openSelectIdRef.current = null
+    }
   }
 
   const handleFilterChange = (field, value) => {
@@ -703,7 +717,11 @@ function App() {
                       id="utility-role-mode-select"
                       className="form-select"
                       value={roleMode}
-                      onChange={(event) => handleRoleChange(event.target.value)}
+                      onChange={(event) => {
+                        handleSelectPickerClosed('utility-role-mode-select')
+                        handleRoleChange(event.target.value)
+                      }}
+                      onBlur={() => handleSelectPickerClosed('utility-role-mode-select')}
                     >
                       {ROLE_OPTIONS.map((role) => (
                         <option key={role.value} value={role.value}>
@@ -717,7 +735,16 @@ function App() {
                       title="Seçim listesini aç"
                       aria-label="Seçim listesini aç"
                       aria-controls="utility-role-mode-select"
-                      onClick={() => handleOpenSelectPicker('utility-role-mode-select')}
+                      onMouseDown={(event) => {
+                        event.preventDefault()
+                        handleToggleSelectPicker('utility-role-mode-select')
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          handleToggleSelectPicker('utility-role-mode-select')
+                        }
+                      }}
                     >
                       <span className="material-icons-outlined" aria-hidden="true">
                         ads_click
@@ -750,7 +777,11 @@ function App() {
                         id="utility-insight-scope-select"
                         className="form-select"
                         value={insightScope}
-                        onChange={(event) => handleInsightScopeChange(event.target.value)}
+                        onChange={(event) => {
+                          handleSelectPickerClosed('utility-insight-scope-select')
+                          handleInsightScopeChange(event.target.value)
+                        }}
+                        onBlur={() => handleSelectPickerClosed('utility-insight-scope-select')}
                       >
                         {INSIGHT_SCOPE_OPTIONS.map((scopeOption) => (
                           <option key={scopeOption.value} value={scopeOption.value}>
@@ -764,7 +795,16 @@ function App() {
                         title="Seçim listesini aç"
                         aria-label="Seçim listesini aç"
                         aria-controls="utility-insight-scope-select"
-                        onClick={() => handleOpenSelectPicker('utility-insight-scope-select')}
+                        onMouseDown={(event) => {
+                          event.preventDefault()
+                          handleToggleSelectPicker('utility-insight-scope-select')
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            handleToggleSelectPicker('utility-insight-scope-select')
+                          }
+                        }}
                       >
                         <span className="material-icons-outlined" aria-hidden="true">
                           ads_click
