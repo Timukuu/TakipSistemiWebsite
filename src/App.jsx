@@ -1598,6 +1598,93 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
         </div>
       </section>
 
+      {reportsSnapshot.subjectAvgDuration.length > 0 ? (
+        <section className="row g-4 mb-4">
+          <div className="col-12">
+            <div className="card rounded-4 border-0 shadow-sm">
+              <div className="card-body">
+                <div className="section-heading mb-3">
+                  <div>
+                    <h3>Ders Bazlı Ortalama Üretim Süresi</h3>
+                    <p>Başlangıç ve bitiş tarihlerine göre hesaplanan ortalama tamamlama süresi.</p>
+                  </div>
+                </div>
+                <div className="row g-3">
+                  {reportsSnapshot.subjectAvgDuration.map((item) => (
+                    <div className="col-6 col-md-4 col-xl-3" key={item.code}>
+                      <div className="avg-duration-card">
+                        <h4 className="avg-duration-subject">{item.name}</h4>
+                        {item.avgDays !== null ? (
+                          <>
+                            <div className="avg-duration-value">{item.avgDays} gün</div>
+                            <small className="avg-duration-meta">{item.sampleCount} / {item.totalCount} kayıt üzerinden</small>
+                          </>
+                        ) : (
+                          <>
+                            <div className="avg-duration-value no-data">—</div>
+                            <small className="avg-duration-meta">Tarih bilgisi yok ({item.totalCount} kayıt)</small>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="card rounded-4 border-0 shadow-sm mb-4">
+        <div className="card-body">
+          <div className="section-heading mb-3">
+            <div>
+              <h3>Ders Bazlı Performans Tablosu</h3>
+              <p>Yönetici görünümünde operasyon yoğunluğu ve risk göstergeleri.</p>
+            </div>
+          </div>
+          <div className="table-responsive">
+            <table className="table align-middle mb-0 report-table">
+              <thead>
+                <tr>
+                  <th>Ders</th>
+                  <th>Toplam</th>
+                  <th>Aktif</th>
+                  <th>Tamamlanan</th>
+                  <th>Onay Bekleyen</th>
+                  <th>Eksik Bilgi</th>
+                  <th>Geciken</th>
+                  <th>Yaklaşan</th>
+                  <th>Ortalama Bölüm</th>
+                  <th>Tamamlanma</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reportsSnapshot.reportTableRows.map((row) => (
+                  <tr key={row.code}>
+                    <td className="fw-semibold">{row.name}</td>
+                    <td>{row.totalGames}</td>
+                    <td>{row.inProgressGames}</td>
+                    <td>{row.completedGames}</td>
+                    <td>{row.awaitingApprovalStages}</td>
+                    <td>{row.missingInfoGames}</td>
+                    <td>{row.overdueGames}</td>
+                    <td>{row.dueSoonGames}</td>
+                    <td>{row.averageSections}</td>
+                    <td>
+                      <div className="report-progress">
+                        <div className="report-progress-bar" style={{ width: `${row.completionRate}%` }} />
+                      </div>
+                      <span>{row.completionRate}%</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <section className="row g-4 mb-4">
         <div className="col-12 col-xl-4">
           <div className="card rounded-4 border-0 shadow-sm h-100">
@@ -1669,56 +1756,6 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="card rounded-4 border-0 shadow-sm">
-        <div className="card-body">
-          <div className="section-heading mb-3">
-            <div>
-              <h3>Ders Bazlı Performans Tablosu</h3>
-              <p>Yönetici görünümünde operasyon yoğunluğu ve risk göstergeleri.</p>
-            </div>
-          </div>
-          <div className="table-responsive">
-            <table className="table align-middle mb-0 report-table">
-              <thead>
-                <tr>
-                  <th>Ders</th>
-                  <th>Toplam</th>
-                  <th>Aktif</th>
-                  <th>Tamamlanan</th>
-                  <th>Onay Bekleyen</th>
-                  <th>Eksik Bilgi</th>
-                  <th>Geciken</th>
-                  <th>Yaklaşan</th>
-                  <th>Ortalama Bölüm</th>
-                  <th>Tamamlanma</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reportsSnapshot.reportTableRows.map((row) => (
-                  <tr key={row.code}>
-                    <td className="fw-semibold">{row.name}</td>
-                    <td>{row.totalGames}</td>
-                    <td>{row.inProgressGames}</td>
-                    <td>{row.completedGames}</td>
-                    <td>{row.awaitingApprovalStages}</td>
-                    <td>{row.missingInfoGames}</td>
-                    <td>{row.overdueGames}</td>
-                    <td>{row.dueSoonGames}</td>
-                    <td>{row.averageSections}</td>
-                    <td>
-                      <div className="report-progress">
-                        <div className="report-progress-bar" style={{ width: `${row.completionRate}%` }} />
-                      </div>
-                      <span>{row.completionRate}%</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </div>
       </section>
@@ -1821,42 +1858,6 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
         </div>
       </section>
 
-      {reportsSnapshot.subjectAvgDuration.length > 0 ? (
-        <section className="row g-4 mb-4">
-          <div className="col-12">
-            <div className="card rounded-4 border-0 shadow-sm">
-              <div className="card-body">
-                <div className="section-heading mb-3">
-                  <div>
-                    <h3>Ders Bazlı Ortalama Üretim Süresi</h3>
-                    <p>Başlangıç ve bitiş tarihlerine göre hesaplanan ortalama tamamlama süresi.</p>
-                  </div>
-                </div>
-                <div className="row g-3">
-                  {reportsSnapshot.subjectAvgDuration.map((item) => (
-                    <div className="col-6 col-md-4 col-xl-3" key={item.code}>
-                      <div className="avg-duration-card">
-                        <h4 className="avg-duration-subject">{item.name}</h4>
-                        {item.avgDays !== null ? (
-                          <>
-                            <div className="avg-duration-value">{item.avgDays} gün</div>
-                            <small className="avg-duration-meta">{item.sampleCount} / {item.totalCount} kayıt üzerinden</small>
-                          </>
-                        ) : (
-                          <>
-                            <div className="avg-duration-value no-data">—</div>
-                            <small className="avg-duration-meta">Tarih bilgisi yok ({item.totalCount} kayıt)</small>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : null}
     </>
   )
 }
