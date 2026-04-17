@@ -383,6 +383,47 @@ a {
   box-shadow: 0 0 0 0.18rem rgba(59, 130, 246, 0.18);
 }
 
+.utility-panel .utility-select-group {
+  flex-wrap: nowrap;
+}
+
+.utility-panel .utility-select-group .form-select {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.utility-panel .utility-select-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.65rem;
+  margin-bottom: 0;
+  color: #bfdbfe;
+  background: rgba(30, 58, 138, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-left: 0;
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.utility-panel .utility-select-hint:hover,
+.utility-panel .utility-select-hint:focus {
+  background: rgba(59, 130, 246, 0.35);
+  color: #f8fbff;
+}
+
+.utility-panel .utility-select-group:focus-within .utility-select-hint {
+  border-color: rgba(96, 165, 250, 0.45);
+  color: #f8fbff;
+}
+
+.utility-panel .utility-select-hint .material-icons-outlined {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
 .utility-panel .section-heading h3,
 .utility-panel .section-heading p {
   color: #eff6ff;

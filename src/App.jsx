@@ -681,18 +681,33 @@ function App() {
             <div className="card-body">
               <div className="row g-3 align-items-end utility-panel-controls">
                 <div className="col-12 col-xl-3">
-                  <label className="form-label">Aktif Görünüm</label>
-                  <select
-                    className="form-select"
-                    value={roleMode}
-                    onChange={(event) => handleRoleChange(event.target.value)}
-                  >
-                    {ROLE_OPTIONS.map((role) => (
-                      <option key={role.value} value={role.value}>
-                        {role.label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="form-label" htmlFor="utility-role-mode-select">
+                    Aktif Görünüm
+                  </label>
+                  <div className="input-group utility-select-group">
+                    <select
+                      id="utility-role-mode-select"
+                      className="form-select"
+                      value={roleMode}
+                      onChange={(event) => handleRoleChange(event.target.value)}
+                    >
+                      {ROLE_OPTIONS.map((role) => (
+                        <option key={role.value} value={role.value}>
+                          {role.label}
+                        </option>
+                      ))}
+                    </select>
+                    <label
+                      htmlFor="utility-role-mode-select"
+                      className="input-group-text utility-select-hint"
+                      title="Seçim yapmak için tıklayın"
+                      aria-label="Seçim yapmak için tıklayın"
+                    >
+                      <span className="material-icons-outlined" aria-hidden="true">
+                        ads_click
+                      </span>
+                    </label>
+                  </div>
                 </div>
                 <div className="col-12 col-xl-3">
                   <label className="form-label">Mock Kullanıcı</label>
@@ -711,18 +726,33 @@ function App() {
                 </div>
                 {currentView === 'dashboard' || currentView === 'reports' ? (
                   <div className="col-12 col-xl-3">
-                    <label className="form-label">İçerik Kapsamı</label>
-                    <select
-                      className="form-select"
-                      value={insightScope}
-                      onChange={(event) => handleInsightScopeChange(event.target.value)}
-                    >
-                      {INSIGHT_SCOPE_OPTIONS.map((scopeOption) => (
-                        <option key={scopeOption.value} value={scopeOption.value}>
-                          {scopeOption.label}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="form-label" htmlFor="utility-insight-scope-select">
+                      İçerik Kapsamı
+                    </label>
+                    <div className="input-group utility-select-group">
+                      <select
+                        id="utility-insight-scope-select"
+                        className="form-select"
+                        value={insightScope}
+                        onChange={(event) => handleInsightScopeChange(event.target.value)}
+                      >
+                        {INSIGHT_SCOPE_OPTIONS.map((scopeOption) => (
+                          <option key={scopeOption.value} value={scopeOption.value}>
+                            {scopeOption.label}
+                          </option>
+                        ))}
+                      </select>
+                      <label
+                        htmlFor="utility-insight-scope-select"
+                        className="input-group-text utility-select-hint"
+                        title="Seçim yapmak için tıklayın"
+                        aria-label="Seçim yapmak için tıklayın"
+                      >
+                        <span className="material-icons-outlined" aria-hidden="true">
+                          ads_click
+                        </span>
+                      </label>
+                    </div>
                   </div>
                 ) : null}
                 <div className="col-12 utility-panel-summary">
