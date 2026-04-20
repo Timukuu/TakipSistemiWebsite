@@ -141,7 +141,17 @@ function App() {
   const [subjects, setSubjects] = useState(subjectsData)
   const [users, setUsers] = useState(usersData)
   const [teams, setTeams] = useState(teamsData)
-  const [currentView, setCurrentView] = useState('dashboard')
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window === 'undefined') return 'dashboard'
+    const stored = window.localStorage.getItem('app.currentView')
+    const allowed = ['dashboard', 'reports', 'games', 'simulations', 'teams']
+    return allowed.includes(stored) ? stored : 'dashboard'
+  })
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('app.currentView', currentView)
+  }, [currentView])
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [roleMode, setRoleMode] = useState(initialRoleState.roleMode)
@@ -504,6 +514,26 @@ function App() {
     setDraftGame(structuredClone(nextGame))
     setFormErrors({})
     setSaveMessage('')
+  }
+
+  const handleInlineStageChange = (record, stageKey, nextStatus) => {
+    if (!record || !STAGE_ORDER.includes(stageKey)) return
+    const updater = record.content_type === 'simulation' ? setSimulations : setGames
+    updater((currentRecords) =>
+      currentRecords.map((item) => {
+        if (item.id !== record.id) return item
+        const nextItem = { ...item, [stageKey]: nextStatus, updated_at: new Date().toISOString() }
+        const allApproved = STAGE_ORDER.every((key) => nextItem[key] === 'onaylandi')
+        nextItem.is_completed = allApproved
+        return nextItem
+      }),
+    )
+    setDraftGame((currentDraft) => {
+      if (!currentDraft || currentDraft.id !== record.id) return currentDraft
+      const nextDraft = { ...currentDraft, [stageKey]: nextStatus, updated_at: new Date().toISOString() }
+      nextDraft.is_completed = STAGE_ORDER.every((key) => nextDraft[key] === 'onaylandi')
+      return nextDraft
+    })
   }
 
   const handleCreateGame = () => {
@@ -1074,6 +1104,7 @@ function App() {
               onOpenPlayer={handleOpenPlayer}
               onOpenSubjectManager={handleOpenSubjectManager}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
+              onStageChange={handleInlineStageChange}
               recordTypeLabel="Simülasyon"
               roleMode={roleMode}
               showLevelFilter
@@ -1094,6 +1125,7 @@ function App() {
               onOpenPlayer={handleOpenPlayer}
               onOpenSubjectManager={handleOpenSubjectManager}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
+              onStageChange={handleInlineStageChange}
               recordTypeLabel="Oyun"
               roleMode={roleMode}
               showLevelFilter
@@ -2771,6 +2803,7 @@ function GamesView({
   onOpenPlayer,
   onOpenSubjectManager,
   onResetFilters,
+  onStageChange,
   recordTypeLabel = 'Oyun',
   roleMode,
   showLevelFilter = false,
@@ -2914,7 +2947,7 @@ function GamesView({
                       <td>{getResponsibleUserName(users, game.responsible_user_id)}</td>
                       <td>{game.interface_count}</td>
                       <td className="stage-flow-cell">
-                        <StageProgress game={game} />
+                        <StageProgress game={game} onStageChange={onStageChange} />
                       </td>
                       <td>
                         <div className="table-secondary-stack">{formatDate(game.start_date)}</div>
@@ -2989,17 +3022,47 @@ function GamesView({
   )
 }
 
-function StageProgress({ game }) {
+function StageProgress({ game, onStageChange }) {
+  const statusKeys = Object.keys(STATUS_LABELS)
+  const interactive = typeof onStageChange === 'function'
   return (
     <div className="stage-progress-track" role="list" aria-label="Üretim Aşamaları">
       {STAGE_ORDER.map((stageKey, index) => {
         const status = game[stageKey]
+        const isLast = index === STAGE_ORDER.length - 1
         return (
-          <div key={stageKey} className={`stage-progress-item status-${status} ${index === STAGE_ORDER.length - 1 ? 'is-last' : ''}`} role="listitem">
+          <div
+            key={stageKey}
+            className={`stage-progress-item status-${status} ${isLast ? 'is-last' : ''}`}
+            role="listitem"
+          >
             <span className="stage-progress-label">{STAGE_LABELS[stageKey]}</span>
-            <span className={`stage-progress-badge status-${status}`}>
-              {STATUS_LABELS[status]}
-            </span>
+            <div className={`stage-progress-control status-${status}${interactive ? ' is-interactive' : ''}`}>
+              <span className={`stage-progress-badge status-${status}`}>{STATUS_LABELS[status]}</span>
+              {interactive ? (
+                <>
+                  <span className="material-icons-outlined stage-progress-caret" aria-hidden="true">
+                    expand_more
+                  </span>
+                  <select
+                    className="stage-progress-select"
+                    value={status}
+                    aria-label={`${STAGE_LABELS[stageKey]} durumunu güncelle`}
+                    onClick={(event) => event.stopPropagation()}
+                    onChange={(event) => {
+                      event.stopPropagation()
+                      onStageChange(game, stageKey, event.target.value)
+                    }}
+                  >
+                    {statusKeys.map((statusKey) => (
+                      <option key={statusKey} value={statusKey}>
+                        {STATUS_LABELS[statusKey]}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              ) : null}
+            </div>
           </div>
         )
       })}

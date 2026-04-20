@@ -897,6 +897,71 @@ a {
   background: #10b981;
 }
 
+.stage-progress-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-progress-control.is-interactive {
+  cursor: pointer;
+  padding-right: 1.15rem;
+  border-radius: 999px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stage-progress-control.is-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+.stage-progress-control.is-interactive:focus-within {
+  box-shadow: 0 0 0 0.18rem rgba(59, 130, 246, 0.35);
+}
+
+.stage-progress-caret {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: currentColor;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.stage-progress-control.status-baslamadi .stage-progress-caret {
+  color: #64748b;
+}
+
+.stage-progress-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  z-index: 3;
+}
+
+.stage-progress-select:focus {
+  outline: none;
+}
+
+.stage-progress-select option {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
 .table-pill,
 .link-badge {
   display: inline-flex;
