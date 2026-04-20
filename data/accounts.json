@@ -1,0 +1,211 @@
+[
+  {
+    "username": "bt_onur",
+    "password": "b2026",
+    "name": "Berk Timuçin Önür",
+    "role": "admin",
+    "subjects": [
+      "turkce"
+    ],
+    "email": "bt_onur@meb.gov.tr"
+  },
+  {
+    "username": "esin_ozgenc",
+    "password": "e2026",
+    "name": "Esin Özgenç",
+    "role": "admin",
+    "subjects": [],
+    "email": "esin_ozgenc@meb.gov.tr"
+  },
+  {
+    "username": "berna_ozer",
+    "password": "b2026",
+    "name": "Berna Özer",
+    "role": "lead",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "berna_ozer@meb.gov.tr"
+  },
+  {
+    "username": "esengul_yildiz",
+    "password": "e2026",
+    "name": "Esengül Yıldız",
+    "role": "lead",
+    "subjects": [
+      "matematik"
+    ],
+    "email": "esengul_yildiz@meb.gov.tr"
+  },
+  {
+    "username": "lokman_polat",
+    "password": "l2026",
+    "name": "Lokman Polat",
+    "role": "lead",
+    "subjects": [
+      "sosyal_bilgiler"
+    ],
+    "email": "lokman_polat@meb.gov.tr"
+  },
+  {
+    "username": "te_angi",
+    "password": "t2026",
+    "name": "Tacınur Ezgi Angı Çelik",
+    "role": "lead",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "tacinur_ezgi_angi_celik@meb.gov.tr"
+  },
+  {
+    "username": "tulin_kosukoglu",
+    "password": "t2026",
+    "name": "Tülin Kosukoğlu",
+    "role": "lead",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "tulin_kosukoglu@meb.gov.tr"
+  },
+  {
+    "username": "altan_acun",
+    "password": "a2026",
+    "name": "Altan Acun",
+    "role": "user",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "altan_acun@meb.gov.tr"
+  },
+  {
+    "username": "arzu_sarlayan",
+    "password": "a2026",
+    "name": "Arzu Şarlayan",
+    "role": "user",
+    "subjects": [
+      "sosyal_bilgiler"
+    ],
+    "email": "arzu_sarlayan@meb.gov.tr"
+  },
+  {
+    "username": "filiz_senturk",
+    "password": "f2026",
+    "name": "Filiz Şentürk",
+    "role": "user",
+    "subjects": [
+      "matematik"
+    ],
+    "email": "filiz_senturk@meb.gov.tr"
+  },
+  {
+    "username": "gamze_halat",
+    "password": "g2026",
+    "name": "Gamze Halat",
+    "role": "user",
+    "subjects": [
+      "sosyal_bilgiler"
+    ],
+    "email": "gamze_halat@meb.gov.tr"
+  },
+  {
+    "username": "ht_oguzoglu",
+    "password": "h2026",
+    "name": "H. Tibet Oğuzoğlu",
+    "role": "user",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "ht_oguzoglu@meb.gov.tr"
+  },
+  {
+    "username": "hediye_ciklaatli",
+    "password": "h2026",
+    "name": "Hediye Çıklaatlı",
+    "role": "user",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "hediye_ciklaatli@meb.gov.tr"
+  },
+  {
+    "username": "kt_aricioglu",
+    "password": "k2026",
+    "name": "Kemal Tarık Arıcıoğlu",
+    "role": "user",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "kt_aricioglu@meb.gov.tr"
+  },
+  {
+    "username": "my_toprak",
+    "password": "m2026",
+    "name": "Mehmet Yaşar Toprak",
+    "role": "user",
+    "subjects": [
+      "sosyal_bilgiler"
+    ],
+    "email": "my_toprak@meb.gov.tr"
+  },
+  {
+    "username": "meryem_kivilcim",
+    "password": "m2026",
+    "name": "Meryem Kıvılcım",
+    "role": "user",
+    "subjects": [
+      "sosyal_bilgiler",
+      "turkce"
+    ],
+    "email": "meryem_kivilcim@meb.gov.tr"
+  },
+  {
+    "username": "mesut_kural",
+    "password": "m2026",
+    "name": "Mesut Kural",
+    "role": "user",
+    "subjects": [
+      "sosyal_bilgiler"
+    ],
+    "email": "mesut_kural@meb.gov.tr"
+  },
+  {
+    "username": "murat_ustundag",
+    "password": "m2026",
+    "name": "Murat Üstündağ",
+    "role": "user",
+    "subjects": [
+      "turkce"
+    ],
+    "email": "murat_ustundag@meb.gov.tr"
+  },
+  {
+    "username": "naci_arslan",
+    "password": "n2026",
+    "name": "Naci Arslan",
+    "role": "user",
+    "subjects": [
+      "matematik"
+    ],
+    "email": "naci_arslan@meb.gov.tr"
+  },
+  {
+    "username": "ozgur_kara",
+    "password": "o2026",
+    "name": "Özgür Kara",
+    "role": "user",
+    "subjects": [
+      "fen_bilimleri"
+    ],
+    "email": "ozgur_kara@meb.gov.tr"
+  },
+  {
+    "username": "sebahattin_soylu",
+    "password": "s2026",
+    "name": "Sebahattin Soylu",
+    "role": "user",
+    "subjects": [
+      "matematik"
+    ],
+    "email": "sebahattin_soylu@meb.gov.tr"
+  }
+]

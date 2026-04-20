@@ -40,6 +40,13 @@ import {
   matchesFilters,
   validateGameDraft,
 } from './utils/gameData'
+import {
+  ACCOUNT_ROLE_LABELS,
+  accountToActiveUser,
+  loadStoredAccount,
+  persistAccount,
+} from './utils/auth.js'
+import LoginScreen from './components/LoginScreen.jsx'
 
 function resolvePlayableUrl(playUrl, baseUrl) {
   if (!playUrl) {
@@ -136,6 +143,17 @@ function resolveGameEducationLevel(game) {
 function App() {
   const baseUrl = import.meta.env.BASE_URL
   const initialRoleState = useMemo(() => getInitialRoleState(usersData), [])
+  const [currentAccount, setCurrentAccount] = useState(() => loadStoredAccount())
+
+  const handleLogin = (account) => {
+    persistAccount(account)
+    setCurrentAccount(account)
+  }
+
+  const handleLogout = () => {
+    persistAccount(null)
+    setCurrentAccount(null)
+  }
   const [games, setGames] = useState(gamesData.map((game) => ({ ...game, content_type: 'game', education_level: '' })))
   const [simulations, setSimulations] = useState(simulationsData.map((simulation) => ({ ...simulation, content_type: 'simulation' })))
   const [subjects, setSubjects] = useState(subjectsData)
@@ -170,10 +188,41 @@ function App() {
 
   const nonAdminUsers = useMemo(() => users.filter((user) => user.role === 'user'), [users])
 
-  const activeUser = useMemo(
-    () => users.find((user) => user.id === selectedUserId) ?? nonAdminUsers[0] ?? null,
-    [nonAdminUsers, selectedUserId, users],
+  const isAdminAccount = !currentAccount || currentAccount.role === 'admin'
+  const accountActiveUser = useMemo(
+    () => (currentAccount && currentAccount.role !== 'admin' ? accountToActiveUser(currentAccount) : null),
+    [currentAccount],
   )
+
+  const activeUser = useMemo(() => {
+    if (accountActiveUser) return accountActiveUser
+    return users.find((user) => user.id === selectedUserId) ?? nonAdminUsers[0] ?? null
+  }, [accountActiveUser, nonAdminUsers, selectedUserId, users])
+
+  useEffect(() => {
+    if (currentAccount && currentAccount.role !== 'admin' && roleMode !== 'user') {
+      setRoleMode('user')
+    }
+  }, [currentAccount, roleMode])
+
+  useEffect(() => {
+    if (!accountActiveUser) return
+    setUsers((currentUsers) => {
+      if (currentUsers.some((user) => user.id === accountActiveUser.id)) {
+        return currentUsers
+      }
+      return [...currentUsers, accountActiveUser]
+    })
+  }, [accountActiveUser])
+
+  const canManageSubjects = isAdminAccount && roleMode === 'admin'
+  const canManageContent = isAdminAccount
+    ? roleMode === 'admin'
+    : currentAccount?.role === 'lead'
+  const canManageTeam = isAdminAccount
+    ? roleMode === 'admin'
+    : currentAccount?.role === 'lead'
+  const showUtilityToggles = isAdminAccount
 
   useEffect(() => {
     subjects.forEach((subject) => {
@@ -312,8 +361,8 @@ function App() {
   )
 
   const navigationItems = useMemo(
-    () => (roleMode === 'admin' ? [...NAV_ITEMS, REPORTS_NAV_ITEM] : NAV_ITEMS),
-    [roleMode],
+    () => [...NAV_ITEMS, REPORTS_NAV_ITEM],
+    [],
   )
 
   useEffect(() => {
@@ -321,17 +370,23 @@ function App() {
     return () => document.body.classList.remove('toggled')
   }, [isSidebarCollapsed])
 
+  const activeUserSubjectCodes = useMemo(() => {
+    if (!activeUser) return []
+    if (Array.isArray(activeUser.subjects) && activeUser.subjects.length > 0) return activeUser.subjects
+    return activeUser.subject ? [activeUser.subject] : []
+  }, [activeUser])
+
   const gameSubjectOptions = useMemo(() => {
     const levelForFilter = gameLevelFilter === 'all' ? '' : gameLevelFilter
     const subjectPool = filterSubjectsByCatalog(subjects, 'game', levelForFilter)
-    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => subject.code === activeUser?.subject)
-  }, [activeUser?.subject, gameLevelFilter, roleMode, subjects])
+    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => activeUserSubjectCodes.includes(subject.code))
+  }, [activeUserSubjectCodes, gameLevelFilter, roleMode, subjects])
 
   const simulationSubjectOptions = useMemo(() => {
     const levelForFilter = simulationLevelFilter === 'all' ? '' : simulationLevelFilter
     const subjectPool = filterSubjectsByCatalog(subjects, 'simulation', levelForFilter)
-    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => subject.code === activeUser?.subject)
-  }, [activeUser?.subject, roleMode, simulationLevelFilter, subjects])
+    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => activeUserSubjectCodes.includes(subject.code))
+  }, [activeUserSubjectCodes, roleMode, simulationLevelFilter, subjects])
 
   const drawerSubjectOptions = useMemo(() => {
     if (!draftGame) {
@@ -341,8 +396,8 @@ function App() {
     const catalogKey = draftGame.content_type === 'simulation' ? 'simulation' : 'game'
     const levelForDraft = draftGame.education_level || ''
     const subjectPool = filterSubjectsByCatalog(subjects, catalogKey, levelForDraft)
-    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => subject.code === activeUser?.subject)
-  }, [activeUser?.subject, currentView, draftGame, gameSubjectOptions, roleMode, simulationSubjectOptions, subjects])
+    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => activeUserSubjectCodes.includes(subject.code))
+  }, [activeUserSubjectCodes, currentView, draftGame, gameSubjectOptions, roleMode, simulationSubjectOptions, subjects])
 
   const availableResponsibleUsers = useMemo(() => {
     const subjectCode = draftGame?.subject
@@ -465,7 +520,7 @@ function App() {
         const subjectPool = filterSubjectsByCatalog(subjects, catalogKey, value)
         const fallbackSubject =
           subjectPool.find((subject) => subject.code === nextDraft.subject) ??
-          subjectPool.find((subject) => roleMode === 'admin' || subject.code === activeUser?.subject)
+          subjectPool.find((subject) => roleMode === 'admin' || activeUserSubjectCodes.includes(subject.code))
         nextDraft.subject = fallbackSubject?.code ?? ''
         nextDraft.responsible_user_id = nonAdminUsers.find((user) => user.subject === nextDraft.subject)?.id ?? ''
         const currentClassLevel = nextDraft.class_level ?? ''
@@ -796,6 +851,10 @@ function App() {
     setDrawerMode('edit')
   }
 
+  if (!currentAccount) {
+    return <LoginScreen onLogin={handleLogin} />
+  }
+
   return (
     <>
       <header className="top-header">
@@ -826,6 +885,34 @@ function App() {
               >
                 <span className="material-icons-outlined">dashboard</span>
               </button>
+            </li>
+            <li className="nav-item">
+              <div className="header-account">
+                <div className="header-account-avatar" aria-hidden="true">
+                  {currentAccount.name
+                    .split(' ')
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((part) => part.charAt(0))
+                    .join('')
+                    .toLocaleUpperCase('tr')}
+                </div>
+                <div className="header-account-info">
+                  <span className="header-account-name">{currentAccount.name}</span>
+                  <span className="header-account-role">
+                    {ACCOUNT_ROLE_LABELS[currentAccount.role]}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="theme-icon-button header-logout"
+                  onClick={handleLogout}
+                  aria-label="Çıkış Yap"
+                  title="Çıkış Yap"
+                >
+                  <span className="material-icons-outlined">logout</span>
+                </button>
+              </div>
             </li>
           </ul>
         </nav>
@@ -884,11 +971,20 @@ function App() {
             </div>
             <div className="page-breadcrumb-content">
               <span className="crumb-pill">
-                {roleMode === 'admin' ? 'Yönetici Görünümü' : 'Ders Sorumlusu Görünümü'}
+                {currentAccount.role === 'admin'
+                  ? roleMode === 'admin'
+                    ? 'Yönetici Görünümü'
+                    : 'Önizleme: Kullanıcı Görünümü'
+                  : ACCOUNT_ROLE_LABELS[currentAccount.role]}
               </span>
               {roleMode === 'user' && activeUser ? (
                 <span className="crumb-pill muted">
-                  {activeUser.name} · {SUBJECT_LABELS[activeUser.subject]}
+                  {activeUser.name}
+                  {activeUser.subjects?.length
+                    ? ` · ${activeUser.subjects.map((code) => SUBJECT_LABELS[code] || code).join(', ')}`
+                    : activeUser.subject
+                      ? ` · ${SUBJECT_LABELS[activeUser.subject]}`
+                      : ''}
                 </span>
               ) : null}
             </div>
@@ -897,6 +993,7 @@ function App() {
           <section className="card rounded-4 border-0 shadow-sm mb-4 utility-panel">
             <div className="card-body">
               <div className="row g-3 align-items-end utility-panel-controls">
+                {showUtilityToggles ? (
                 <div className="col-12 col-xl-3">
                   <label className="form-label" htmlFor="utility-role-mode-select">
                     Aktif Görünüm
@@ -941,6 +1038,8 @@ function App() {
                     </button>
                   </div>
                 </div>
+                ) : null}
+                {showUtilityToggles ? (
                 <div className="col-12 col-xl-3">
                   <label className="form-label">Mock Kullanıcı</label>
                   <select
@@ -956,6 +1055,7 @@ function App() {
                     ))}
                   </select>
                 </div>
+                ) : null}
                 {currentView === 'dashboard' || currentView === 'reports' || currentView === 'teams' ? (
                   <div className="col-12 col-xl-3">
                     <label className="form-label" htmlFor="utility-insight-scope-select">
@@ -1077,6 +1177,7 @@ function App() {
           ) : currentView === 'teams' ? (
             <TeamsView
               activeUser={activeUser}
+              canManageTeam={canManageTeam}
               insightScope={insightScope}
               onAddMember={handleAddTeamMember}
               onRemoveMember={handleRemoveTeamMember}
@@ -1087,7 +1188,8 @@ function App() {
             />
           ) : currentView === 'simulations' ? (
             <GamesView
-              canManageSubjects={roleMode === 'admin'}
+              canManageContent={canManageContent}
+              canManageSubjects={canManageSubjects}
               filteredGames={filteredSimulations}
               formFilters={filters}
               levelFilterValue={simulationLevelFilter}
@@ -1098,7 +1200,7 @@ function App() {
               onOpenPlayer={handleOpenPlayer}
               onOpenSubjectManager={handleOpenSubjectManager}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
-              onStageChange={handleInlineStageChange}
+              onStageChange={canManageContent ? handleInlineStageChange : undefined}
               recordTypeLabel="Simülasyon"
               roleMode={roleMode}
               showLevelFilter
@@ -1108,7 +1210,8 @@ function App() {
             />
           ) : (
             <GamesView
-              canManageSubjects={roleMode === 'admin'}
+              canManageContent={canManageContent}
+              canManageSubjects={canManageSubjects}
               filteredGames={filteredGames}
               formFilters={filters}
               levelFilterValue={gameLevelFilter}
@@ -1119,7 +1222,7 @@ function App() {
               onOpenPlayer={handleOpenPlayer}
               onOpenSubjectManager={handleOpenSubjectManager}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
-              onStageChange={handleInlineStageChange}
+              onStageChange={canManageContent ? handleInlineStageChange : undefined}
               recordTypeLabel="Oyun"
               roleMode={roleMode}
               showLevelFilter
@@ -1140,6 +1243,7 @@ function App() {
       {draftGame ? (
         <GameDetailDrawer
           availableResponsibleUsers={availableResponsibleUsers}
+          canManageContent={canManageContent}
           drawerMode={drawerMode}
           draftGame={draftGame}
           formErrors={formErrors}
@@ -1372,20 +1476,6 @@ function DashboardView({ contentTypeLabel, dashboardSummary, dashboardPieSnapsho
 }
 
 function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
-  if (roleMode !== 'admin') {
-    return (
-      <section className="card rounded-4 border-0 shadow-sm">
-        <div className="card-body py-5">
-          <div className="reports-locked-state">
-            <span className="material-icons-outlined">lock</span>
-            <h3>Raporlar Yalnızca Yönetici Görünümünde Açılır</h3>
-            <p>Detaylı istatistikler ve grafik ekranları yalnızca yönetici görünümünde erişilebilir.</p>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
   const sharedTooltip = {
     theme: 'light',
   }
@@ -2071,6 +2161,7 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
 
 function TeamsView({
   activeUser,
+  canManageTeam = false,
   insightScope,
   onAddMember,
   onRemoveMember,
@@ -2105,7 +2196,10 @@ function TeamsView({
       return true
     })
     if (roleMode === 'user' && activeUser) {
-      return pool.filter((subject) => subject.code === activeUser.subject)
+      const codes = Array.isArray(activeUser.subjects) && activeUser.subjects.length > 0
+        ? activeUser.subjects
+        : activeUser.subject ? [activeUser.subject] : []
+      return pool.filter((subject) => codes.includes(subject.code))
     }
     return pool
   }, [activeUser, contentScope, educationLevel, roleMode, subjects])
@@ -2163,7 +2257,7 @@ function TeamsView({
     }
   }, [scopedTeamMembers, teamsBySubject])
 
-  const canEdit = roleMode === 'admin'
+  const canEdit = canManageTeam
 
   const [addingForSubject, setAddingForSubject] = useState(null)
   const [editingMemberId, setEditingMemberId] = useState(null)
@@ -2786,6 +2880,7 @@ function TeamsView({
 }
 
 function GamesView({
+  canManageContent = true,
   canManageSubjects = false,
   filteredGames,
   formFilters,
@@ -2891,9 +2986,11 @@ function GamesView({
                   Ders Ekle
                 </button>
               ) : null}
-              <button type="button" className="btn btn-primary filter-action-btn" onClick={onCreateGame}>
-                Senaryo Ekle
-              </button>
+              {canManageContent ? (
+                <button type="button" className="btn btn-primary filter-action-btn" onClick={onCreateGame}>
+                  Senaryo Ekle
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
@@ -3113,6 +3210,7 @@ function MetricCard({ helper, icon, label, tone, value }) {
 
 function GameDetailDrawer({
   availableResponsibleUsers,
+  canManageContent = true,
   drawerMode,
   draftGame,
   formErrors,
@@ -3276,9 +3374,11 @@ function GameDetailDrawer({
           <button type="button" className="btn btn-light" onClick={onClose}>
             Kapat
           </button>
-          <button type="button" className="btn btn-primary" onClick={onSave}>
-            {drawerMode === 'create' ? 'Kaydı Ekle' : 'Kaydı Güncelle'}
-          </button>
+          {canManageContent ? (
+            <button type="button" className="btn btn-primary" onClick={onSave}>
+              {drawerMode === 'create' ? 'Kaydı Ekle' : 'Kaydı Güncelle'}
+            </button>
+          ) : null}
         </div>
       </aside>
     </>

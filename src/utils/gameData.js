@@ -90,26 +90,38 @@ export function createEmptyGame(subjectCode, userId) {
   }
 }
 
+function getActiveUserSubjects(activeUser) {
+  if (!activeUser) return []
+  if (Array.isArray(activeUser.subjects) && activeUser.subjects.length > 0) {
+    return activeUser.subjects
+  }
+  return activeUser.subject ? [activeUser.subject] : []
+}
+
 export function getScopedGames(games, roleMode, activeUser) {
   if (roleMode === 'admin') {
     return games
   }
 
-  if (!activeUser) {
+  const subjects = getActiveUserSubjects(activeUser)
+  if (subjects.length === 0) {
     return []
   }
 
-  return games.filter((game) => game.subject === activeUser.subject)
+  return games.filter((game) => subjects.includes(game.subject))
 }
 
 export function getEffectiveFilters(filters, roleMode, activeUser) {
-  if (roleMode === 'user' && activeUser) {
-    return {
-      ...filters,
-      subject: activeUser.subject,
-    }
+  if (roleMode !== 'user' || !activeUser) {
+    return filters
   }
 
+  const subjects = getActiveUserSubjects(activeUser)
+  if (subjects.length === 1) {
+    return { ...filters, subject: subjects[0] }
+  }
+
+  // Çoklu ders: subject filtresini kullanıcının manuel seçimine bırakıyoruz.
   return filters
 }
 
