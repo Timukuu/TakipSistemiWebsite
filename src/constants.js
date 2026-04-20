@@ -5,7 +5,7 @@
 
 export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Ana Panel', icon: 'dashboard' },
-  { id: 'games', label: 'Oyun Listesi', icon: 'table_rows' },
+  { id: 'games', label: 'Oyun Listesi', icon: 'sports_esports' },
   { id: 'simulations', label: 'Simülasyon Listesi', icon: 'science' },
   { id: 'teams', label: 'Ekip Listesi', icon: 'groups' },
 ]
