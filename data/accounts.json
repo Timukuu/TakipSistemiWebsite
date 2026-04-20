@@ -1,5 +1,14 @@
 [
   {
+    "username": "admin",
+    "password": "admin2026",
+    "name": "Anonim Yönetici",
+    "role": "admin",
+    "subjects": [],
+    "email": null,
+    "anonymous": true
+  },
+  {
     "username": "bt_onur",
     "password": "b2026",
     "name": "Berk Timuçin Önür",

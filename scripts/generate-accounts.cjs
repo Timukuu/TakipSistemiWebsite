@@ -3,6 +3,17 @@ const path = require('path')
 
 const teams = require(path.join('..', 'data', 'teams.json'))
 
+/** Kişiye bağlı olmayan süper yönetici — script her çalıştığında korunur */
+const SUPER_ADMIN_ACCOUNT = {
+  username: 'admin',
+  password: 'admin2026',
+  name: 'Anonim Yönetici',
+  role: 'admin',
+  subjects: [],
+  email: null,
+  anonymous: true,
+}
+
 const TR_MAP = { 'ç': 'c', 'Ç': 'c', 'ğ': 'g', 'Ğ': 'g', 'ı': 'i', 'İ': 'i', 'ö': 'o', 'Ö': 'o', 'ş': 's', 'Ş': 's', 'ü': 'u', 'Ü': 'u' }
 
 function slug(str) {
@@ -67,14 +78,18 @@ for (const [, person] of peopleMap) {
   })
 }
 
-accounts.sort((a, b) => {
+const teamAccounts = accounts.filter((a) => a.username !== SUPER_ADMIN_ACCOUNT.username)
+
+teamAccounts.sort((a, b) => {
   const rolePriority = { admin: 0, lead: 1, user: 2 }
   const priorityDiff = rolePriority[a.role] - rolePriority[b.role]
   if (priorityDiff !== 0) return priorityDiff
   return a.name.localeCompare(b.name, 'tr')
 })
 
+const finalAccounts = [SUPER_ADMIN_ACCOUNT, ...teamAccounts]
+
 const outPath = path.join(__dirname, '..', 'data', 'accounts.json')
-fs.writeFileSync(outPath, JSON.stringify(accounts, null, 2) + '\n', 'utf8')
-console.log(`Wrote ${accounts.length} accounts to ${outPath}`)
-accounts.forEach((a) => console.log(`${a.role.padEnd(6)} ${a.username.padEnd(22)} ${a.password.padEnd(8)} ${a.name}`))
+fs.writeFileSync(outPath, JSON.stringify(finalAccounts, null, 2) + '\n', 'utf8')
+console.log(`Wrote ${finalAccounts.length} accounts to ${outPath}`)
+finalAccounts.forEach((a) => console.log(`${a.role.padEnd(6)} ${a.username.padEnd(22)} ${a.password.padEnd(8)} ${a.name}`))

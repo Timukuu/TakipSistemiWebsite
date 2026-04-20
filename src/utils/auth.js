@@ -14,6 +14,15 @@ export const ACCOUNT_ROLE_LABELS = {
   user: 'Kullanıcı',
 }
 
+/** Kişi adı taşımayan süper yönetici hesabı için sabit görünen etiket */
+export const ANONYMOUS_ADMIN_DISPLAY_NAME = 'Anonim Yönetici'
+
+export function getAccountDisplayName(account) {
+  if (!account) return ''
+  if (account.anonymous) return ANONYMOUS_ADMIN_DISPLAY_NAME
+  return account.name
+}
+
 const STORAGE_KEY = 'app.currentAccount'
 
 export function authenticate(username, password) {

@@ -43,6 +43,7 @@ import {
 import {
   ACCOUNT_ROLE_LABELS,
   accountToActiveUser,
+  getAccountDisplayName,
   loadStoredAccount,
   persistAccount,
 } from './utils/auth.js'
@@ -889,7 +890,7 @@ function App() {
             <li className="nav-item">
               <div className="header-account">
                 <div className="header-account-avatar" aria-hidden="true">
-                  {currentAccount.name
+                  {getAccountDisplayName(currentAccount)
                     .split(' ')
                     .filter(Boolean)
                     .slice(0, 2)
@@ -898,7 +899,7 @@ function App() {
                     .toLocaleUpperCase('tr')}
                 </div>
                 <div className="header-account-info">
-                  <span className="header-account-name">{currentAccount.name}</span>
+                  <span className="header-account-name">{getAccountDisplayName(currentAccount)}</span>
                   <span className="header-account-role">
                     {ACCOUNT_ROLE_LABELS[currentAccount.role]}
                   </span>
