@@ -827,12 +827,6 @@ function App() {
                 <span className="material-icons-outlined">dashboard</span>
               </button>
             </li>
-            <li className="nav-item">
-              <div className="header-chip">
-                <span className="material-icons-outlined">public</span>
-                <span>GitHub Pages</span>
-              </div>
-            </li>
           </ul>
         </nav>
       </header>
