@@ -900,20 +900,26 @@ a {
 .stage-progress-control {
   position: relative;
   display: inline-flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
+  border-radius: 999px;
 }
 
 .stage-progress-control.is-interactive {
   cursor: pointer;
-  padding-right: 1.15rem;
-  border-radius: 999px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stage-progress-control.is-interactive .stage-progress-badge {
+  padding-right: 1.5rem;
 }
 
 .stage-progress-control.is-interactive:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+.stage-progress-control.is-interactive:hover .stage-progress-badge {
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.14);
 }
 
 .stage-progress-control.is-interactive:focus-within {
@@ -922,14 +928,20 @@ a {
 
 .stage-progress-caret {
   position: absolute;
-  right: 0.25rem;
+  right: 0.45rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: currentColor;
-  opacity: 0.85;
+  opacity: 0.9;
   pointer-events: none;
   z-index: 2;
+}
+
+.stage-progress-control.status-onaylandi .stage-progress-caret,
+.stage-progress-control.status-devam_ediyor .stage-progress-caret,
+.stage-progress-control.status-onaya_gonderildi .stage-progress-caret {
+  color: #ffffff;
 }
 
 .stage-progress-control.status-baslamadi .stage-progress-caret {
