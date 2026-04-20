@@ -20,6 +20,7 @@ import {
   STATUS_FILTER_OPTIONS,
   STATUS_LABELS,
   SUBJECT_LABELS,
+  TEAM_ROLE_LABELS,
   TEAM_ROLE_TYPES,
 } from './constants'
 import {
@@ -2068,6 +2069,50 @@ function TeamsView({
   const [draftMember, setDraftMember] = useState(null)
   const [draftErrors, setDraftErrors] = useState({})
   const [confirmRemoveId, setConfirmRemoveId] = useState(null)
+  const [presetSelection, setPresetSelection] = useState('new')
+  const presetOpenRef = useRef(null)
+
+  const peopleDirectory = useMemo(() => {
+    const map = new Map()
+    teams.forEach((member) => {
+      const trimmed = (member.name || '').trim()
+      if (!trimmed) return
+      const key = trimmed.toLocaleLowerCase('tr')
+      const existing = map.get(key)
+      if (existing) {
+        if (!existing.email && member.email) existing.email = member.email
+        existing.roleCounts[member.role_type] = (existing.roleCounts[member.role_type] ?? 0) + 1
+        if (!existing.subjects.includes(member.subject)) {
+          existing.subjects.push(member.subject)
+        }
+      } else {
+        map.set(key, {
+          key,
+          name: trimmed,
+          email: member.email || null,
+          roleCounts: { [member.role_type]: 1 },
+          subjects: [member.subject],
+        })
+      }
+    })
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, 'tr'))
+  }, [teams])
+
+  const currentSubjectMemberKeys = useMemo(() => {
+    if (!addingForSubject) return new Set()
+    return new Set(
+      teams
+        .filter(
+          (member) =>
+            member.subject === addingForSubject &&
+            member.content_scope === contentScope &&
+            (!isSimulationScope ||
+              !educationLevel ||
+              member.education_level === educationLevel),
+        )
+        .map((member) => (member.name || '').trim().toLocaleLowerCase('tr')),
+    )
+  }, [addingForSubject, contentScope, educationLevel, isSimulationScope, teams])
 
   useEffect(() => {
     setAddingForSubject(null)
@@ -2088,6 +2133,8 @@ function TeamsView({
     })
     setDraftErrors({})
     setConfirmRemoveId(null)
+    setPresetSelection('new')
+    presetOpenRef.current = null
   }
 
   const startEditMember = (member) => {
@@ -2101,6 +2148,8 @@ function TeamsView({
     })
     setDraftErrors({})
     setConfirmRemoveId(null)
+    setPresetSelection('new')
+    presetOpenRef.current = null
   }
 
   const cancelDraft = () => {
@@ -2108,6 +2157,60 @@ function TeamsView({
     setEditingMemberId(null)
     setDraftMember(null)
     setDraftErrors({})
+    setPresetSelection('new')
+    presetOpenRef.current = null
+  }
+
+  const handlePresetChange = (value) => {
+    setPresetSelection(value)
+    if (value === 'new') {
+      setDraftMember({
+        name: '',
+        email: '',
+        role_type: TEAM_ROLE_TYPES[0].value,
+        is_lead: false,
+      })
+    } else {
+      const person = peopleDirectory.find((entry) => entry.key === value)
+      if (person) {
+        const dominantRole = Object.entries(person.roleCounts).sort(
+          (a, b) => b[1] - a[1],
+        )[0]?.[0] ?? TEAM_ROLE_TYPES[0].value
+        setDraftMember((prev) => ({
+          name: person.name,
+          email: person.email || '',
+          role_type: prev?.role_type || dominantRole,
+          is_lead: prev?.is_lead ?? false,
+        }))
+      }
+    }
+    setDraftErrors({})
+  }
+
+  const handleTogglePresetPicker = (selectId) => {
+    const selectEl = typeof document !== 'undefined' ? document.getElementById(selectId) : null
+    if (!selectEl || selectEl.disabled) return
+    if (presetOpenRef.current === selectId) {
+      presetOpenRef.current = null
+      selectEl.blur()
+      return
+    }
+    presetOpenRef.current = selectId
+    if (typeof selectEl.showPicker === 'function') {
+      try {
+        selectEl.showPicker()
+        return
+      } catch {
+        // Fallback: focus if showPicker not supported
+      }
+    }
+    selectEl.focus()
+  }
+
+  const handlePresetPickerClosed = (selectId) => {
+    if (presetOpenRef.current === selectId) {
+      presetOpenRef.current = null
+    }
   }
 
   const validateDraft = () => {
@@ -2160,8 +2263,80 @@ function TeamsView({
     setConfirmRemoveId(null)
   }
 
-  const renderMemberForm = (subjectName) => (
+  const renderMemberForm = (subjectName) => {
+    const isAdding = Boolean(addingForSubject) && !editingMemberId
+    const presetId = `team-preset-select-${addingForSubject ?? 'new'}`
+    const availablePresets = peopleDirectory.filter(
+      (person) => !currentSubjectMemberKeys.has(person.key),
+    )
+    return (
     <div className="team-member-form">
+      {isAdding ? (
+        <div className="team-preset-picker">
+          <label className="form-label small text-secondary-emphasis" htmlFor={presetId}>
+            Kayıtlı bir kişi seç veya yeni kişi ekle
+          </label>
+          <div className="input-group utility-select-group">
+            <select
+              id={presetId}
+              className="form-select"
+              value={presetSelection}
+              onChange={(event) => {
+                handlePresetPickerClosed(presetId)
+                handlePresetChange(event.target.value)
+              }}
+              onBlur={() => handlePresetPickerClosed(presetId)}
+            >
+              <option value="new">+ Yeni kişi ekle</option>
+              {availablePresets.length > 0 ? (
+                <optgroup label="Mevcut Ekip Üyeleri">
+                  {availablePresets.map((person) => {
+                    const dominantRole =
+                      Object.entries(person.roleCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? ''
+                    const roleLabel = dominantRole ? ` · ${TEAM_ROLE_LABELS[dominantRole] ?? ''}` : ''
+                    return (
+                      <option key={person.key} value={person.key}>
+                        {person.name}
+                        {person.email ? ` · ${person.email}` : ''}
+                        {roleLabel}
+                      </option>
+                    )
+                  })}
+                </optgroup>
+              ) : null}
+            </select>
+            <button
+              type="button"
+              className="input-group-text utility-select-hint"
+              title="Listeyi aç"
+              aria-label="Listeyi aç"
+              aria-controls={presetId}
+              onMouseDown={(event) => {
+                event.preventDefault()
+                handleTogglePresetPicker(presetId)
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  handleTogglePresetPicker(presetId)
+                }
+              }}
+            >
+              <span className="material-icons-outlined" aria-hidden="true">
+                ads_click
+              </span>
+            </button>
+          </div>
+          {presetSelection !== 'new' ? (
+            <small className="team-preset-hint">
+              <span className="material-icons-outlined" aria-hidden="true">
+                info
+              </span>
+              Ad Soyad ve e-posta otomatik dolduruldu. Görev veya sorumluluk bilgisini ekip için özelleştirebilirsiniz.
+            </small>
+          ) : null}
+        </div>
+      ) : null}
       <div className="row g-2">
         <div className="col-12 col-md-6">
           <label className="form-label small text-secondary-emphasis">Ad Soyad</label>
@@ -2230,7 +2405,8 @@ function TeamsView({
         </button>
       </div>
     </div>
-  )
+    )
+  }
 
   const getAvatarInitials = (name) =>
     name
