@@ -551,14 +551,48 @@ function App() {
     const isSimulationView = currentView === 'simulations'
     const activeLevelFilter = isSimulationView ? simulationLevelFilter : gameLevelFilter
     setSubjectDraft({
+      preset: 'new',
       name: '',
       code: '',
       responsible_name: '',
       supports_game: !isSimulationView,
+      supports_simulation: isSimulationView,
       supports_temel: activeLevelFilter !== 'orta_ogretim',
       supports_orta: activeLevelFilter === 'orta_ogretim' || activeLevelFilter === 'all',
     })
     setSubjectDraftErrors({})
+  }
+
+  const handleSubjectPresetChange = (value) => {
+    setSubjectDraftErrors({})
+    if (value === 'new') {
+      const isSimulationView = currentView === 'simulations'
+      const activeLevelFilter = isSimulationView ? simulationLevelFilter : gameLevelFilter
+      setSubjectDraft({
+        preset: 'new',
+        name: '',
+        code: '',
+        responsible_name: '',
+        supports_game: !isSimulationView,
+        supports_simulation: isSimulationView,
+        supports_temel: activeLevelFilter !== 'orta_ogretim',
+        supports_orta: activeLevelFilter === 'orta_ogretim' || activeLevelFilter === 'all',
+      })
+      return
+    }
+    const existing = subjects.find((subject) => subject.code === value)
+    if (!existing) return
+    const responsibleUser = users.find((user) => user.subject === existing.code && user.role === 'user')
+    setSubjectDraft({
+      preset: existing.code,
+      name: existing.name,
+      code: existing.code,
+      responsible_name: responsibleUser?.name || '',
+      supports_game: existing.catalogs?.includes('game') || false,
+      supports_simulation: existing.catalogs?.includes('simulation') || false,
+      supports_temel: existing.education_levels?.includes('temel_egitim') || false,
+      supports_orta: existing.education_levels?.includes('orta_ogretim') || false,
+    })
   }
 
   const handleCloseSubjectManager = () => {
@@ -592,6 +626,8 @@ function App() {
         .replace(/\s+/g, '_')
         .replace(/_{2,}/g, '_')
 
+    const isExistingPreset = subjectDraft.preset && subjectDraft.preset !== 'new'
+
     const catalogs = []
     const educationLevels = []
 
@@ -599,7 +635,7 @@ function App() {
       catalogs.push('game')
     }
 
-    if (subjectDraft.supports_temel || subjectDraft.supports_orta) {
+    if (subjectDraft.supports_simulation) {
       catalogs.push('simulation')
     }
 
@@ -611,28 +647,54 @@ function App() {
       educationLevels.push('orta_ogretim')
     }
 
-    if (!normalizedName) {
-      nextErrors.name = 'Ders adı zorunludur.'
-    }
+    if (!isExistingPreset) {
+      if (!normalizedName) {
+        nextErrors.name = 'Ders adı zorunludur.'
+      }
 
-    if (!normalizedCode) {
-      nextErrors.code = 'Ders kodu zorunludur.'
-    }
+      if (!normalizedCode) {
+        nextErrors.code = 'Ders kodu zorunludur.'
+      }
 
-    if (!normalizedResponsibleName) {
-      nextErrors.responsible_name = 'Varsayılan sorumlu adı zorunludur.'
+      if (!normalizedResponsibleName) {
+        nextErrors.responsible_name = 'Varsayılan sorumlu adı zorunludur.'
+      }
+
+      if (normalizedCode && subjects.some((subject) => subject.code === normalizedCode)) {
+        nextErrors.code = 'Bu ders kodu zaten kullanılıyor.'
+      }
     }
 
     if (catalogs.length === 0) {
       nextErrors.catalogs = 'En az bir kullanım alanı seçin.'
     }
 
-    if (subjects.some((subject) => subject.code === normalizedCode)) {
-      nextErrors.code = 'Bu ders kodu zaten kullanılıyor.'
+    if (educationLevels.length === 0) {
+      nextErrors.levels = 'En az bir kademe seçin.'
     }
 
     if (Object.keys(nextErrors).length > 0) {
       setSubjectDraftErrors(nextErrors)
+      return
+    }
+
+    if (isExistingPreset) {
+      setSubjects((currentSubjects) =>
+        currentSubjects.map((subject) =>
+          subject.code === subjectDraft.preset
+            ? {
+                ...subject,
+                catalogs: Array.from(new Set([...(subject.catalogs || []), ...catalogs])),
+                education_levels: Array.from(
+                  new Set([...(subject.education_levels || []), ...educationLevels]),
+                ),
+                is_active: true,
+              }
+            : subject,
+        ),
+      )
+      setSubjectDraft(null)
+      setSubjectDraftErrors({})
       return
     }
 
@@ -1070,7 +1132,9 @@ function App() {
           errors={subjectDraftErrors}
           onChange={handleSubjectDraftChange}
           onClose={handleCloseSubjectManager}
+          onPresetChange={handleSubjectPresetChange}
           onSave={handleSaveSubject}
+          subjects={subjects}
         />
       ) : null}
 
@@ -2785,7 +2849,7 @@ function GamesView({
                 >
                   {SIMULATION_LEVEL_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {option.value === 'all' ? `Tüm ${recordTypeLabel}lar` : option.label}
                     </option>
                   ))}
                 </select>
@@ -3164,7 +3228,43 @@ function GameDetailDrawer({
   )
 }
 
-function SubjectDetailDrawer({ draft, errors, onChange, onClose, onSave }) {
+function SubjectDetailDrawer({ draft, errors, onChange, onClose, onPresetChange, onSave, subjects }) {
+  const presetOpenRef = useRef(null)
+  const isExistingPreset = draft.preset && draft.preset !== 'new'
+  const presetOptions = useMemo(
+    () =>
+      [...(subjects || [])]
+        .filter((subject) => subject.is_active !== false)
+        .sort((a, b) => a.name.localeCompare(b.name, 'tr')),
+    [subjects],
+  )
+
+  const handleTogglePresetPicker = (selectId) => {
+    const selectEl = typeof document !== 'undefined' ? document.getElementById(selectId) : null
+    if (!selectEl || selectEl.disabled) return
+    if (presetOpenRef.current === selectId) {
+      presetOpenRef.current = null
+      selectEl.blur()
+      return
+    }
+    presetOpenRef.current = selectId
+    if (typeof selectEl.showPicker === 'function') {
+      try {
+        selectEl.showPicker()
+        return
+      } catch {
+        // fallback
+      }
+    }
+    selectEl.focus()
+  }
+
+  const handlePresetPickerClosed = (selectId) => {
+    if (presetOpenRef.current === selectId) {
+      presetOpenRef.current = null
+    }
+  }
+
   return (
     <>
       <div className="drawer-backdrop" onClick={onClose} aria-hidden="true" />
@@ -3181,41 +3281,102 @@ function SubjectDetailDrawer({ draft, errors, onChange, onClose, onSave }) {
         <div className="detail-drawer-body">
           <div className="drawer-section">
             <div className="drawer-section-title">
-              <h4>Ders Bilgileri</h4>
-              <p>Yeni ders tanımını ekleyin ve hangi kataloglarda kullanılacağını belirleyin.</p>
+              <h4>Ders Seçimi</h4>
+              <p>Sistemde kayıtlı bir ders seçerek kapsamını genişletebilir veya yeni bir ders oluşturabilirsiniz.</p>
             </div>
-            <div className="row g-3">
-              <FormField label="Ders Adı" error={errors.name}>
-                <input
-                  className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                  value={draft.name}
-                  onChange={(event) => onChange('name', event.target.value)}
-                  placeholder="Örnek: Coğrafya"
-                />
-              </FormField>
-              <FormField label="Ders Kodu" error={errors.code}>
-                <input
-                  className={`form-control ${errors.code ? 'is-invalid' : ''}`}
-                  value={draft.code}
-                  onChange={(event) => onChange('code', event.target.value)}
-                  placeholder="ornek: cografya"
-                />
-              </FormField>
-              <FormField label="Varsayılan Sorumlu" error={errors.responsible_name}>
-                <input
-                  className={`form-control ${errors.responsible_name ? 'is-invalid' : ''}`}
-                  value={draft.responsible_name}
-                  onChange={(event) => onChange('responsible_name', event.target.value)}
-                  placeholder="Örnek: Ayşe Yılmaz"
-                />
-              </FormField>
+            <div className="team-preset-picker">
+              <label className="form-label" htmlFor="subject-preset-select">
+                Ders Preset
+              </label>
+              <div className="input-group utility-select-group">
+                <select
+                  id="subject-preset-select"
+                  className="form-select"
+                  value={draft.preset || 'new'}
+                  onChange={(event) => onPresetChange?.(event.target.value)}
+                  onBlur={() => handlePresetPickerClosed('subject-preset-select')}
+                >
+                  <option value="new">Yeni ders ekle</option>
+                  {presetOptions.length > 0 ? (
+                    <optgroup label="Mevcut Dersler">
+                      {presetOptions.map((subject) => (
+                        <option key={subject.code} value={subject.code}>
+                          {subject.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ) : null}
+                </select>
+                <button
+                  type="button"
+                  className="input-group-text utility-select-hint"
+                  title="Dropdown'u aç / kapat"
+                  aria-label="Dropdown'u aç / kapat"
+                  aria-controls="subject-preset-select"
+                  onMouseDown={(event) => {
+                    event.preventDefault()
+                    handleTogglePresetPicker('subject-preset-select')
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      handleTogglePresetPicker('subject-preset-select')
+                    }
+                  }}
+                >
+                  <span className="material-icons-outlined" aria-hidden="true">
+                    ads_click
+                  </span>
+                </button>
+              </div>
+              {isExistingPreset ? (
+                <div className="team-preset-hint">
+                  <span className="material-icons-outlined" aria-hidden="true">info</span>
+                  Seçili ders güncelleniyor. Kullanım alanı ve kademe seçiminiz mevcut tanıma eklenecek.
+                </div>
+              ) : null}
             </div>
           </div>
+
+          {!isExistingPreset ? (
+            <div className="drawer-section">
+              <div className="drawer-section-title">
+                <h4>Ders Bilgileri</h4>
+                <p>Yeni ders tanımını ekleyin ve hangi kataloglarda kullanılacağını belirleyin.</p>
+              </div>
+              <div className="row g-3">
+                <FormField label="Ders Adı" error={errors.name}>
+                  <input
+                    className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                    value={draft.name}
+                    onChange={(event) => onChange('name', event.target.value)}
+                    placeholder="Örnek: Coğrafya"
+                  />
+                </FormField>
+                <FormField label="Ders Kodu" error={errors.code}>
+                  <input
+                    className={`form-control ${errors.code ? 'is-invalid' : ''}`}
+                    value={draft.code}
+                    onChange={(event) => onChange('code', event.target.value)}
+                    placeholder="ornek: cografya"
+                  />
+                </FormField>
+                <FormField label="Varsayılan Sorumlu" error={errors.responsible_name}>
+                  <input
+                    className={`form-control ${errors.responsible_name ? 'is-invalid' : ''}`}
+                    value={draft.responsible_name}
+                    onChange={(event) => onChange('responsible_name', event.target.value)}
+                    placeholder="Örnek: Ayşe Yılmaz"
+                  />
+                </FormField>
+              </div>
+            </div>
+          ) : null}
 
           <div className="drawer-section">
             <div className="drawer-section-title">
               <h4>Kullanım Alanları</h4>
-              <p>Dersin oyun ve simülasyon akışlarında hangi kapsamda kullanılacağını seçin.</p>
+              <p>Dersin hangi kataloglarda ve kademelerde kullanılacağını seçin.</p>
             </div>
             <div className="row g-3">
               <FormField label="Katalog Seçimi" error={errors.catalogs} fullWidth>
@@ -3233,10 +3394,23 @@ function SubjectDetailDrawer({ draft, errors, onChange, onClose, onSave }) {
                     <input
                       className="form-check-input"
                       type="checkbox"
+                      checked={draft.supports_simulation}
+                      onChange={(event) => onChange('supports_simulation', event.target.checked)}
+                    />
+                    <span>Simülasyon Kaydı İçin Kullan</span>
+                  </label>
+                </div>
+              </FormField>
+              <FormField label="Kademe Seçimi" error={errors.levels} fullWidth>
+                <div className="d-grid gap-3">
+                  <label className="completion-toggle">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
                       checked={draft.supports_temel}
                       onChange={(event) => onChange('supports_temel', event.target.checked)}
                     />
-                    <span>Temel Eğitim Simülasyonlarında Kullan</span>
+                    <span>Temel Eğitim Kapsamında Kullan</span>
                   </label>
                   <label className="completion-toggle">
                     <input
@@ -3245,7 +3419,7 @@ function SubjectDetailDrawer({ draft, errors, onChange, onClose, onSave }) {
                       checked={draft.supports_orta}
                       onChange={(event) => onChange('supports_orta', event.target.checked)}
                     />
-                    <span>Orta Öğretim Simülasyonlarında Kullan</span>
+                    <span>Orta Öğretim Kapsamında Kullan</span>
                   </label>
                 </div>
               </FormField>
@@ -3257,7 +3431,7 @@ function SubjectDetailDrawer({ draft, errors, onChange, onClose, onSave }) {
             Kapat
           </button>
           <button type="button" className="btn btn-primary" onClick={onSave}>
-            Dersi Ekle
+            {isExistingPreset ? 'Dersi Güncelle' : 'Dersi Ekle'}
           </button>
         </div>
       </aside>
