@@ -101,7 +101,8 @@
       "simulation"
     ],
     "education_levels": [
-      "temel_egitim"
+      "temel_egitim",
+      "orta_ogretim"
     ]
   }
 ]

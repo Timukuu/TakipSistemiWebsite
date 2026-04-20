@@ -81,7 +81,7 @@ function filterSubjectsByCatalog(subjects, contentType, educationLevel = '') {
       return false
     }
 
-    if (contentType !== 'simulation' || !educationLevel) {
+    if (!educationLevel) {
       return true
     }
 
@@ -90,10 +90,6 @@ function filterSubjectsByCatalog(subjects, contentType, educationLevel = '') {
 }
 
 function getClassLevelOptions(contentType, educationLevel) {
-  if (contentType !== 'simulation') {
-    return CLASS_LEVEL_OPTIONS
-  }
-
   if (educationLevel === 'temel_egitim') {
     return CLASS_LEVEL_OPTIONS.slice(0, 8)
   }
@@ -103,6 +99,37 @@ function getClassLevelOptions(contentType, educationLevel) {
   }
 
   return CLASS_LEVEL_OPTIONS
+}
+
+function getEducationLevelFromClassLevel(classLevel) {
+  if (!classLevel) {
+    return ''
+  }
+  const match = String(classLevel).match(/(\d+)/)
+  if (!match) {
+    return ''
+  }
+  const number = Number(match[1])
+  if (Number.isNaN(number)) {
+    return ''
+  }
+  if (number >= 1 && number <= 8) {
+    return 'temel_egitim'
+  }
+  if (number >= 9 && number <= 12) {
+    return 'orta_ogretim'
+  }
+  return ''
+}
+
+function resolveGameEducationLevel(game) {
+  if (!game) {
+    return ''
+  }
+  if (game.education_level) {
+    return game.education_level
+  }
+  return getEducationLevelFromClassLevel(game.class_level)
 }
 
 function App() {
@@ -121,6 +148,7 @@ function App() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [insightScope, setInsightScope] = useState('games')
   const [simulationLevelFilter, setSimulationLevelFilter] = useState('all')
+  const [gameLevelFilter, setGameLevelFilter] = useState('all')
   const [draftGame, setDraftGame] = useState(null)
   const [drawerMode, setDrawerMode] = useState('edit')
   const [formErrors, setFormErrors] = useState({})
@@ -145,10 +173,13 @@ function App() {
   const currentInsightLevel = insightScope === 'simulations_temel' ? 'temel_egitim' : insightScope === 'simulations_orta' ? 'orta_ogretim' : ''
   const contentTypeLabel = insightScope === 'games' ? 'Oyun' : 'Simülasyon'
 
-  const scopedGames = useMemo(
-    () => getScopedGames(games, roleMode, activeUser),
-    [activeUser, games, roleMode],
-  )
+  const scopedGames = useMemo(() => {
+    const gamePool =
+      gameLevelFilter === 'all'
+        ? games
+        : games.filter((game) => resolveGameEducationLevel(game) === gameLevelFilter)
+    return getScopedGames(gamePool, roleMode, activeUser)
+  }, [activeUser, gameLevelFilter, games, roleMode])
 
   const scopedSimulations = useMemo(() => {
     const simulationPool =
@@ -269,10 +300,11 @@ function App() {
     return () => document.body.classList.remove('toggled')
   }, [isSidebarCollapsed])
 
-  const gameSubjectOptions = useMemo(
-    () => (roleMode === 'admin' ? filterSubjectsByCatalog(subjects, 'game') : filterSubjectsByCatalog(subjects, 'game').filter((subject) => subject.code === activeUser?.subject)),
-    [activeUser?.subject, roleMode, subjects],
-  )
+  const gameSubjectOptions = useMemo(() => {
+    const levelForFilter = gameLevelFilter === 'all' ? '' : gameLevelFilter
+    const subjectPool = filterSubjectsByCatalog(subjects, 'game', levelForFilter)
+    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => subject.code === activeUser?.subject)
+  }, [activeUser?.subject, gameLevelFilter, roleMode, subjects])
 
   const simulationSubjectOptions = useMemo(() => {
     const levelForFilter = simulationLevelFilter === 'all' ? '' : simulationLevelFilter
@@ -285,12 +317,10 @@ function App() {
       return currentView === 'simulations' ? simulationSubjectOptions : gameSubjectOptions
     }
 
-    if (draftGame.content_type === 'simulation') {
-      const subjectPool = filterSubjectsByCatalog(subjects, 'simulation', draftGame.education_level)
-      return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => subject.code === activeUser?.subject)
-    }
-
-    return gameSubjectOptions
+    const catalogKey = draftGame.content_type === 'simulation' ? 'simulation' : 'game'
+    const levelForDraft = draftGame.education_level || ''
+    const subjectPool = filterSubjectsByCatalog(subjects, catalogKey, levelForDraft)
+    return roleMode === 'admin' ? subjectPool : subjectPool.filter((subject) => subject.code === activeUser?.subject)
   }, [activeUser?.subject, currentView, draftGame, gameSubjectOptions, roleMode, simulationSubjectOptions, subjects])
 
   const availableResponsibleUsers = useMemo(() => {
@@ -409,11 +439,26 @@ function App() {
         nextDraft.responsible_user_id = fallbackUser?.id ?? ''
       }
 
-      if (field === 'education_level' && nextDraft.content_type === 'simulation') {
-        const subjectPool = filterSubjectsByCatalog(subjects, 'simulation', value)
-        const fallbackSubject = subjectPool.find((subject) => roleMode === 'admin' || subject.code === activeUser?.subject)
+      if (field === 'education_level') {
+        const catalogKey = nextDraft.content_type === 'simulation' ? 'simulation' : 'game'
+        const subjectPool = filterSubjectsByCatalog(subjects, catalogKey, value)
+        const fallbackSubject =
+          subjectPool.find((subject) => subject.code === nextDraft.subject) ??
+          subjectPool.find((subject) => roleMode === 'admin' || subject.code === activeUser?.subject)
         nextDraft.subject = fallbackSubject?.code ?? ''
         nextDraft.responsible_user_id = nonAdminUsers.find((user) => user.subject === nextDraft.subject)?.id ?? ''
+        const currentClassLevel = nextDraft.class_level ?? ''
+        const classLevelLevel = getEducationLevelFromClassLevel(currentClassLevel)
+        if (value && classLevelLevel && classLevelLevel !== value) {
+          nextDraft.class_level = ''
+        }
+      }
+
+      if (field === 'class_level' && value) {
+        const derivedLevel = getEducationLevelFromClassLevel(value)
+        if (derivedLevel) {
+          nextDraft.education_level = derivedLevel
+        }
       }
 
       if (field === 'is_completed' && value) {
@@ -452,8 +497,10 @@ function App() {
 
   const handleCreateGame = () => {
     const isSimulationView = currentView === 'simulations'
-    const nextLevel = simulationLevelFilter === 'all' ? 'temel_egitim' : simulationLevelFilter
-    const availableSubjects = isSimulationView ? filterSubjectsByCatalog(subjects, 'simulation', nextLevel) : gameSubjectOptions
+    const catalogKey = isSimulationView ? 'simulation' : 'game'
+    const activeLevelFilter = isSimulationView ? simulationLevelFilter : gameLevelFilter
+    const nextLevel = activeLevelFilter === 'all' ? 'temel_egitim' : activeLevelFilter
+    const availableSubjects = filterSubjectsByCatalog(subjects, catalogKey, nextLevel)
     const subjectCode = roleMode === 'user' ? activeUser?.subject : availableSubjects[0]?.code
     const responsibleUserId =
       roleMode === 'user'
@@ -464,7 +511,7 @@ function App() {
     setDraftGame({
       ...createEmptyGame(subjectCode, responsibleUserId),
       content_type: isSimulationView ? 'simulation' : 'game',
-      education_level: isSimulationView ? nextLevel : '',
+      education_level: nextLevel,
     })
     setFormErrors({})
     setSaveMessage('')
@@ -490,13 +537,15 @@ function App() {
   }
 
   const handleOpenSubjectManager = () => {
+    const isSimulationView = currentView === 'simulations'
+    const activeLevelFilter = isSimulationView ? simulationLevelFilter : gameLevelFilter
     setSubjectDraft({
       name: '',
       code: '',
       responsible_name: '',
-      supports_game: currentView !== 'simulations',
-      supports_temel: currentView === 'simulations' ? simulationLevelFilter !== 'orta_ogretim' : false,
-      supports_orta: currentView === 'simulations' ? simulationLevelFilter === 'orta_ogretim' : false,
+      supports_game: !isSimulationView,
+      supports_temel: activeLevelFilter !== 'orta_ogretim',
+      supports_orta: activeLevelFilter === 'orta_ogretim' || activeLevelFilter === 'all',
     })
     setSubjectDraftErrors({})
   }
@@ -964,14 +1013,17 @@ function App() {
               canManageSubjects={roleMode === 'admin'}
               filteredGames={filteredGames}
               formFilters={filters}
+              levelFilterValue={gameLevelFilter}
               onCreateGame={handleCreateGame}
               onFilterChange={handleFilterChange}
+              onLevelFilterChange={setGameLevelFilter}
               onOpenGame={handleOpenGame}
               onOpenPlayer={handleOpenPlayer}
               onOpenSubjectManager={handleOpenSubjectManager}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
               recordTypeLabel="Oyun"
               roleMode={roleMode}
+              showLevelFilter
               subjectOptions={gameSubjectOptions}
               title="Oyun Listesi"
               users={users}
@@ -2793,22 +2845,20 @@ function GameDetailDrawer({
                   ))}
                 </select>
               </FormField>
-              {draftGame.content_type === 'simulation' ? (
-                <FormField label="Kademe" error={formErrors.education_level}>
-                  <select
-                    className={`form-select ${formErrors.education_level ? 'is-invalid' : ''}`}
-                    value={draftGame.education_level ?? ''}
-                    onChange={(event) => onChange('education_level', event.target.value)}
-                  >
-                    <option value="">Kademe Seçin</option>
-                    {SIMULATION_LEVEL_OPTIONS.filter((option) => option.value !== 'all').map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-              ) : null}
+              <FormField label="Kademe" error={formErrors.education_level}>
+                <select
+                  className={`form-select ${formErrors.education_level ? 'is-invalid' : ''}`}
+                  value={draftGame.education_level ?? ''}
+                  onChange={(event) => onChange('education_level', event.target.value)}
+                >
+                  <option value="">Kademe Seçin</option>
+                  {SIMULATION_LEVEL_OPTIONS.filter((option) => option.value !== 'all').map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
               <FormField label="Sınıf" error={formErrors.class_level}>
                 <select className={`form-select ${formErrors.class_level ? 'is-invalid' : ''}`} value={draftGame.class_level ?? ''} onChange={(event) => onChange('class_level', event.target.value)}>
                   <option value="">Sınıf Seçin</option>
