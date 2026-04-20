@@ -1689,3 +1689,322 @@ a {
     align-items: stretch;
   }
 }
+
+/* ===== Ekip Listesi ===== */
+.team-stat-card {
+  background: linear-gradient(180deg, #ffffff, #f4f7ff);
+}
+
+.team-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(30, 58, 138, 0.15);
+}
+
+.team-stat-icon .material-icons-outlined {
+  font-size: 1.5rem;
+}
+
+.team-role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.team-role-chip .material-icons-outlined {
+  font-size: 1rem;
+}
+
+.team-role-chip.role-alan_uzmani {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
+.team-role-chip.role-grafik_tasarim {
+  background: rgba(236, 72, 153, 0.12);
+  color: #be185d;
+  border-color: rgba(236, 72, 153, 0.22);
+}
+
+.team-role-chip.role-unity {
+  background: rgba(99, 102, 241, 0.12);
+  color: #4338ca;
+  border-color: rgba(99, 102, 241, 0.22);
+}
+
+.team-subject-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.team-subject-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.team-subject-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.3);
+}
+
+.team-subject-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  box-shadow: 0 8px 18px rgba(59, 130, 246, 0.28);
+}
+
+.team-subject-chip.subject-matematik {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+}
+
+.team-subject-chip.subject-fen_bilimleri {
+  background: linear-gradient(135deg, #10b981, #0ea5e9);
+}
+
+.team-subject-chip.subject-sosyal_bilgiler {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+}
+
+.team-subject-chip.subject-turkce {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+}
+
+.team-subject-chip.subject-fizik {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+
+.team-subject-chip.subject-kimya {
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+}
+
+.team-subject-chip.subject-biyoloji {
+  background: linear-gradient(135deg, #84cc16, #22c55e);
+}
+
+.team-subject-chip.subject-hayat_bilgisi {
+  background: linear-gradient(135deg, #f472b6, #f59e0b);
+}
+
+.team-role-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.team-role-group {
+  border-radius: 14px;
+  padding: 0.85rem;
+  background: rgba(241, 245, 249, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.team-role-group.role-alan_uzmani {
+  background: rgba(16, 185, 129, 0.07);
+  border-color: rgba(16, 185, 129, 0.18);
+}
+
+.team-role-group.role-grafik_tasarim {
+  background: rgba(236, 72, 153, 0.07);
+  border-color: rgba(236, 72, 153, 0.18);
+}
+
+.team-role-group.role-unity {
+  background: rgba(99, 102, 241, 0.07);
+  border-color: rgba(99, 102, 241, 0.18);
+}
+
+.team-role-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #0f172a;
+  margin-bottom: 0.6rem;
+}
+
+.team-role-header .material-icons-outlined {
+  font-size: 1.15rem;
+  color: #334155;
+}
+
+.team-role-count {
+  margin-left: auto;
+  min-width: 1.5rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: rgba(15, 23, 42, 0.08);
+  color: #1e293b;
+  text-align: center;
+}
+
+.team-member-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.team-member-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.team-member-item:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.08);
+}
+
+.team-member-item.is-lead {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(180deg, #ffffff, rgba(16, 185, 129, 0.06));
+}
+
+.team-member-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.team-member-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.team-member-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  color: #0f172a;
+}
+
+.team-member-lead-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #047857;
+  background: rgba(16, 185, 129, 0.14);
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.team-member-lead-pill .material-icons-outlined {
+  font-size: 0.9rem;
+}
+
+.team-member-actions {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.team-member-actions .btn {
+  --bs-btn-padding-y: 0.3rem;
+  --bs-btn-padding-x: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.team-member-actions .btn .material-icons-outlined {
+  font-size: 1rem;
+}
+
+.team-member-form-wrapper {
+  width: 100%;
+  background: rgba(241, 245, 249, 0.65);
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(59, 130, 246, 0.35);
+}
+
+.team-member-form-wrapper-new {
+  margin-bottom: 1rem;
+}
+
+.team-member-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.team-empty-state {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.85);
+}
+
+.team-empty-state .material-icons-outlined {
+  font-size: 1.5rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 767.98px) {
+  .team-subject-header {
+    flex-wrap: wrap;
+  }
+
+  .team-member-item {
+    flex-wrap: wrap;
+  }
+
+  .team-member-actions {
+    margin-left: auto;
+  }
+}
+
+

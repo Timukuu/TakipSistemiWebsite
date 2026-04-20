@@ -7,9 +7,22 @@ export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Ana Panel', icon: 'dashboard' },
   { id: 'games', label: 'Oyun Listesi', icon: 'table_rows' },
   { id: 'simulations', label: 'Simülasyon Listesi', icon: 'science' },
+  { id: 'teams', label: 'Ekip Listesi', icon: 'groups' },
 ]
 
 export const REPORTS_NAV_ITEM = { id: 'reports', label: 'Raporlar', icon: 'pie_chart' }
+
+export const TEAM_ROLE_TYPES = [
+  { value: 'alan_uzmani', label: 'Alan Uzmanı', icon: 'menu_book' },
+  { value: 'grafik_tasarim', label: 'Grafik Tasarım', icon: 'brush' },
+  { value: 'unity', label: 'Unity', icon: 'code' },
+]
+
+export const TEAM_ROLE_LABELS = {
+  alan_uzmani: 'Alan Uzmanı',
+  grafik_tasarim: 'Grafik Tasarım',
+  unity: 'Unity',
+}
 
 export const STAGE_ORDER = [
   'scenario_status',

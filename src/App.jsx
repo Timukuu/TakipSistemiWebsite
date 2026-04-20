@@ -3,6 +3,7 @@ import ReactApexChart from 'react-apexcharts'
 import gamesData from '../data/games.json'
 import simulationsData from '../data/simulations.json'
 import subjectsData from '../data/subjects.json'
+import teamsData from '../data/teams.json'
 import usersData from '../data/users.json'
 import {
   CLASS_LEVEL_OPTIONS,
@@ -19,6 +20,7 @@ import {
   STATUS_FILTER_OPTIONS,
   STATUS_LABELS,
   SUBJECT_LABELS,
+  TEAM_ROLE_TYPES,
 } from './constants'
 import {
   buildDashboardSummary,
@@ -110,6 +112,7 @@ function App() {
   const [simulations, setSimulations] = useState(simulationsData.map((simulation) => ({ ...simulation, content_type: 'simulation' })))
   const [subjects, setSubjects] = useState(subjectsData)
   const [users, setUsers] = useState(usersData)
+  const [teams, setTeams] = useState(teamsData)
   const [currentView, setCurrentView] = useState('dashboard')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -315,6 +318,44 @@ function App() {
   const handleInsightScopeChange = (nextScope) => {
     setInsightScope(nextScope)
     handleCloseGame()
+  }
+
+  const generateTeamMemberId = () =>
+    `team_member_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
+
+  const handleAddTeamMember = (newMember) => {
+    const memberWithId = {
+      id: newMember.id || generateTeamMemberId(),
+      name: (newMember.name || '').trim(),
+      subject: newMember.subject,
+      role_type: newMember.role_type,
+      is_lead: Boolean(newMember.is_lead),
+      content_scope: newMember.content_scope || 'game',
+      education_level: newMember.education_level ?? null,
+      email: newMember.email?.trim() || null,
+      user_id: newMember.user_id ?? null,
+      created_at: new Date().toISOString(),
+    }
+    setTeams((previous) => [...previous, memberWithId])
+  }
+
+  const handleUpdateTeamMember = (memberId, updates) => {
+    setTeams((previous) =>
+      previous.map((member) =>
+        member.id === memberId
+          ? {
+              ...member,
+              ...updates,
+              name: (updates.name ?? member.name).trim(),
+              email: (updates.email ?? member.email)?.trim() || null,
+            }
+          : member,
+      ),
+    )
+  }
+
+  const handleRemoveTeamMember = (memberId) => {
+    setTeams((previous) => previous.filter((member) => member.id !== memberId))
   }
 
   const openSelectIdRef = useRef(null)
@@ -691,7 +732,9 @@ function App() {
                   ? 'Raporlar'
                   : currentView === 'simulations'
                     ? 'Simülasyon Listesi'
-                    : 'Oyun Listesi'}
+                    : currentView === 'teams'
+                      ? 'Ekip Listesi'
+                      : 'Oyun Listesi'}
             </div>
             <div className="page-breadcrumb-content">
               <span className="crumb-pill">
@@ -767,7 +810,7 @@ function App() {
                     ))}
                   </select>
                 </div>
-                {currentView === 'dashboard' || currentView === 'reports' ? (
+                {currentView === 'dashboard' || currentView === 'reports' || currentView === 'teams' ? (
                   <div className="col-12 col-xl-3">
                     <label className="form-label" htmlFor="utility-insight-scope-select">
                       İçerik Kapsamı
@@ -884,6 +927,17 @@ function App() {
               contentTypeLabel={contentTypeLabel}
               reportsSnapshot={reportsSnapshot}
               roleMode={roleMode}
+            />
+          ) : currentView === 'teams' ? (
+            <TeamsView
+              activeUser={activeUser}
+              insightScope={insightScope}
+              onAddMember={handleAddTeamMember}
+              onRemoveMember={handleRemoveTeamMember}
+              onUpdateMember={handleUpdateTeamMember}
+              roleMode={roleMode}
+              subjects={subjects}
+              teams={teams}
             />
           ) : currentView === 'simulations' ? (
             <GamesView
@@ -1858,6 +1912,537 @@ function ReportsView({ contentTypeLabel, reportsSnapshot, roleMode }) {
         </div>
       </section>
 
+    </>
+  )
+}
+
+function TeamsView({
+  activeUser,
+  insightScope,
+  onAddMember,
+  onRemoveMember,
+  onUpdateMember,
+  roleMode,
+  subjects,
+  teams,
+}) {
+  const contentScope = insightScope === 'games' ? 'game' : 'simulation'
+  const educationLevel =
+    insightScope === 'simulations_temel'
+      ? 'temel_egitim'
+      : insightScope === 'simulations_orta'
+        ? 'orta_ogretim'
+        : null
+
+  const isSimulationScope = contentScope === 'simulation'
+  const scopeLabel = isSimulationScope
+    ? educationLevel === 'temel_egitim'
+      ? 'Temel Eğitim Simülasyon'
+      : 'Orta Öğretim Simülasyon'
+    : 'Oyun'
+
+  const visibleSubjects = useMemo(() => {
+    const pool = subjects.filter((subject) => {
+      if (!subject.is_active) return false
+      if (!subject.catalogs?.includes(contentScope)) return false
+      if (isSimulationScope && educationLevel) {
+        return subject.education_levels?.includes(educationLevel)
+      }
+      return true
+    })
+    if (roleMode === 'user' && activeUser) {
+      return pool.filter((subject) => subject.code === activeUser.subject)
+    }
+    return pool
+  }, [activeUser, contentScope, educationLevel, isSimulationScope, roleMode, subjects])
+
+  const filteredTeams = useMemo(() => {
+    return teams.filter((member) => {
+      if (member.content_scope !== contentScope) return false
+      if (isSimulationScope && educationLevel && member.education_level !== educationLevel) {
+        return false
+      }
+      return true
+    })
+  }, [contentScope, educationLevel, isSimulationScope, teams])
+
+  const visibleSubjectCodes = useMemo(() => visibleSubjects.map((subject) => subject.code), [visibleSubjects])
+  const scopedTeamMembers = useMemo(
+    () => filteredTeams.filter((member) => visibleSubjectCodes.includes(member.subject)),
+    [filteredTeams, visibleSubjectCodes],
+  )
+
+  const teamsBySubject = useMemo(() => {
+    const map = new Map()
+    visibleSubjects.forEach((subject) => {
+      map.set(subject.code, {
+        subject,
+        members: scopedTeamMembers.filter((member) => member.subject === subject.code),
+      })
+    })
+    return Array.from(map.values())
+  }, [scopedTeamMembers, visibleSubjects])
+
+  const summaryCounts = useMemo(() => {
+    const roleCounts = TEAM_ROLE_TYPES.reduce((acc, role) => {
+      acc[role.value] = 0
+      return acc
+    }, {})
+    scopedTeamMembers.forEach((member) => {
+      if (roleCounts[member.role_type] !== undefined) {
+        roleCounts[member.role_type] += 1
+      }
+    })
+    const leadCount = scopedTeamMembers.filter((member) => member.is_lead).length
+    return {
+      total: scopedTeamMembers.length,
+      lead: leadCount,
+      roleCounts,
+      subjectCount: teamsBySubject.filter((entry) => entry.members.length > 0).length,
+    }
+  }, [scopedTeamMembers, teamsBySubject])
+
+  const canEdit = roleMode === 'admin'
+
+  const [addingForSubject, setAddingForSubject] = useState(null)
+  const [editingMemberId, setEditingMemberId] = useState(null)
+  const [draftMember, setDraftMember] = useState(null)
+  const [draftErrors, setDraftErrors] = useState({})
+  const [confirmRemoveId, setConfirmRemoveId] = useState(null)
+
+  useEffect(() => {
+    setAddingForSubject(null)
+    setEditingMemberId(null)
+    setDraftMember(null)
+    setDraftErrors({})
+    setConfirmRemoveId(null)
+  }, [contentScope, educationLevel, roleMode, activeUser?.id])
+
+  const startAddMember = (subjectCode) => {
+    setEditingMemberId(null)
+    setAddingForSubject(subjectCode)
+    setDraftMember({
+      name: '',
+      email: '',
+      role_type: TEAM_ROLE_TYPES[0].value,
+      is_lead: false,
+    })
+    setDraftErrors({})
+    setConfirmRemoveId(null)
+  }
+
+  const startEditMember = (member) => {
+    setAddingForSubject(null)
+    setEditingMemberId(member.id)
+    setDraftMember({
+      name: member.name,
+      email: member.email || '',
+      role_type: member.role_type,
+      is_lead: member.is_lead,
+    })
+    setDraftErrors({})
+    setConfirmRemoveId(null)
+  }
+
+  const cancelDraft = () => {
+    setAddingForSubject(null)
+    setEditingMemberId(null)
+    setDraftMember(null)
+    setDraftErrors({})
+  }
+
+  const validateDraft = () => {
+    const errors = {}
+    if (!draftMember?.name?.trim()) {
+      errors.name = 'Ad soyad zorunlu.'
+    }
+    if (!draftMember?.role_type) {
+      errors.role_type = 'Bir görev seçin.'
+    }
+    if (draftMember?.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draftMember.email.trim())) {
+      errors.email = 'Geçerli bir e-posta girin.'
+    }
+    return errors
+  }
+
+  const handleSubmitDraft = () => {
+    const errors = validateDraft()
+    if (Object.keys(errors).length > 0) {
+      setDraftErrors(errors)
+      return
+    }
+    if (addingForSubject) {
+      onAddMember({
+        name: draftMember.name,
+        email: draftMember.email,
+        role_type: draftMember.role_type,
+        is_lead: draftMember.is_lead,
+        subject: addingForSubject,
+        content_scope: contentScope,
+        education_level: educationLevel,
+      })
+    } else if (editingMemberId) {
+      onUpdateMember(editingMemberId, {
+        name: draftMember.name,
+        email: draftMember.email,
+        role_type: draftMember.role_type,
+        is_lead: draftMember.is_lead,
+      })
+    }
+    cancelDraft()
+  }
+
+  const handleConfirmRemove = (memberId) => {
+    setConfirmRemoveId(memberId)
+  }
+
+  const executeRemove = (memberId) => {
+    onRemoveMember(memberId)
+    setConfirmRemoveId(null)
+  }
+
+  const renderMemberForm = (subjectName) => (
+    <div className="team-member-form">
+      <div className="row g-2">
+        <div className="col-12 col-md-6">
+          <label className="form-label small text-secondary-emphasis">Ad Soyad</label>
+          <input
+            className={`form-control ${draftErrors.name ? 'is-invalid' : ''}`}
+            value={draftMember?.name ?? ''}
+            onChange={(event) => setDraftMember((prev) => ({ ...prev, name: event.target.value }))}
+            placeholder="Örn: Ayşe Yılmaz"
+          />
+          {draftErrors.name ? <div className="invalid-feedback d-block">{draftErrors.name}</div> : null}
+        </div>
+        <div className="col-12 col-md-6">
+          <label className="form-label small text-secondary-emphasis">E-posta (opsiyonel)</label>
+          <input
+            type="email"
+            className={`form-control ${draftErrors.email ? 'is-invalid' : ''}`}
+            value={draftMember?.email ?? ''}
+            onChange={(event) => setDraftMember((prev) => ({ ...prev, email: event.target.value }))}
+            placeholder="ornek@meb.gov.tr"
+          />
+          {draftErrors.email ? <div className="invalid-feedback d-block">{draftErrors.email}</div> : null}
+        </div>
+        <div className="col-12 col-md-6">
+          <label className="form-label small text-secondary-emphasis">Görev</label>
+          <select
+            className={`form-select ${draftErrors.role_type ? 'is-invalid' : ''}`}
+            value={draftMember?.role_type ?? ''}
+            onChange={(event) => setDraftMember((prev) => ({ ...prev, role_type: event.target.value }))}
+          >
+            {TEAM_ROLE_TYPES.map((role) => (
+              <option key={role.value} value={role.value}>
+                {role.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="col-12 col-md-6 d-flex align-items-end">
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={`team-lead-${editingMemberId ?? addingForSubject}`}
+              checked={Boolean(draftMember?.is_lead)}
+              onChange={(event) =>
+                setDraftMember((prev) => ({ ...prev, is_lead: event.target.checked }))
+              }
+            />
+            <label
+              className="form-check-label"
+              htmlFor={`team-lead-${editingMemberId ?? addingForSubject}`}
+            >
+              Ders Sorumlusu olarak işaretle
+            </label>
+          </div>
+        </div>
+      </div>
+      <div className="team-member-form-actions">
+        <button type="button" className="btn btn-link text-decoration-none" onClick={cancelDraft}>
+          Vazgeç
+        </button>
+        <button type="button" className="btn btn-primary" onClick={handleSubmitDraft}>
+          <span className="material-icons-outlined me-1" aria-hidden="true">
+            {editingMemberId ? 'save' : 'person_add'}
+          </span>
+          {editingMemberId ? 'Güncelle' : `${subjectName} ekibine ekle`}
+        </button>
+      </div>
+    </div>
+  )
+
+  const getAvatarInitials = (name) =>
+    name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('') || '?'
+
+  return (
+    <>
+      <section className="row g-3 mb-4">
+        <div className="col-12 col-xl-3 col-md-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100 team-stat-card">
+            <div className="card-body d-flex align-items-center gap-3">
+              <div className="team-stat-icon bg-grd-primary">
+                <span className="material-icons-outlined">groups</span>
+              </div>
+              <div>
+                <p className="text-secondary-emphasis mb-1 small">Toplam Üye</p>
+                <h4 className="mb-0">{summaryCounts.total}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-3 col-md-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100 team-stat-card">
+            <div className="card-body d-flex align-items-center gap-3">
+              <div className="team-stat-icon bg-grd-info">
+                <span className="material-icons-outlined">workspace_premium</span>
+              </div>
+              <div>
+                <p className="text-secondary-emphasis mb-1 small">Ders Sorumlusu</p>
+                <h4 className="mb-0">{summaryCounts.lead}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-3 col-md-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100 team-stat-card">
+            <div className="card-body d-flex align-items-center gap-3">
+              <div className="team-stat-icon bg-grd-success">
+                <span className="material-icons-outlined">library_books</span>
+              </div>
+              <div>
+                <p className="text-secondary-emphasis mb-1 small">Aktif Ders Ekibi</p>
+                <h4 className="mb-0">{summaryCounts.subjectCount}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-xl-3 col-md-6">
+          <div className="card rounded-4 border-0 shadow-sm h-100 team-stat-card">
+            <div className="card-body">
+              <p className="text-secondary-emphasis mb-2 small">Görev Dağılımı</p>
+              <div className="d-flex flex-wrap gap-2">
+                {TEAM_ROLE_TYPES.map((role) => (
+                  <span key={role.value} className={`team-role-chip role-${role.value}`}>
+                    <span className="material-icons-outlined" aria-hidden="true">
+                      {role.icon}
+                    </span>
+                    {role.label}: {summaryCounts.roleCounts[role.value] ?? 0}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="card rounded-4 border-0 shadow-sm mb-4">
+        <div className="card-body">
+          <div className="section-heading d-flex flex-wrap align-items-start justify-content-between gap-3">
+            <div>
+              <h3>{scopeLabel} Ekipleri</h3>
+              <p>
+                {isSimulationScope
+                  ? 'Simülasyon ekipleri için veri güncellemesi sonraki aşamada yapılacak.'
+                  : 'Derslere göre ekip üyelerini görüntüleyebilir, yeni kişi ekleyebilir veya çıkartabilirsiniz.'}
+              </p>
+            </div>
+            {!canEdit ? (
+              <span className="badge rounded-pill bg-light text-secondary">
+                Yalnızca Yönetici görünümünde düzenleme yapılabilir
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      {teamsBySubject.length === 0 ? (
+        <section className="card rounded-4 border-0 shadow-sm mb-4">
+          <div className="card-body text-center py-5">
+            <span className="material-icons-outlined display-5 text-secondary-emphasis mb-2">groups_off</span>
+            <h5 className="mb-1">Bu kapsam için görüntülenebilir ders bulunmuyor</h5>
+            <p className="text-secondary-emphasis mb-0">
+              Farklı bir İçerik Kapsamı veya Aktif Görünüm seçerek ekip listelerini görüntüleyebilirsiniz.
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      <div className="row g-4 mb-4">
+        {teamsBySubject.map(({ subject, members }) => {
+          const membersByRole = TEAM_ROLE_TYPES.map((role) => ({
+            role,
+            list: members.filter((member) => member.role_type === role.value),
+          }))
+          const leads = members.filter((member) => member.is_lead)
+
+          return (
+            <div className="col-12 col-xl-6" key={subject.code}>
+              <div className="card rounded-4 border-0 shadow-sm h-100 team-subject-card">
+                <div className="card-body">
+                  <header className="team-subject-header">
+                    <div>
+                      <span className={`team-subject-chip subject-${subject.code}`}>
+                        {subject.name.charAt(0)}
+                      </span>
+                    </div>
+                    <div className="flex-grow-1">
+                      <h4 className="mb-0">{subject.name}</h4>
+                      <small className="text-secondary-emphasis">
+                        {members.length} üye · {leads.length} ders sorumlusu
+                      </small>
+                    </div>
+                    {canEdit ? (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-primary"
+                        onClick={() => startAddMember(subject.code)}
+                        disabled={addingForSubject === subject.code}
+                      >
+                        <span className="material-icons-outlined me-1" aria-hidden="true">
+                          person_add
+                        </span>
+                        Kişi Ekle
+                      </button>
+                    ) : null}
+                  </header>
+
+                  {addingForSubject === subject.code ? (
+                    <div className="team-member-form-wrapper team-member-form-wrapper-new">
+                      {renderMemberForm(subject.name)}
+                    </div>
+                  ) : null}
+
+                  {members.length === 0 ? (
+                    <div className="team-empty-state">
+                      <span className="material-icons-outlined" aria-hidden="true">
+                        person_off
+                      </span>
+                      <div>
+                        <strong>Henüz üye yok</strong>
+                        <p className="mb-0 text-secondary-emphasis small">
+                          {canEdit
+                            ? 'Bu ders için ilk ekip üyesini ekleyebilirsiniz.'
+                            : 'Yönetici görünümüne geçerek üye ekleyebilirsiniz.'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="team-role-stack">
+                      {membersByRole.map(({ role, list }) =>
+                        list.length === 0 ? null : (
+                          <div key={role.value} className={`team-role-group role-${role.value}`}>
+                            <div className="team-role-header">
+                              <span className="material-icons-outlined" aria-hidden="true">
+                                {role.icon}
+                              </span>
+                              <span>{role.label}</span>
+                              <span className="team-role-count">{list.length}</span>
+                            </div>
+                            <ul className="team-member-list">
+                              {list.map((member) => {
+                                const isEditing = editingMemberId === member.id
+                                const isConfirming = confirmRemoveId === member.id
+                                return (
+                                  <li key={member.id} className={`team-member-item${member.is_lead ? ' is-lead' : ''}`}>
+                                    {isEditing ? (
+                                      <div className="team-member-form-wrapper">
+                                        {renderMemberForm(subject.name)}
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <div className="team-member-avatar" aria-hidden="true">
+                                          {getAvatarInitials(member.name)}
+                                        </div>
+                                        <div className="team-member-copy">
+                                          <div className="team-member-name">
+                                            <strong>{member.name}</strong>
+                                            {member.is_lead ? (
+                                              <span className="team-member-lead-pill">
+                                                <span className="material-icons-outlined" aria-hidden="true">
+                                                  workspace_premium
+                                                </span>
+                                                Ders Sorumlusu
+                                              </span>
+                                            ) : null}
+                                          </div>
+                                          <small className="text-secondary-emphasis">
+                                            {member.email ?? 'E-posta kayıtlı değil'}
+                                          </small>
+                                        </div>
+                                        {canEdit ? (
+                                          <div className="team-member-actions">
+                                            {isConfirming ? (
+                                              <>
+                                                <button
+                                                  type="button"
+                                                  className="btn btn-sm btn-outline-secondary"
+                                                  onClick={() => setConfirmRemoveId(null)}
+                                                >
+                                                  Vazgeç
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  className="btn btn-sm btn-danger"
+                                                  onClick={() => executeRemove(member.id)}
+                                                >
+                                                  <span className="material-icons-outlined me-1" aria-hidden="true">
+                                                    person_remove
+                                                  </span>
+                                                  Çıkart
+                                                </button>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <button
+                                                  type="button"
+                                                  className="btn btn-sm btn-outline-primary"
+                                                  onClick={() => startEditMember(member)}
+                                                  title="Düzenle"
+                                                  aria-label="Düzenle"
+                                                >
+                                                  <span className="material-icons-outlined" aria-hidden="true">
+                                                    edit
+                                                  </span>
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  className="btn btn-sm btn-outline-danger"
+                                                  onClick={() => handleConfirmRemove(member.id)}
+                                                  title="Çıkart"
+                                                  aria-label="Çıkart"
+                                                >
+                                                  <span className="material-icons-outlined" aria-hidden="true">
+                                                    person_remove
+                                                  </span>
+                                                </button>
+                                              </>
+                                            )}
+                                          </div>
+                                        ) : null}
+                                      </>
+                                    )}
+                                  </li>
+                                )
+                              })}
+                            </ul>
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </>
   )
 }
