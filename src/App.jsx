@@ -216,6 +216,12 @@ function App() {
     })
   }, [accountActiveUser])
 
+  useEffect(() => {
+    if (nonAdminUsers.length === 0) return
+    if (nonAdminUsers.some((user) => user.id === selectedUserId)) return
+    setSelectedUserId(nonAdminUsers[0].id)
+  }, [nonAdminUsers, selectedUserId])
+
   const canManageSubjects = isAdminAccount && roleMode === 'admin'
   const canManageContent = isAdminAccount
     ? roleMode === 'admin'
@@ -1040,7 +1046,7 @@ function App() {
                   </div>
                 </div>
                 ) : null}
-                {showUtilityToggles ? (
+                {showUtilityToggles && roleMode !== 'admin' ? (
                 <div className="col-12 col-xl-3">
                   <label className="form-label">Mock Kullanıcı</label>
                   <select
@@ -3646,4 +3652,3 @@ function FormField({ children, error, fullWidth = false, label }) {
 }
 
 export default App
-

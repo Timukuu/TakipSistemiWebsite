@@ -2335,6 +2335,17 @@ a {
   color: #64748b;
 }
 
+.login-input input:-webkit-autofill,
+.login-input input:-webkit-autofill:hover,
+.login-input input:-webkit-autofill:focus,
+.login-input input:-webkit-autofill:active {
+  -webkit-text-fill-color: #f8fafc;
+  caret-color: #f8fafc;
+  -webkit-box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.75) inset;
+  box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.75) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
 .login-toggle-visibility {
   background: transparent;
   border: 0;
@@ -2435,12 +2446,12 @@ a {
 .header-account-name {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #f8fbff;
 }
 
 .header-account-role {
   font-size: 0.7rem;
-  color: #64748b;
+  color: #dbeafe;
   letter-spacing: 0.02em;
 }
 
