@@ -1980,7 +1980,14 @@ function TeamsView({
         members: scopedTeamMembers.filter((member) => member.subject === subject.code),
       })
     })
-    return Array.from(map.values())
+    const entries = Array.from(map.values())
+    entries.sort((a, b) => {
+      if (a.members.length > 0 && b.members.length === 0) return -1
+      if (a.members.length === 0 && b.members.length > 0) return 1
+      if (a.members.length !== b.members.length) return b.members.length - a.members.length
+      return a.subject.name.localeCompare(b.subject.name, 'tr')
+    })
+    return entries
   }, [scopedTeamMembers, visibleSubjects])
 
   const summaryCounts = useMemo(() => {
@@ -2242,7 +2249,7 @@ function TeamsView({
         </div>
       </section>
 
-      <section className="card rounded-4 border-0 shadow-sm mb-4">
+      <section className="card rounded-4 border-0 shadow-sm mb-4 teams-info-card">
         <div className="card-body">
           <div className="section-heading d-flex flex-wrap align-items-start justify-content-between gap-3">
             <div>
@@ -2263,9 +2270,9 @@ function TeamsView({
       </section>
 
       {teamsBySubject.length === 0 ? (
-        <section className="card rounded-4 border-0 shadow-sm mb-4">
+        <section className="card rounded-4 border-0 shadow-sm mb-4 teams-info-card">
           <div className="card-body text-center py-5">
-            <span className="material-icons-outlined display-5 text-secondary-emphasis mb-2">groups_off</span>
+            <span className="material-icons-outlined display-5 text-white-50 mb-2">groups_off</span>
             <h5 className="mb-1">Bu kapsam için görüntülenebilir ders bulunmuyor</h5>
             <p className="text-secondary-emphasis mb-0">
               Farklı bir İçerik Kapsamı veya Aktif Görünüm seçerek ekip listelerini görüntüleyebilirsiniz.
