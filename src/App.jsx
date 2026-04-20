@@ -171,8 +171,14 @@ function App() {
     })
   }, [subjects])
 
-  const currentInsightLevel = insightScope === 'simulations_temel' ? 'temel_egitim' : insightScope === 'simulations_orta' ? 'orta_ogretim' : ''
-  const contentTypeLabel = insightScope === 'games' ? 'Oyun' : 'Simülasyon'
+  const currentInsightContentType = insightScope.startsWith('simulations') ? 'simulation' : 'game'
+  const currentInsightLevel =
+    insightScope === 'games_temel' || insightScope === 'simulations_temel'
+      ? 'temel_egitim'
+      : insightScope === 'games_orta' || insightScope === 'simulations_orta'
+        ? 'orta_ogretim'
+        : ''
+  const contentTypeLabel = currentInsightContentType === 'game' ? 'Oyun' : 'Simülasyon'
 
   const scopedGames = useMemo(() => {
     const gamePool =
@@ -193,12 +199,16 @@ function App() {
 
   const scopedInsightRecords = useMemo(() => {
     const sourceRecords =
-      insightScope === 'games'
-        ? games
-        : simulations.filter((simulation) => simulation.education_level === currentInsightLevel)
+      currentInsightContentType === 'game'
+        ? currentInsightLevel
+          ? games.filter((game) => resolveGameEducationLevel(game) === currentInsightLevel)
+          : games
+        : currentInsightLevel
+          ? simulations.filter((simulation) => simulation.education_level === currentInsightLevel)
+          : simulations
 
     return getScopedGames(sourceRecords, roleMode, activeUser)
-  }, [activeUser, currentInsightLevel, games, insightScope, roleMode, simulations])
+  }, [activeUser, currentInsightContentType, currentInsightLevel, games, roleMode, simulations])
 
   const effectiveFilters = useMemo(
     () => getEffectiveFilters(filters, roleMode, activeUser),
@@ -216,8 +226,8 @@ function App() {
   )
 
   const insightSubjects = useMemo(
-    () => filterSubjectsByCatalog(subjects, insightScope === 'games' ? 'game' : 'simulation', currentInsightLevel),
-    [currentInsightLevel, insightScope, subjects],
+    () => filterSubjectsByCatalog(subjects, currentInsightContentType, currentInsightLevel),
+    [currentInsightContentType, currentInsightLevel, subjects],
   )
 
   const dashboardSummary = useMemo(
@@ -1979,26 +1989,27 @@ function TeamsView({
   subjects,
   teams,
 }) {
-  const contentScope = insightScope === 'games' ? 'game' : 'simulation'
+  const contentScope = insightScope.startsWith('simulations') ? 'simulation' : 'game'
   const educationLevel =
-    insightScope === 'simulations_temel'
+    insightScope === 'games_temel' || insightScope === 'simulations_temel'
       ? 'temel_egitim'
-      : insightScope === 'simulations_orta'
+      : insightScope === 'games_orta' || insightScope === 'simulations_orta'
         ? 'orta_ogretim'
         : null
 
   const isSimulationScope = contentScope === 'simulation'
-  const scopeLabel = isSimulationScope
-    ? educationLevel === 'temel_egitim'
-      ? 'Temel Eğitim Simülasyon'
-      : 'Orta Öğretim Simülasyon'
-    : 'Oyun'
+  const contentLabel = isSimulationScope ? 'Simülasyon' : 'Oyun'
+  const scopeLabel = educationLevel === 'temel_egitim'
+    ? `Temel Eğitim ${contentLabel}`
+    : educationLevel === 'orta_ogretim'
+      ? `Orta Öğretim ${contentLabel}`
+      : `Genel ${contentLabel}`
 
   const visibleSubjects = useMemo(() => {
     const pool = subjects.filter((subject) => {
       if (!subject.is_active) return false
       if (!subject.catalogs?.includes(contentScope)) return false
-      if (isSimulationScope && educationLevel) {
+      if (educationLevel) {
         return subject.education_levels?.includes(educationLevel)
       }
       return true
@@ -2007,17 +2018,17 @@ function TeamsView({
       return pool.filter((subject) => subject.code === activeUser.subject)
     }
     return pool
-  }, [activeUser, contentScope, educationLevel, isSimulationScope, roleMode, subjects])
+  }, [activeUser, contentScope, educationLevel, roleMode, subjects])
 
   const filteredTeams = useMemo(() => {
     return teams.filter((member) => {
       if (member.content_scope !== contentScope) return false
-      if (isSimulationScope && educationLevel && member.education_level !== educationLevel) {
+      if (educationLevel && member.education_level && member.education_level !== educationLevel) {
         return false
       }
       return true
     })
-  }, [contentScope, educationLevel, isSimulationScope, teams])
+  }, [contentScope, educationLevel, teams])
 
   const visibleSubjectCodes = useMemo(() => visibleSubjects.map((subject) => subject.code), [visibleSubjects])
   const scopedTeamMembers = useMemo(
@@ -2106,13 +2117,13 @@ function TeamsView({
           (member) =>
             member.subject === addingForSubject &&
             member.content_scope === contentScope &&
-            (!isSimulationScope ||
-              !educationLevel ||
+            (!educationLevel ||
+              !member.education_level ||
               member.education_level === educationLevel),
         )
         .map((member) => (member.name || '').trim().toLocaleLowerCase('tr')),
     )
-  }, [addingForSubject, contentScope, educationLevel, isSimulationScope, teams])
+  }, [addingForSubject, contentScope, educationLevel, teams])
 
   useEffect(() => {
     setAddingForSubject(null)
@@ -2485,7 +2496,9 @@ function TeamsView({
               <p>
                 {isSimulationScope
                   ? 'Simülasyon ekipleri için veri güncellemesi sonraki aşamada yapılacak.'
-                  : 'Derslere göre ekip üyelerini görüntüleyebilir, yeni kişi ekleyebilir veya çıkartabilirsiniz.'}
+                  : educationLevel
+                    ? `${scopeLabel} kapsamındaki derslere göre ekip üyelerini görüntüleyebilir, yeni kişi ekleyebilir veya çıkartabilirsiniz.`
+                    : 'Derslere göre ekip üyelerini görüntüleyebilir, yeni kişi ekleyebilir veya çıkartabilirsiniz.'}
               </p>
             </div>
             {!canEdit ? (

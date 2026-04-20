@@ -87,7 +87,10 @@ export const DEFAULT_FILTERS = {
 }
 
 export const INSIGHT_SCOPE_OPTIONS = [
-  { value: 'games', label: 'Oyun' },
+  { value: 'games', label: 'Genel Oyun' },
+  { value: 'games_temel', label: 'Temel Eğitim Oyun' },
+  { value: 'games_orta', label: 'Orta Öğretim Oyun' },
+  { value: 'simulations', label: 'Genel Simülasyon' },
   { value: 'simulations_temel', label: 'Temel Eğitim Simülasyon' },
   { value: 'simulations_orta', label: 'Orta Öğretim Simülasyon' },
 ]
