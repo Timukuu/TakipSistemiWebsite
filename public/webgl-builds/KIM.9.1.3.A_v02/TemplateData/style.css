@@ -1,0 +1,93 @@
+/* =======================================================================
+   Responsive Unity WebGL + MEB yükleyici
+   --------------------------------------------------------------------- */
+
+/* === GENEL ============================================================== */
+:root{
+  --main-red:#d40000;
+  --spinner-size:clamp(40px,8vw,80px);   /* 40‑80 px arası                */
+  --bar-width:clamp(120px,25vw,280px);   /* Unity bar’ı kullanırsanız     */
+  --bar-height:clamp(14px,2.5vw,26px);
+  --font-small:clamp(12px,2.2vw,18px);
+  --font-medium:clamp(14px,2.4vw,22px);
+}
+
+html,body{padding:0;margin:0;height:100%}
+body{display:flex;justify-content:center;align-items:center;background:#231F20;overflow:hidden}
+
+/* === UNITY CANVAS ====================================================== */
+#unity-container{
+  position:relative;max-width:100vw;max-height:100vh;
+}
+#unity-canvas{
+  width:100%;height:auto;              /* Aspect ratio: Unity belirler   */
+  background:#231F20;
+}
+
+/* === MEB LOADER ======================================================== */
+#meb-loading-overlay{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.2rem;background:#fff;z-index:9999;text-align:center;
+}
+
+/* ► LOGO – spinner’ın biraz üzerinde ----------------------------------- */
+#meb-logo{
+  margin-top:7%;                       /* üst boşluk (yüzdelik)          */
+  width:clamp(120px,60vw,640px);height:auto;
+}
+
+/* ► SPINNER BLOKU ------------------------------------------------------- */
+#meb-spinner-container{
+  width:var(--spinner-size);
+  aspect-ratio:1;                      /* eni = boyu  ⇒ daire korunur    */
+  flex-shrink:0;                       /* daralırken sıkıştırma          */
+  position:relative;
+}
+
+.spinner{
+  width:100%;height:100%;
+  aspect-ratio:1;                      /* Safari’de ekstra güvence       */
+  box-sizing:border-box;               /* border ölçü hatası önleme      */
+  border:5px solid #f3f3f3;
+  border-top:5px solid var(--main-red);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+/* ► YÜZDE METNİ --------------------------------------------------------- */
+.percentage-text{
+  position:absolute;inset:0;
+  display:flex;justify-content:center;align-items:center;
+  font:700 var(--font-small) Arial;color:var(--main-red);
+  pointer-events:none;
+}
+
+/* ► “Yükleniyor…” ------------------------------------------------------- */
+#meb-loading-text{
+  font:600 var(--font-medium) Arial;color:#333;
+  animation:blink 1.6s infinite;
+}
+
+/* ► EBA FOOTER ---------------------------------------------------------- */
+#meb-footer{
+  margin-top:auto;width:100%;max-width:100vw;padding:0.6rem 0;
+  background:#dc0d15;display:flex;justify-content:center;align-items:center;
+}
+#meb-footer img{width:clamp(90px,28vw,180px);height:auto}
+
+/* === UNITY VARSAYILAN BAR’I GİZLE ===================================== */
+#unity-loading-bar,#unity-progress-bar-empty,
+#unity-progress-bar-full,#unity-logo{display:none!important}
+
+/* === TAM EKRAN BUTONU ================================================== */
+#unity-fullscreen-button{
+  position:fixed;bottom:20px;right:20px;z-index:10;display:none;
+  width:40px;height:40px;
+  background:url('TemplateData/fullscreen-button.png') center/contain no-repeat;
+  border:none;background-color:transparent;cursor:pointer;
+}
+
+/* === ANİMASYONLAR ===================================================== */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
