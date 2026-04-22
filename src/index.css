@@ -1886,6 +1886,20 @@ a {
   border-bottom: 1px dashed rgba(148, 163, 184, 0.22);
 }
 
+.team-subject-header .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.team-subject-header .btn .material-icons-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .team-subject-chip {
   display: inline-flex;
   align-items: center;
